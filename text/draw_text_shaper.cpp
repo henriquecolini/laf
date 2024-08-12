@@ -173,6 +173,14 @@ gfx::Rect draw_text(os::Surface* surface,
   else {
     blob = TextBlob::MakeWithShaper(fontMgr, font, text);
     if (surface) {
+      // Paint background
+      if (gfx::geta(bg) > 0) {
+        os::Paint paint;
+        paint.color(bg);
+        paint.style(os::Paint::Fill);
+        surface->drawRect(gfx::RectF(blob->bounds()).offset(x, y), paint);
+      }
+
       os::Paint paint;
       paint.color(fg);
       draw_text(
