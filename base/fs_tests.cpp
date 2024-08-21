@@ -41,7 +41,13 @@ TEST(FS, FixPathSeparators)
   const std::string sep(1, path_separator);
   EXPECT_EQ(sep, fix_path_separators("/"));
   EXPECT_EQ(sep, fix_path_separators("///"));
+  EXPECT_EQ(sep+"a"+sep, fix_path_separators("//a/"));
   EXPECT_EQ("a"+sep+"b"+sep, fix_path_separators("a///b/"));
+
+#if LAF_WINDOWS
+  EXPECT_EQ("\\\\hostname\\a\\b", fix_path_separators("\\\\hostname\\\\a/b"));
+  EXPECT_EQ("\\\\hostname\\b", fix_path_separators("\\\\/hostname\\b"));
+#endif
 }
 
 TEST(FS, MakeDirectory)
@@ -281,6 +287,11 @@ TEST(FS, NormalizePath)
   EXPECT_EQ(".."+sep+"..", normalize_path("../a/../.."));
   EXPECT_EQ("..", normalize_path("a/../.."));
   EXPECT_EQ(sep+"b", normalize_path("/a/../b"));
+
+#if LAF_WINDOWS
+  EXPECT_EQ("\\\\hostname\\b", normalize_path("\\\\hostname\\\\a/../b"));
+  EXPECT_EQ("\\\\hostname\\b\\a", normalize_path("\\\\/hostname\\b/a"));
+#endif
 }
 
 #if COMPARE_WITH_STD_FS

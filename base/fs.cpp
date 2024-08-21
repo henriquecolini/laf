@@ -249,7 +249,22 @@ std::string fix_path_separators(const std::string& filename)
 {
   std::string result;
   result.reserve(filename.size());
-  for (auto chr : filename) {
+
+  size_t i = 0;
+
+#if LAF_WINDOWS
+  // Network paths can start with two backslashes
+  if (filename.size() >= 2 &&
+      filename[0] == path_separator && // Check for equality to backslash (\),
+      filename[1] == path_separator) { // no for is_path_separator()
+    result.push_back(path_separator);
+    result.push_back(path_separator);
+    i += 2;
+  }
+#endif
+
+  for (; i<filename.size(); ++i) {
+    const auto chr = filename[i];
     if (is_path_separator(chr)) {
       if (result.empty() || !is_path_separator(result.back()))
         result.push_back(path_separator);
@@ -272,8 +287,20 @@ std::string normalize_path(const std::string& _path)
   std::string path = fix_path_separators(_path);
 
   std::string fn;
-  if (!path.empty() && path[0] == path_separator)
+  fn.reserve(path.size());
+
+  // Add the first separator for absolute paths.
+  if (!path.empty() && path[0] == path_separator) {
     fn.push_back(path_separator);
+
+#if LAF_WINDOWS
+    // Add the second separator for network paths.
+    if (path.size() >= 2 &&
+        path[1] == path_separator) {
+      fn.push_back(path_separator);
+    }
+#endif
+  }
 
   std::vector<std::string> parts;
   split_string(path, parts, path_separators);
