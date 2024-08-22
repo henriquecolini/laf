@@ -172,7 +172,7 @@ gfx::Rect draw_text(os::Surface* surface,
   }
   else {
     blob = TextBlob::MakeWithShaper(fontMgr, font, text);
-    if (surface) {
+    if (surface && blob) {
       // Paint background
       if (gfx::geta(bg) > 0) {
         os::Paint paint;
