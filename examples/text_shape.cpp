@@ -109,7 +109,8 @@ void draw_window(Window* window,
     p.color(gfx::rgba(240, 240, 240));
     surface->drawRect(box, p);
     p.color(gfx::rgba(64, 64, 64));
-    draw_text(surface, edit.blob, textPos, &p);
+    if (edit.blob)
+      draw_text(surface, edit.blob, textPos, &p);
     surface->restore();
   }
 
@@ -117,7 +118,8 @@ void draw_window(Window* window,
   p.color(gfx::rgba(240, 240, 240));
   if (!box.isEmpty())
     static_cast<SkiaSurface*>(surface)->canvas().clipRect(to_skia(box), SkClipOp::kDifference);
-  draw_text(surface, edit.blob, textPos, &p);
+  if (edit.blob)
+    draw_text(surface, edit.blob, textPos, &p);
   surface->restore();
 
   // Draw current char
