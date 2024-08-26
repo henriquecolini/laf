@@ -119,6 +119,11 @@ gfx::RectF FreeTypeFont::getGlyphBounds(glyph_t glyph) const
   return gfx::RectF();        // TODO impl
 }
 
+float FreeTypeFont::getGlyphAdvance(glyph_t glyph) const
+{
+  return 0;                     // TODO impl
+}
+
 base::Ref<FreeTypeFont> FreeTypeFont::LoadFont(
   ft::Lib& lib,
   const char* filename,

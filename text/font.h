@@ -52,6 +52,7 @@ namespace text {
 
     virtual glyph_t codePointToGlyph(codepoint_t cp) const = 0;
     virtual gfx::RectF getGlyphBounds(glyph_t glyph) const = 0;
+    virtual float getGlyphAdvance(glyph_t glyph) const = 0;
 
     Font* fallback() const {
       return m_fallback;

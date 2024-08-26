@@ -68,9 +68,10 @@ gfx::RectF TextBlob::RunInfo::getGlyphBounds(const size_t i) const
 
   // Get bounds of whitespace from a space glyph.
   if (bounds.isEmpty()) {
-    auto glyph = font->getGlyphBounds(' ');
-    bounds.w = glyph.w - glyph.x;
-    bounds.h = glyph.h - glyph.y;
+    FontMetrics metrics;
+    font->metrics(&metrics);
+    bounds.w = font->getGlyphAdvance(font->codePointToGlyph(' '));
+    bounds.h = std::abs(metrics.capHeight);
   }
 
   ASSERT(!bounds.isEmpty());

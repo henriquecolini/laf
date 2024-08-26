@@ -35,6 +35,7 @@ namespace text {
 
     glyph_t codePointToGlyph(codepoint_t codepoint) const override;
     gfx::RectF getGlyphBounds(glyph_t glyph) const override;
+    float getGlyphAdvance(glyph_t glyph) const override;
 
     SkFont& skFont() { return m_skFont; }
 

@@ -105,6 +105,10 @@ public:
     return getCharBounds(128);
   }
 
+  float getGlyphAdvance(glyph_t glyph) const override {
+    return getGlyphBounds(glyph).w;
+  }
+
   gfx::RectF getGlyphBoundsOnSheet(glyph_t glyph) const {
     if (glyph >= 0 && glyph < (int)m_glyphs.size())
       return m_glyphs[glyph];

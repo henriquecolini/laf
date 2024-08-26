@@ -129,4 +129,11 @@ gfx::RectF SkiaFont::getGlyphBounds(glyph_t glyph) const
   return os::from_skia(bounds);
 }
 
+float SkiaFont::getGlyphAdvance(glyph_t glyph) const
+{
+  float widths = 0.0f;
+  m_skFont.getWidthsBounds(&glyph, 1, &widths, nullptr, nullptr);
+  return widths;
+}
+
 } // namespace text

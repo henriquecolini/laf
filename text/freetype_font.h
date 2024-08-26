@@ -41,6 +41,7 @@ namespace text {
 
     glyph_t codePointToGlyph(codepoint_t cp) const override;
     gfx::RectF getGlyphBounds(glyph_t glyph) const override;
+    float getGlyphAdvance(glyph_t glyph) const override;
 
     Face& face() { return m_face; }
 

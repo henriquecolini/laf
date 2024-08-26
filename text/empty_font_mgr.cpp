@@ -39,6 +39,7 @@ public:
 
   glyph_t codePointToGlyph(codepoint_t) const override { return false; }
   gfx::RectF getGlyphBounds(glyph_t) const override { return gfx::RectF(); }
+  float getGlyphAdvance(glyph_t glyph) const override { return 0; }
 };
 
 class EmptyFontStyleSet : public FontStyleSet {
