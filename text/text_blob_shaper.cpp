@@ -23,7 +23,8 @@ TextBlobRef TextBlob::MakeWithShaper(
   const FontMgrRef& fontMgr,
   const FontRef& font,
   const std::string& text,
-  TextBlob::RunHandler* handler)
+  TextBlob::RunHandler* handler,
+  const TextBlob::ShaperFeatures features)
 {
   ASSERT(font);
   switch (font->type()) {
@@ -37,7 +38,8 @@ TextBlobRef TextBlob::MakeWithShaper(
 
 #if LAF_SKIA
     case FontType::Native:
-      return SkiaTextBlob::MakeWithShaper(fontMgr, font, text, handler);
+      return SkiaTextBlob::MakeWithShaper(
+        fontMgr, font, text, handler, features);
 #endif
 
     default:

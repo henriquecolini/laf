@@ -57,6 +57,11 @@ namespace text {
       gfx::RectF getGlyphBounds(size_t i) const;
     };
 
+    struct ShaperFeatures {
+      bool ligatures = true;
+      ShaperFeatures() { }
+    };
+
     class RunHandler {
     public:
       virtual ~RunHandler() = default;
@@ -94,7 +99,8 @@ namespace text {
       const FontMgrRef& fontMgr,
       const FontRef& font,
       const std::string& text,
-      RunHandler* handler = nullptr);
+      RunHandler* handler = nullptr,
+      const ShaperFeatures features = {});
 
   private:
     gfx::RectF m_bounds;

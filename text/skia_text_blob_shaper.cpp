@@ -23,6 +23,7 @@
 #include "modules/skshaper/include/SkShaper.h"
 
 #include <limits>
+#include <vector>
 
 namespace text {
 
@@ -125,7 +126,8 @@ TextBlobRef SkiaTextBlob::MakeWithShaper(
   const FontMgrRef& fontMgr,
   const FontRef& font,
   const std::string& text,
-  TextBlob::RunHandler* handler)
+  TextBlob::RunHandler* handler,
+  const TextBlob::ShaperFeatures features)
 {
   ASSERT(font);
   ASSERT(font->type() == FontType::Native);
@@ -150,12 +152,19 @@ TextBlobRef SkiaTextBlob::MakeWithShaper(
                                                     SkFontStyle::Normal(),
                                                     &*languageRun);
 
+    std::vector<SkShaper::Feature> ft;
+    if (!features.ligatures) {
+      ft.emplace_back(SkShaper::Feature{
+        SkSetFourByteTag('l', 'i', 'g', 'a'), 0, 0, text.size() });
+    }
+
     shaper->shape(text.c_str(),
                   text.size(),
                   *fontRun,
                   *bidiRun,
                   *scriptRun,
                   *languageRun,
+                  ft.data(), ft.size(),
                   std::numeric_limits<float>::max(),
                   &shaperHandler);
 

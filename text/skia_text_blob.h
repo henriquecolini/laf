@@ -32,7 +32,8 @@ public:
     const FontMgrRef& fontMgr,
     const FontRef& font,
     const std::string& text,
-    TextBlob::RunHandler* handler);
+    TextBlob::RunHandler* handler,
+    const TextBlob::ShaperFeatures features);
 
 private:
   sk_sp<SkTextBlob> m_skTextBlob;
