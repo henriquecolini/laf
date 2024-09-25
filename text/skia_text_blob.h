@@ -33,7 +33,7 @@ public:
     const FontRef& font,
     const std::string& text,
     TextBlob::RunHandler* handler,
-    const TextBlob::ShaperFeatures features);
+    const ShaperFeatures features);
 
 private:
   sk_sp<SkTextBlob> m_skTextBlob;

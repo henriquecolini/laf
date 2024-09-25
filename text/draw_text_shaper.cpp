@@ -162,16 +162,17 @@ gfx::Rect draw_text(os::Surface* surface,
                     const std::string& text,
                     gfx::Color fg, gfx::Color bg,
                     int x, int y,
-                    DrawTextDelegate* delegate)
+                    DrawTextDelegate* delegate,
+                    ShaperFeatures features)
 {
   TextBlobRef blob;
   if (delegate) {
     AdapterBuilder handler(surface, text, fg, bg,
                            gfx::PointF(x, y), delegate);
-    blob = TextBlob::MakeWithShaper(fontMgr, font, text, &handler);
+    blob = TextBlob::MakeWithShaper(fontMgr, font, text, &handler, features);
   }
   else {
-    blob = TextBlob::MakeWithShaper(fontMgr, font, text);
+    blob = TextBlob::MakeWithShaper(fontMgr, font, text, nullptr, features);
     if (surface && blob) {
       // Paint background
       if (gfx::geta(bg) > 0) {

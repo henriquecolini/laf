@@ -127,7 +127,7 @@ TextBlobRef SkiaTextBlob::MakeWithShaper(
   const FontRef& font,
   const std::string& text,
   TextBlob::RunHandler* handler,
-  const TextBlob::ShaperFeatures features)
+  const ShaperFeatures features)
 {
   ASSERT(font);
   ASSERT(font->type() == FontType::Native);

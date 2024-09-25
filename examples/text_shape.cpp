@@ -65,7 +65,7 @@ struct TextEdit {
   void makeBlob(FontMgrRef& fontMgr, FontRef& font) {
     // Create a blob without ligatures (to edit char by char)
     BoxBuilder handler;
-    TextBlob::ShaperFeatures features;
+    ShaperFeatures features;
     features.ligatures = false;
     blob = TextBlob::MakeWithShaper(fontMgr, font, text, &handler, features);
     boxes = handler.boxes();

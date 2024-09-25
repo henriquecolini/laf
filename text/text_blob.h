@@ -11,7 +11,7 @@
 #include "gfx/point.h"
 #include "gfx/rect.h"
 #include "text/fwd.h"
-#include "text/text_blob.h"
+#include "text/shaper_features.h"
 
 #include <functional>
 #include <string>
@@ -55,11 +55,6 @@ namespace text {
 
       // It can be used in RunHandler and in RunVisitor.
       gfx::RectF getGlyphBounds(size_t i) const;
-    };
-
-    struct ShaperFeatures {
-      bool ligatures = true;
-      ShaperFeatures() { }
     };
 
     class RunHandler {

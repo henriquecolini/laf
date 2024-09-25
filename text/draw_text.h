@@ -17,6 +17,7 @@
 #include "text/font.h"
 #include "text/font_mgr.h"
 #include "text/fwd.h"
+#include "text/shaper_features.h"
 
 namespace os {
   class Surface;
@@ -62,7 +63,8 @@ namespace text {
     const std::string& text,
     gfx::Color fg, gfx::Color bg,
     int x, int y,
-    DrawTextDelegate* delegate);
+    DrawTextDelegate* delegate = nullptr,
+    ShaperFeatures features = {});
 
   void draw_text(
     os::Surface* surface,

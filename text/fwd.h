@@ -17,6 +17,8 @@ namespace text {
   using codepoint_t = base::codepoint_t;
   using glyph_t = base::glyph_t;
 
+  class DrawTextDelegate;
+
   class Font;
   using FontRef = base::Ref<Font>;
 
@@ -30,6 +32,8 @@ namespace text {
 
   class FontStyleSet;
   using FontStyleSetRef = base::Ref<FontStyleSet>;
+
+  struct ShaperFeatures;
 
   class TextBlob;
   using TextBlobRef = base::Ref<TextBlob>;

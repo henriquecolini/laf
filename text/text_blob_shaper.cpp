@@ -24,7 +24,7 @@ TextBlobRef TextBlob::MakeWithShaper(
   const FontRef& font,
   const std::string& text,
   TextBlob::RunHandler* handler,
-  const TextBlob::ShaperFeatures features)
+  const ShaperFeatures features)
 {
   ASSERT(font);
   switch (font->type()) {
