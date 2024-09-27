@@ -251,3 +251,21 @@ add_library(skshaper INTERFACE)
 target_link_libraries(skshaper INTERFACE ${SKSHAPER_LIBRARY} skunicode)
 target_compile_definitions(skshaper INTERFACE
   SK_SHAPER_HARFBUZZ_AVAILABLE)
+
+# icudtl.dat file is needed by skunicode
+if(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  set(SKIA_ICUDATA_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+else()
+  set(SKIA_ICUDATA_OUTPUT_DIR ${CMAKE_BINARY_DIR})
+endif()
+
+set(SKIA_ICUDATA_FILE ${SKIA_DIR}/third_party/externals/icu/flutter/icudtl.dat)
+set(SKIA_ICUDATA_FILE_OUTPUT ${SKIA_ICUDATA_OUTPUT_DIR}/icudtl.dat)
+add_custom_command(
+  OUTPUT ${SKIA_ICUDATA_FILE_OUTPUT}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SKIA_ICUDATA_FILE} ${SKIA_ICUDATA_FILE_OUTPUT}
+  MAIN_DEPENDENCY ${SKIA_ICUDATA_FILE}
+  DEPENDS ${GEN_DEP})
+add_custom_target(skia_copy_icudata
+  DEPENDS ${SKIA_ICUDATA_FILE_OUTPUT})
+add_dependencies(skunicode skia_copy_icudata)
