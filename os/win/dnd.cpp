@@ -240,6 +240,9 @@ SurfaceRef DragDataProviderWin::getImage()
 
         if (ext == "BMP")
           return os::decode_bmp(content, content.size());
+
+        if (ext == "WEBP")
+          return os::decode_webp(content, content.size());
       }
     }
   }
@@ -303,7 +306,8 @@ bool DragDataProviderWin::contains(DragDataItemType type)
                 std::string ext = base::get_file_extension(filename);
                 std::transform(ext.begin(), ext.end(), ext.begin(), ::toupper);
                 if (ext == "PNG" || ext == "JPG" || ext == "JPEG" ||
-                    ext == "JPE" || ext == "GIF" || ext == "BMP")
+                    ext == "JPE" || ext == "GIF" || ext == "BMP" ||
+                    ext == "WEBP")
                   return true;
               }
             }

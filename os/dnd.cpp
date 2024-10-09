@@ -19,6 +19,7 @@ static DecoderFunc g_decode_png = default_decode_png;
 static DecoderFunc g_decode_jpg = default_decode_jpg;
 static DecoderFunc g_decode_bmp = default_decode_bmp;
 static DecoderFunc g_decode_gif = default_decode_gif;
+static DecoderFunc g_decode_webp = nullptr;
 
 void set_decode_png(DecoderFunc func)
 {
@@ -40,6 +41,11 @@ void set_decode_gif(DecoderFunc func)
   g_decode_gif = func;
 }
 
+void set_decode_webp(DecoderFunc func)
+{
+  g_decode_webp = func;
+}
+
 SurfaceRef decode_png(const uint8_t* buf, const uint32_t len)
 {
   return g_decode_png(buf, len);
@@ -58,6 +64,11 @@ SurfaceRef decode_bmp(const uint8_t* buf, const uint32_t len)
 SurfaceRef decode_gif(const uint8_t* buf, const uint32_t len)
 {
   return g_decode_gif(buf, len);
+}
+
+SurfaceRef decode_webp(const uint8_t* buf, const uint32_t len)
+{
+  return g_decode_webp ? g_decode_webp(buf, len) : nullptr;
 }
 
 } // namespace os

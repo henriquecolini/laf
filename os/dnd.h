@@ -36,11 +36,13 @@ namespace os {
   void set_decode_jpg(DecoderFunc func);
   void set_decode_bmp(DecoderFunc func);
   void set_decode_gif(DecoderFunc func);
+  void set_decode_webp(DecoderFunc func);
 
   SurfaceRef decode_png(const uint8_t* buf, uint32_t len);
   SurfaceRef decode_jpg(const uint8_t* buf, uint32_t len);
   SurfaceRef decode_bmp(const uint8_t* buf, uint32_t len);
   SurfaceRef decode_gif(const uint8_t* buf, uint32_t len);
+  SurfaceRef decode_webp(const uint8_t* buf, uint32_t len);
 #endif
   // Operations that can be supported by source and target windows in a drag
   // and drop operation.
