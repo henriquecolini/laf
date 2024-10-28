@@ -67,8 +67,8 @@ public:
   }
 
   void setTabletOptions(const TabletOptions& options) override {
-#if LAF_WINDOWS
     SkiaSystemBase::setTabletOptions(options);
+#if LAF_WINDOWS
     if (SkiaWindow* window = dynamic_cast<SkiaWindow*>(defaultWindow())) {
       // TODO notify all windows
       window->onTabletOptionsChange();
