@@ -270,7 +270,6 @@ bool DragDataProviderWin::contains(DragDataItemType type)
   UINT urlFormat = RegisterClipboardFormat(CFSTR_INETURL);
   UINT pngFormat = RegisterClipboardFormat(L"PNG");
   UINT fileDescriptorFormat = RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR);
-  char name[101];
   FORMATETC fmt;
   while (formats->Next(1, &fmt, nullptr) == S_OK) {
     switch (fmt.cfFormat) {
