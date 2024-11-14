@@ -11,16 +11,6 @@
 
 #include "os/common/system.h"
 
-#if LAF_WINDOWS
-  #include "os/win/native_dialogs.h"
-#elif LAF_MACOS
-  #include "os/osx/native_dialogs.h"
-#elif LAF_LINUX
-  #include "os/x11/native_dialogs.h"
-#else
-  #include "os/native_dialogs.h"
-#endif
-
 #if CLIP_ENABLE_IMAGE
   #include "clip/clip.h"
 #endif
@@ -89,20 +79,6 @@ CommonSystem::~CommonSystem()
 void CommonSystem::errorMessage(const char* msg)
 {
   fputs(msg, stderr);
-}
-
-NativeDialogs* CommonSystem::nativeDialogs()
-{
-  if (!m_nativeDialogs) {
-#if LAF_WINDOWS
-    m_nativeDialogs = Ref<NativeDialogs>(new NativeDialogsWin);
-#elif LAF_MACOS
-    m_nativeDialogs = Ref<NativeDialogs>(new NativeDialogsOSX);
-#elif LAF_LINUX
-    m_nativeDialogs = Ref<NativeDialogs>(new NativeDialogsX11);
-#endif
-  }
-  return m_nativeDialogs.get();
 }
 
 KeyModifiers CommonSystem::keyModifiers()

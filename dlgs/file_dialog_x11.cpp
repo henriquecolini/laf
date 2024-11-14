@@ -1,5 +1,5 @@
-// LAF OS Library
-// Copyright (C) 2023  Igara Studio S.A.
+// laf-dlgs
+// Copyright (C) 2023-2024  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -8,20 +8,20 @@
 #include "config.h"
 #endif
 
-#include "os/x11/native_dialogs.h"
+#include "dlgs/file_dialog.h"
 
 #include "base/file_handle.h"
 #include "base/fs.h"
 #include "base/log.h"
 #include "base/replace_string.h"
 #include "base/split_string.h"
-#include "os/common/file_dialog.h"
-#include "os/x11/x11.h"
+
+#include <X11/Xlib.h>
 
 #include <cstdio>              // popen/pclose()
 #include <cstring>
 
-namespace os {
+namespace dlgs {
 
 static std::string quote_for_shell(const std::string& in)
 {
@@ -44,7 +44,7 @@ static std::string quote_for_shell(const std::string& in)
 }
 
 // Uses zenity or kdialog to display the native file dialog.
-class FileDialogX11 : public CommonFileDialog {
+class FileDialogX11 : public FileDialog {
 public:
   enum class CLITool {
     Unknown,
@@ -53,7 +53,8 @@ public:
     KDialog,                    // Used for KDE
   };
 
-  FileDialogX11() {
+  FileDialogX11(const Spec& spec) {
+    m_display = (Display*)spec.x11display;
   }
 
   std::string fileName() override {
@@ -89,9 +90,8 @@ public:
     }
   }
 
-  Result show(Window* parent) override {
+  Result show(void* parent) override {
     switch (s_cliTool) {
-
       case CLITool::Zenity: {
         std::string cmd;
         cmd = "zenity --file-selection --title " + quote_for_shell(m_title);
@@ -142,7 +142,9 @@ public:
 
         // Flushes pending events to the X Server, so that input does not
         // get stuck when opening a pipe to zenity.
-        XFlush(X11::instance()->display());
+        if (m_display)
+          XFlush(m_display);
+
         // Here we run the command and get a handle to read its
         // stdout.
         FILE* f = popen(cmd.c_str(), "r");
@@ -222,6 +224,7 @@ public:
   }
 
 private:
+  Display* m_display = nullptr;
   std::string m_filename;
   base::paths m_filenames;
   std::string m_initialDir;
@@ -231,15 +234,11 @@ private:
 FileDialogX11::CLITool FileDialogX11::s_cliTool =
   FileDialogX11::CLITool::Unknown;
 
-NativeDialogsX11::NativeDialogsX11()
-{
-}
-
-FileDialogRef NativeDialogsX11::makeFileDialog()
+FileDialogRef FileDialog::makeX11(const Spec& spec)
 {
   if (FileDialogX11::AreCLIToolsAvailable())
-    return make_ref<FileDialogX11>();
+    return base::make_ref<FileDialogX11>(spec);
   return nullptr;
 }
 
-} // namespace os
+}  // namespace dlgs

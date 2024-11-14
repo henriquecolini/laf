@@ -74,19 +74,7 @@ namespace os {
     virtual void setEnabled(bool state) = 0;
     virtual void setChecked(bool state) = 0;
     virtual void setShortcut(const Shortcut& shortcut) = 0;
-
-    // Indicates that this is the "Edit" menu with the
-    // Cut/Copy/Paste/etc. commands. Used by the laf implementation on
-    // macOS to switch the "Edit" menu completely with a standard
-    // implementation when necessary.
-    //
-    // If you are going to use a native file dialog (os::FileDialog),
-    // you will need to specify a standard "Edit" menu to make the
-    // Undo/Redo/Cut/Copy/Paste/etc. keyboard shortcuts work.
-    //
-    // The specific details are not beautiful or important, but you
-    // can search for "OSXEditMenuHack" to know why this is needed.
-    virtual void setAsStandardEditMenuItem() = 0;
+    virtual void* nativeHandle() = 0;
   };
 
   class Menu : public RefCount {

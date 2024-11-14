@@ -37,7 +37,6 @@ namespace os {
   class EventQueue;
   class Logger;
   class Menus;
-  class NativeDialogs;
   class Surface;
   class System;
 
@@ -145,7 +144,6 @@ namespace os {
     // Sub-interfaces
     virtual Logger* logger() = 0;
     virtual Menus* menus() = 0;
-    virtual NativeDialogs* nativeDialogs() = 0;
     virtual EventQueue* eventQueue() = 0;
 
     // Returns the main screen

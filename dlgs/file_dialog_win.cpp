@@ -1,5 +1,5 @@
-// LAF OS Library
-// Copyright (C) 2020-2022  Igara Studio S.A.
+// laf-dlgs
+// Copyright (C) 2020-2024  Igara Studio S.A.
 // Copyright (C) 2015-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -9,14 +9,11 @@
 #include "config.h"
 #endif
 
-#include "os/win/native_dialogs.h"
+#include "dlgs/file_dialog.h"
 
 #include "base/fs.h"
 #include "base/string.h"
 #include "base/win/comptr.h"
-#include "os/common/file_dialog.h"
-#include "os/error.h"
-#include "os/window.h"
 
 #include <windows.h>
 #include <shobjidl.h>
@@ -24,14 +21,14 @@
 #include <string>
 #include <vector>
 
-namespace os {
+namespace dlgs {
 
 // 32k is the limit for Win95/98/Me/NT4/2000/XP with ANSI version
 #define FILENAME_BUFSIZE (1024*32)
 
-class FileDialogWin32 : public CommonFileDialog {
+class FileDialogWin : public FileDialog {
 public:
-  FileDialogWin32()
+  FileDialogWin(const Spec& spec)
     : m_filename(FILENAME_BUFSIZE)
     , m_defFilter(0) {
   }
@@ -49,7 +46,7 @@ public:
     m_initialDir = base::from_utf8(base::get_file_path(filename));
   }
 
-  Result show(Window* parent) override {
+  Result show(void* parent) override {
     Result result = Result::Error;
     bool shown = false;
 
@@ -62,7 +59,7 @@ public:
 
 private:
 
-  HRESULT showWithNewAPI(Window* parent, Result& result) {
+  HRESULT showWithNewAPI(void* parent, Result& result) {
     base::ComPtr<IFileDialog> dlg;
     HRESULT hr = CoCreateInstance(
       (m_type == Type::SaveFile ? CLSID_FileSaveDialog:
@@ -145,7 +142,7 @@ private:
         return hr;
     }
 
-    hr = dlg->Show(parent ? (HWND)parent->nativeHandle(): nullptr);
+    hr = dlg->Show((HWND)parent);
     if (hr == HRESULT_FROM_WIN32(ERROR_CANCELLED)) {
       result = Result::Cancel;
       return S_OK;
@@ -200,7 +197,7 @@ private:
     return S_OK;
   }
 
-  HRESULT showWithOldAPI(Window* parent, Result& result) {
+  HRESULT showWithOldAPI(void* parent, Result& result) {
     std::wstring title = base::from_utf8(m_title);
     std::wstring defExt = base::from_utf8(m_defExtension);
     std::wstring filtersWStr = getFiltersForGetOpenFileName();
@@ -208,7 +205,7 @@ private:
     OPENFILENAME ofn;
     ZeroMemory(&ofn, sizeof(ofn));
     ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = (HWND)parent->nativeHandle();
+    ofn.hwndOwner = (HWND)parent;
     ofn.hInstance = GetModuleHandle(NULL);
     ofn.lpstrFilter = filtersWStr.c_str();
     ofn.nFilterIndex = m_defFilter;
@@ -265,11 +262,12 @@ private:
     if (!res) {
       DWORD err = CommDlgExtendedError();
       if (err) {
+        // TODO add a way to customize this
         std::vector<char> buf(1024);
         std::snprintf(
           buf.data(), buf.size(),
           "Error using GetOpen/SaveFileName Win32 API. Code: %d", err);
-        os::error_message(&buf[0]);
+        MessageBoxA((HWND)parent, "Error", buf.data(), MB_OK | MB_ICONERROR);
         return E_FAIL;
       }
     }
@@ -357,13 +355,9 @@ private:
   std::wstring m_initialDir;
 };
 
-NativeDialogsWin::NativeDialogsWin()
+FileDialogRef FileDialog::makeWin(const Spec& spec)
 {
+  return base::make_ref<FileDialogWin>(spec);
 }
 
-FileDialogRef NativeDialogsWin::makeFileDialog()
-{
-  return make_ref<FileDialogWin32>();
-}
-
-} // namespace os
+} // namespace dlgs

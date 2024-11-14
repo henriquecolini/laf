@@ -20,7 +20,6 @@ if(WIN32)
     win/dnd.cpp
     win/event_queue.cpp
     win/keys.cpp
-    win/native_dialogs.cpp
     win/system.cpp
     win/winapi.cpp
     win/window.cpp
@@ -39,7 +38,6 @@ elseif(APPLE)
       osx/keys.mm
       osx/logger.mm
       osx/menus.mm
-      osx/native_dialogs.mm
       osx/system.mm
       osx/view.mm
       osx/window.mm
@@ -49,7 +47,6 @@ else()
   list(APPEND LAF_OS_SOURCES
     x11/event_queue.cpp
     x11/keys.cpp
-    x11/native_dialogs.cpp
     x11/system.cpp
     x11/window.cpp
     x11/x11.cpp

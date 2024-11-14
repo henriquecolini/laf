@@ -47,8 +47,6 @@ public:
     return nullptr;
   }
 
-  NativeDialogs* nativeDialogs() override;
-
   EventQueue* eventQueue() override {
     return EventQueue::instance();
   }
@@ -86,7 +84,6 @@ protected:
 
 private:
   std::string m_appName;
-  Ref<NativeDialogs> m_nativeDialogs;
 };
 
 } // namespace os

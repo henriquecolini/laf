@@ -1,5 +1,5 @@
-// LAF OS Library
-// Copyright (C) 2020-2022  Igara Studio S.A.
+// laf-dlgs
+// Copyright (C) 2020-2024  Igara Studio S.A.
 // Copyright (C) 2012-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -8,12 +8,9 @@
 #include <Cocoa/Cocoa.h>
 #include <vector>
 
+#include "dlgs/file_dialog.h"
+
 #include "base/fs.h"
-#include "os/common/file_dialog.h"
-#include "os/keys.h"
-#include "os/native_cursor.h"
-#include "os/osx/native_dialogs.h"
-#include "os/window.h"
 
 #include <map>
 
@@ -26,14 +23,15 @@ namespace {
 // etc.
 //
 // So what we have to do if the main menu doesn't provide the standard
-// Edit selectors? (which is our case with our MenuItemOSX and MenuOSX
-// implementations):
+// "Edit" selectors? Which can be our case with laf-os MenuItemOSX and
+// MenuOSX implementations:
 //
-// 1. Before we open the NSSavePanel, find the Edit menu that was
-//    specified by the user with os::MenuItem::setAsStandardEditMenuItem()
-// 2. Replace the Edit menu with a custom made one with the
-//    standard Edit menu prepared especially with selectors
-//    (undo:, redo:, cut:, etc.)
+// 1. Before we open the NSSavePanel, this class receives the current
+//    "Edit" menu that was specified by the user from
+//    FileDialog::Spec::editNSMenuItem.
+// 2. Replaces the "Edit" menu with a custom made one with the
+//    standard Edit menu prepared especially with selectors (undo:,
+//    redo:, cut:, etc.)
 // 3. Each menu item that contains a standard keyboard shortcut
 //    (Command+C, Command+V, etc.) must be modified, because those
 //    shortcuts are now used by this new Edit menu. So we remove the
@@ -41,7 +39,7 @@ namespace {
 //    those items are outside the replaced Edit menu (e.g. if we have
 //    Command+A to select all in other menu like Select > All, instead
 //    of Edit > Select All)
-// 4. After the NSSavePanel is closed, we restore all keyEquivalent
+// 4. After the NSSavePanel is closed, it restores all keyEquivalent
 //    shortcuts and the old Edit menu.
 //
 class OSXEditMenuHack {
@@ -121,20 +119,16 @@ private:
 
 } // anonymous namespace
 
-namespace os {
-extern NSMenuItem* g_standardEditMenuItem;
-}
-
 @interface OpenSaveHelper : NSObject {
 @private
   NSSavePanel* panel;
-  os::Window* window;
+  NSWindow* window;
   int result;
   std::function<void()> fileTypeChangeObserver;
 }
 - (id)init;
 - (void)setPanel:(NSSavePanel*)panel;
-- (void)setWindow:(os::Window*)window;
+- (void)setWindow:(NSWindow*)window;
 - (void)runModal;
 - (int)result;
 - (void)fileTypeChange;
@@ -146,6 +140,8 @@ extern NSMenuItem* g_standardEditMenuItem;
 - (id)init
 {
   if (self = [super init]) {
+    panel = nil;
+    window = nil;
     result = NSFileHandlingPanelCancelButton;
   }
   return self;
@@ -156,7 +152,7 @@ extern NSMenuItem* g_standardEditMenuItem;
   panel = newPanel;
 }
 
-- (void)setWindow:(os::Window*)newWindow
+- (void)setWindow:(NSWindow*)newWindow
 {
   window = newWindow;
 }
@@ -164,10 +160,6 @@ extern NSMenuItem* g_standardEditMenuItem;
 // This is executed in the main thread.
 - (void)runModal
 {
-  os::NativeCursor oldCursor = window->nativeCursor();
-  window->setCursor(os::NativeCursor::Arrow);
-
-  OSXEditMenuHack hack(os::g_standardEditMenuItem);
   [[[NSApplication sharedApplication] mainMenu] setAutoenablesItems:NO];
 
 #ifndef __MAC_10_6              // runModalForTypes is deprecated in 10.6
@@ -184,10 +176,11 @@ extern NSMenuItem* g_standardEditMenuItem;
     result = [panel runModal];
   }
 
-  window->setCursor(oldCursor);
-  NSWindow* nsWindow = (__bridge NSWindow *)window->nativeHandle();
-  [nsWindow makeKeyAndOrderFront:nil];
   [[[NSApplication sharedApplication] mainMenu] setAutoenablesItems:YES];
+
+  // Re-active the parent key window.
+  if (window)
+    [window makeKeyAndOrderFront:nil];
 }
 
 - (int)result
@@ -208,11 +201,13 @@ extern NSMenuItem* g_standardEditMenuItem;
 
 @end
 
-namespace os {
+namespace dlgs {
 
-class FileDialogOSX : public CommonFileDialog {
+class FileDialogOSX : public FileDialog {
 public:
-  FileDialogOSX() {
+  FileDialogOSX(const Spec& spec) {
+    if (spec.editNSMenuItem)
+      m_editMenuItem = (__bridge NSMenuItem*)spec.editNSMenuItem;
   }
 
   std::string fileName() override {
@@ -227,7 +222,7 @@ public:
     m_filename = filename;
   }
 
-  Result show(Window* window) override {
+  Result show(void* window) override {
     Result retValue = Result::Cancel;
     @autoreleasepool {
       NSSavePanel* panel = nil;
@@ -282,7 +277,8 @@ public:
 
       OpenSaveHelper* helper = [OpenSaveHelper new];
       [helper setPanel:panel];
-      [helper setWindow:window];
+      if (window)
+        [helper setWindow:(__bridge NSWindow*)window];
 
       // Configure the file type popup/combobox.
       if (m_popup) {
@@ -323,7 +319,10 @@ public:
         }];
       }
 
-      [helper performSelectorOnMainThread:@selector(runModal) withObject:nil waitUntilDone:YES];
+      {
+        OSXEditMenuHack hack(m_editMenuItem);
+        [helper performSelectorOnMainThread:@selector(runModal) withObject:nil waitUntilDone:YES];
+      }
 
       if ([helper result] == NSFileHandlingPanelOKButton) {
         if (m_type == Type::OpenFiles) {
@@ -385,15 +384,14 @@ private:
   // easily (configuring its target/action properties + accessing its
   // selected item).
   NSPopUpButton* m_popup = nullptr;
+
+  // Pointer to the "Edit" menu used with OSXEditMenuHack.
+  NSMenuItem* m_editMenuItem = nullptr;
 };
 
-NativeDialogsOSX::NativeDialogsOSX()
+FileDialogRef FileDialog::makeOSX(const Spec& spec)
 {
+  return base::make_ref<FileDialogOSX>(spec);
 }
 
-FileDialogRef NativeDialogsOSX::makeFileDialog()
-{
-  return make_ref<FileDialogOSX>();
-}
-
-} // namespace os
+} // namespace dlgs

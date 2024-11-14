@@ -25,6 +25,7 @@ in the future if they are highly valuable on their own.
   minimal set of dependencies
 * [gfx](gfx): Abstract graphics classes (rectangle, point, region,
   etc.)
+* [dlgs](dlgs): Library to show the native dialog to save/open files
 * [ft](ft): FreeType wrapper used by the `os` module (requires
   `freetype` library as dependency). Might be deleted in the future
   (replaced with Skia text rendering)
