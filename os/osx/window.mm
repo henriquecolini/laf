@@ -511,6 +511,8 @@ void WindowOSX::setVisible(bool visible)
     // returns YES).
     if (m_nsWindow.canBecomeMainWindow)
       [m_nsWindow makeMainWindow];
+    else
+      [m_nsWindow setIsVisible:true];
   }
   else {
     [m_nsWindow setIsVisible:false];
