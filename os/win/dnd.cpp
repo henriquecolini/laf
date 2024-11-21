@@ -355,13 +355,14 @@ ULONG DragTargetAdapter::Release()
 
 DragEvent DragTargetAdapter::newDragEvent(POINTL* pt, DWORD* pdwEffect)
 {
-  if (pt)
+  if (pt) {
     // Get drag position
     m_position = m_window->pointFromScreen(gfx::Point(pt->x, pt->y));
+  }
 
   std::unique_ptr<DragDataProvider> ddProvider = std::make_unique<DragDataProviderWin>(m_data.get());
   return DragEvent(m_window,
-                   as_dropoperation(*pdwEffect),
+                   (pdwEffect ? as_dropoperation(*pdwEffect): os::DropOperation::None),
                    m_position,
                    ddProvider);
 }
