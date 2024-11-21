@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2019-2021  Igara Studio S.A.
+// Copyright (C) 2019-2024  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -58,6 +58,13 @@ namespace os {
     void transparent(const bool s) { m_transparent = s; }
     void parent(Window* p) { m_parent = p; }
 
+    // Option to ignore tablet options and avoid calling WTOpen() for
+    // each single window (e.g. tooltips don't need the tablet).
+#if LAF_WINDOWS
+    bool useTabletOptions() const { return m_useTabletOptions; }
+    void useTabletOptions(const bool s) { m_useTabletOptions = s; }
+#endif
+
     const gfx::Rect& frame() const { return m_frame; }
     const gfx::Rect& contentRect() const { return m_contentRect; }
     int scale() const { return m_scale; }
@@ -83,6 +90,9 @@ namespace os {
     int m_scale = 1;
     ScreenRef m_screen;
     Window* m_parent = nullptr;
+#if LAF_WINDOWS
+    bool m_useTabletOptions = true;
+#endif
   };
 
 } // namespace os

@@ -246,6 +246,7 @@ namespace os {
     // packets queue are shared between all windows, because it's
     // information from the device that doesn't depend on the active
     // window.
+    bool m_allowWintab;
     HCTX m_hpenctx;
     static PointerType m_pointerType;
     static float m_pressure;

@@ -181,6 +181,7 @@ WindowWin::WindowWin(const WindowSpec& spec)
   , m_lastPointerDownButton(Event::NoneButton)
   , m_pointerDownCount(0)
 #endif
+  , m_allowWintab(spec.useTabletOptions())
   , m_hpenctx(nullptr)
   , m_fullscreen(false)
   , m_titled(spec.titled())
@@ -2485,6 +2486,9 @@ void WindowWin::checkDarkModeChange()
 
 void WindowWin::openWintabCtx()
 {
+  if (!m_allowWintab)
+    return;
+
   auto sys = system();
   TabletOptions options = sys->tabletOptions();
   if (options.api == TabletAPI::Wintab ||
