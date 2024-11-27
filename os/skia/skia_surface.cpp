@@ -13,6 +13,7 @@
 
 #include "base/file_handle.h"
 #include "gfx/path.h"
+#include "gfx/region.h"
 #include "os/skia/skia_helpers.h"
 #include "os/surface_format.h"
 #include "os/system.h"
@@ -208,6 +209,11 @@ bool SkiaSurface::clipRect(const gfx::Rect& rc)
 void SkiaSurface::clipPath(const gfx::Path& path)
 {
   m_canvas->clipPath(path.skPath());
+}
+
+void SkiaSurface::clipRegion(const gfx::Region& region)
+{
+  m_canvas->clipRegion(region.skRegion());
 }
 
 void SkiaSurface::save()

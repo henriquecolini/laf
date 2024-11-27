@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2018-2022  Igara Studio S.A.
+// Copyright (C) 2018-2024  Igara Studio S.A.
 // Copyright (C) 2012-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -25,6 +25,7 @@
 namespace gfx {
   class Matrix;
   class Path;
+  class Region;
 }
 
 namespace os {
@@ -54,6 +55,7 @@ namespace os {
     virtual void restoreClip() = 0;
     virtual bool clipRect(const gfx::Rect& rc) = 0;
     virtual void clipPath(const gfx::Path& path) = 0;
+    virtual void clipRegion(const gfx::Region& region) = 0;
 
     virtual void save() = 0;
     virtual void concat(const gfx::Matrix& matrix) = 0;

@@ -128,6 +128,9 @@ namespace gfx {
     Region& operator&=(const Region& b) { return createIntersection(*this, b); }
     Region& operator-=(const Region& b) { return createSubtraction(*this, b); }
 
+    const details::Region& skRegion() const { return m_region; }
+    details::Region& skRegion() { return m_region; }
+
   private:
     mutable details::Region m_region;
   };
