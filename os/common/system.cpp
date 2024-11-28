@@ -25,14 +25,22 @@
   #include "clip/clip.h"
 #endif
 
+#include "base/debug.h"
+
 namespace os {
 
 // Weak reference to the unique system instance. This is destroyed by
 // the user (with the main SystemRef to the system).
 System* g_instance = nullptr;
 
+// Flag to know if the intance is already being destroyed, so we
+// cannot add a ref to it, i.e. calling System::instance() is illegal
+// if this flag is true.
+static bool g_is_being_destroyed = false;
+
 SystemRef System::instance()
 {
+  ASSERT(!g_is_being_destroyed);
   if (g_instance)
     return AddRef(g_instance);
   return nullptr;
@@ -40,6 +48,8 @@ SystemRef System::instance()
 
 SystemRef System::make()
 {
+  ASSERT(!g_instance);
+
   SystemRef ref;
 #if LAF_SKIA
   ref = System::makeSkia();
@@ -72,7 +82,7 @@ CommonSystem::~CommonSystem()
 {
   // destroyInstance() can be called multiple times by derived
   // classes.
-  if (instance() == this)
+  if (g_instance == this)
     destroyInstance();
 }
 
@@ -208,8 +218,12 @@ void CommonSystem::destroyInstance()
 {
   // destroyInstance() can be called multiple times by derived
   // classes.
-  if (g_instance != this)
+  if (g_instance != this) {
+    ASSERT(g_is_being_destroyed);
     return;
+  }
+
+  g_is_being_destroyed = true;
 
   // We have to reset the list of all events to clear all possible
   // living WindowRef (so all window destructors are called at this

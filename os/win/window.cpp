@@ -66,6 +66,9 @@
 
 namespace os {
 
+// Extern raw reference to current system instance.
+extern System* g_instance;
+
 // Converts an os::Hit to a Win32 hit test value
 static int hit2hittest[] = {
   HTNOWHERE,                    // os::Hit::None
@@ -135,7 +138,7 @@ static BOOL CALLBACK log_monitor_info(HMONITOR monitor,
 
 std::wstring get_wnd_class_name()
 {
-  if (auto sys = instance()) {
+  if (auto sys = os::System::instance()) {
     if (!sys->appName().empty())
       return base::from_utf8(sys->appName());
   }
@@ -322,12 +325,17 @@ WindowWin::WindowWin(const WindowSpec& spec)
 
 WindowWin::~WindowWin()
 {
-  auto sys = system();
+  // We cannot use os::System::instance() here because that would add
+  // a new reference to a possible dying System pointer, e.g. when we
+  // come from ~System because the last Ref::unref() was called and
+  // this window is being destroyed because its last reference was in
+  // a os::Event of the os::EventQueue.
+  SystemWin* sys = (SystemWin*)g_instance;
 
   // If this assert fails it's highly probable that an os::WindowRef
   // was kept alive in some kind of memory leak (or just inside an
   // os::Event in the os::EventQueue). Also this can happen when
-  // declaring a os::WindowRef before calling os::make_system(),
+  // declaring a os::WindowRef before calling os::System::system(),
   // because of deletion order when destructors got called.
   ASSERT(sys);
 
