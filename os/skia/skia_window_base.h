@@ -42,6 +42,12 @@ public:
     , m_colorSpace(nullptr) {
   }
 
+  ~SkiaWindowBase() {
+#if SK_SUPPORT_GPU
+    detachGpuContext();
+#endif
+  }
+
   void initColorSpace() {
     // Needed on macOS because WindowOSX::colorSpace() needs the
     // m_nsWindow created, and that happens after
@@ -80,10 +86,8 @@ public:
     m_surface.reset();
 
 #if SK_SUPPORT_GPU
-    // Re-create OpenGL context
-    m_gl.detachGL();
-    if (m_glCtx && m_glCtx->isValid())
-      m_glCtx->destroyGLContext();
+    // Detach and re-create OpenGL context
+    detachGpuContext();
 
     // GPU-accelerated surface
     if (m_glCtx && m_preferGpuAcceleration) {
@@ -239,6 +243,15 @@ protected:
 #endif
 
 private:
+
+#if SK_SUPPORT_GPU
+  void detachGpuContext() {
+    m_gl.detachGL();
+    if (m_glCtx && m_glCtx->isValid())
+      m_glCtx->destroyGLContext();
+  }
+#endif
+
   bool m_preferGpuAcceleration = false;
   Backend m_backend = Backend::NONE;
   // Flag used to avoid accessing to an invalid m_surface in the first
