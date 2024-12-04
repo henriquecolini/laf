@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2019-2021  Igara Studio S.A.
+// Copyright (C) 2019-2024  Igara Studio S.A.
 // Copyright (C) 2012-2016  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -42,6 +42,10 @@ public:
       case AppMode::CLI: [m_app setActivationPolicy:NSApplicationActivationPolicyProhibited]; break;
       case AppMode::GUI: [m_app setActivationPolicy:NSApplicationActivationPolicyRegular]; break;
     }
+  }
+
+  bool isHidden() const {
+    return [m_appDelegate isHidden];
   }
 
   void markCliFileAsProcessed(const std::string& fn) {
@@ -91,6 +95,11 @@ bool AppOSX::init()
 void AppOSX::setAppMode(AppMode appMode)
 {
   m_impl->setAppMode(appMode);
+}
+
+bool AppOSX::isHidden() const
+{
+  return m_impl->isHidden();
 }
 
 void AppOSX::markCliFileAsProcessed(const std::string& fn)

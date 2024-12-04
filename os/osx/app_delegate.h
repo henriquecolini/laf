@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2020-2021  Igara Studio S.A.
+// Copyright (C) 2020-2024  Igara Studio S.A.
 // Copyright (C) 2012-2017  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -22,18 +22,23 @@
   // Files that were already processed in the CLI, so we don't need to
   // generate a DropFiles event.
   std::set<std::string> m_cliFiles;
+  bool m_isHidden;
 }
+- (id)init;
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender;
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)app;
 - (void)applicationWillTerminate:(NSNotification*)notification;
 - (void)applicationWillResignActive:(NSNotification*)notification;
 - (void)applicationDidBecomeActive:(NSNotification*)notification;
+- (void)applicationDidHide:(NSNotification*)notification;
+- (void)applicationDidUnhide:(NSNotification*)notification;
 - (BOOL)application:(NSApplication*)app openFiles:(NSArray*)filenames;
 - (void)executeMenuItem:(id)sender;
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem;
 
 - (void)markCliFileAsProcessed:(const std::string&)fn;
 - (void)resetCliFiles;
+- (BOOL)isHidden;
 @end
 
 #endif
