@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2019-2021  Igara Studio S.A.
+// Copyright (C) 2019-2024  Igara Studio S.A.
 // Copyright (C) 2012-2017  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -13,6 +13,7 @@
 
 #include "base/debug.h"
 #include "os/event.h"
+#include "os/osx/app.h"
 #include "os/osx/event_queue.h"
 #include "os/osx/view.h"
 #include "os/osx/window_delegate.h"
@@ -386,7 +387,10 @@ bool WindowOSX::isMaximized() const
 
 bool WindowOSX::isMinimized() const
 {
-  return (m_nsWindow.miniaturized ? true: false);
+  // Return true if the NSWindow is minimized or if the NSApplication
+  // is hidden.
+  return (m_nsWindow.miniaturized ||
+          os::AppOSX::instance()->isHidden());
 }
 
 bool WindowOSX::isFullscreen() const

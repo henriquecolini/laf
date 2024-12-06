@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2020-2022  Igara Studio S.A.
+// Copyright (C) 2020-2024  Igara Studio S.A.
 // Copyright (C) 2012-2017  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -65,6 +65,14 @@
 
 @implementation AppDelegateOSX
 
+- (id)init
+{
+  if (self = [super init]) {
+    m_isHidden = false;
+  }
+  return self;
+}
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
   os::Event ev;
@@ -94,6 +102,16 @@
   NSEvent* event = [NSApp currentEvent];
   if (event != nil)
     [ViewOSX updateKeyFlags:event];
+}
+
+- (void)applicationDidHide:(NSNotification*)notification
+{
+  m_isHidden = true;
+}
+
+- (void)applicationDidUnhide:(NSNotification*)notification
+{
+  m_isHidden = false;
 }
 
 - (BOOL)application:(NSApplication*)app openFiles:(NSArray*)filenames
@@ -145,6 +163,11 @@
 {
   // After finishLaunching() we clear the filter
   m_cliFiles.clear();
+}
+
+- (BOOL)isHidden
+{
+  return m_isHidden;
 }
 
 @end
