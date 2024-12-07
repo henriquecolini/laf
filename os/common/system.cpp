@@ -66,6 +66,7 @@ SystemRef System::make()
 
 CommonSystem::CommonSystem()
 {
+  g_is_being_destroyed = false;
 }
 
 CommonSystem::~CommonSystem()
