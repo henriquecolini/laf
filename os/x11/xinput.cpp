@@ -72,7 +72,7 @@ void XInput::load(::Display* display)
   if (!devices)
     return;
 
-  auto system = instance();
+  auto system = System::instance();
   ASSERT(system);
   if (!system)
     return;

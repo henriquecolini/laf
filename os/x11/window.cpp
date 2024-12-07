@@ -164,7 +164,7 @@ std::string decode_url(const std::string& in)
 
 std::string get_x11_wm_class_name()
 {
-  if (auto sys = instance())
+  if (auto sys = System::instance())
     return sys->appName();
   // On X11 the class name can be empty.
   return std::string();
