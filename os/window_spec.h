@@ -43,6 +43,7 @@ namespace os {
     bool resizable() const { return m_resizable; }
     bool floating() const { return m_floating; }
     bool transparent() const { return m_transparent; }
+    bool modal() const { return m_modal; }
 
     // Parent window used for floating windows
     Window* parent() const { return m_parent; }
@@ -57,6 +58,7 @@ namespace os {
     void floating(const bool s) { m_floating = s; }
     void transparent(const bool s) { m_transparent = s; }
     void parent(Window* p) { m_parent = p; }
+    void modal(const bool s) { m_modal = s; }
 
     // Option to ignore tablet options and avoid calling WTOpen() for
     // each single window (e.g. tooltips don't need the tablet).
@@ -85,6 +87,7 @@ namespace os {
     bool m_resizable = true;
     bool m_floating = false;
     bool m_transparent = false;
+    bool m_modal = false;
     gfx::Rect m_frame;
     gfx::Rect m_contentRect;
     int m_scale = 1;
