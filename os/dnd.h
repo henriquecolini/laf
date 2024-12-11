@@ -8,8 +8,9 @@
 #define OS_DND_H_INCLUDED
 #pragma once
 
-#include "base/paths.h"
 #include "base/debug.h"
+#include "base/enum_flags.h"
+#include "base/paths.h"
 #include "gfx/point.h"
 #include "os/surface.h"
 
@@ -53,6 +54,7 @@ namespace os {
     Link = 4,
     All = Copy | Move | Link,
   };
+  LAF_ENUM_FLAGS(DropOperation);
 
   // Types of representations supported for each DragDataItem.
   enum class DragDataItemType {
