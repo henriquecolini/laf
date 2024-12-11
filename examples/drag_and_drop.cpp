@@ -30,14 +30,6 @@ static void redraw_window(os::Window* window);
 class DragTarget : public os::DragTarget {
 public:
   void dragEnter(os::DragEvent& ev) override {
-    if (!windowData.dropZone.contains(ev.position()) ||
-        !ev.sourceSupports(os::DropOperation::Copy)) {
-      ev.dropResult(os::DropOperation::None);
-    }
-    else if (ev.sourceSupports(os::DropOperation::Copy)) {
-      ev.dropResult(os::DropOperation::Copy);
-    }
-
     windowData.dragEnter = true;
     windowData.dragLeave = false;
     windowData.drag = 0;
@@ -53,6 +45,14 @@ public:
   }
 
   void drag(os::DragEvent& ev) override {
+    if (!windowData.dropZone.contains(ev.position()) ||
+        !ev.sourceSupports(os::DropOperation::Copy)) {
+      ev.dropResult(os::DropOperation::None);
+    }
+    else if (ev.sourceSupports(os::DropOperation::Copy)) {
+      ev.dropResult(os::DropOperation::Copy);
+    }
+
     ++windowData.drag;
     windowData.dragPosition = ev.position();
     redraw_window(ev.target());
