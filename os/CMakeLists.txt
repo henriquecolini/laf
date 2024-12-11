@@ -45,6 +45,7 @@ elseif(APPLE)
   endif()
 else()
   list(APPEND LAF_OS_SOURCES
+    x11/dnd.cpp
     x11/event_queue.cpp
     x11/keys.cpp
     x11/system.cpp

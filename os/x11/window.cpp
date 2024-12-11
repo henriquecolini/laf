@@ -20,12 +20,14 @@
 #include "gfx/border.h"
 #include "gfx/rect.h"
 #include "gfx/region.h"
+#include "os/dnd.h"
 #include "os/event.h"
 #include "os/event_queue.h"
 #include "os/surface.h"
 #include "os/system.h"
 #include "os/window_spec.h"
 #include "os/x11/cursor.h"
+#include "os/x11/dnd.h"
 #include "os/x11/keys.h"
 #include "os/x11/screen.h"
 #include "os/x11/system.h"
@@ -93,15 +95,21 @@ Atom _NET_WM_ALLOWED_ACTIONS = 0;
 
 // Atoms used for the XDND protocol
 Atom XdndAware = 0;
+Atom XdndEnter = 0;
+Atom XdndLeave = 0;
 Atom XdndPosition = 0;
 Atom XdndStatus = 0;
 Atom XdndActionCopy = 0;
+Atom XdndActionMove = 0;
+Atom XdndActionLink = 0;
 Atom XdndDrop = 0;
 Atom XdndFinished = 0;
+Atom XdndTypeList = 0;
+Atom XdndActionList = 0;
 Atom XdndSelection = 0;
 Atom URI_LIST = 0;
-::Window g_dndSource = 0;
-gfx::Point g_dndPosition;
+
+std::unique_ptr<DndDataX11> g_dndData;
 
 // See https://bugs.freedesktop.org/show_bug.cgi?id=12871 for more
 // information, it looks like the official way to convert a X Window
@@ -168,6 +176,35 @@ std::string get_x11_wm_class_name()
     return sys->appName();
   // On X11 the class name can be empty.
   return std::string();
+}
+
+std::vector<Atom> get_atom_list_property(::Display* display,
+                                         ::Window window,
+                                         Atom property,
+                                         long long_offset,
+                                         long long_length)
+{
+  Atom actual_type;
+  int actual_format;
+  unsigned long nitems;
+  unsigned long bytes_after;
+  Atom* prop = nullptr;
+
+  const int res = XGetWindowProperty(
+    display, window,
+    property, long_offset, long_length,
+    False, XA_ATOM,
+    &actual_type, &actual_format,
+    &nitems, &bytes_after,
+    (unsigned char**)&prop);
+  if (res != Success)
+    return {};
+
+  std::vector<Atom> result;
+  for (int i=0; i<nitems; ++i)
+    result.push_back(prop[i]);
+  XFree(prop);
+  return result;
 }
 
 } // anonymous namespace
@@ -416,11 +453,17 @@ WindowX11::WindowX11(::Display* display, const WindowSpec& spec)
   // TODO add support for other formats (e.g. dropping images?)
   if (!XdndAware) {
     XdndAware = XInternAtom(m_display, "XdndAware", False);
+    XdndEnter = XInternAtom(m_display, "XdndEnter", False);
+    XdndLeave = XInternAtom(m_display, "XdndLeave", False);
     XdndPosition = XInternAtom(m_display, "XdndPosition", False);
     XdndStatus = XInternAtom(m_display, "XdndStatus", False);
     XdndActionCopy = XInternAtom(m_display, "XdndActionCopy", False);
+    XdndActionMove = XInternAtom(m_display, "XdndActionMove", False);
+    XdndActionLink = XInternAtom(m_display, "XdndActionLink", False);
     XdndDrop = XInternAtom(m_display, "XdndDrop", False);
     XdndFinished = XInternAtom(m_display, "XdndFinished", False);
+    XdndTypeList = XInternAtom(m_display, "XdndTypeList", False);
+    XdndActionList = XInternAtom(m_display, "XdndActionList", False);
     XdndSelection = XInternAtom(m_display, "XdndSelection", False);
     URI_LIST = XInternAtom(m_display, "text/uri-list", False);
   }
@@ -873,26 +916,8 @@ void WindowX11::setWMClass(const std::string& res_class)
 // TODO this doesn't work on GNOME 3, so still some work is required
 void WindowX11::setAllowedActions()
 {
-  Atom actual_type;
-  int actual_format;
-  unsigned long nitems;
-  unsigned long bytes_after;
-  Atom* prop = nullptr;
-  const int res = XGetWindowProperty(
-    m_display, m_window,
-    _NET_WM_ALLOWED_ACTIONS,
-    0, 256,
-    False, XA_ATOM,
-    &actual_type, &actual_format,
-    &nitems, &bytes_after,
-    (unsigned char**)&prop);
-  if (res != Success)
-    return;
-
-  std::vector<Atom> allowed;
-  for (int i=0; i<nitems; ++i)
-    allowed.push_back(prop[i]);
-  XFree(prop);
+  std::vector<Atom> allowed = get_atom_list_property(
+    m_display, m_window, _NET_WM_ALLOWED_ACTIONS, 0, 256);
 
   // Auxiliary function to match one allowed action from the "spec"
   // with the specific Atom required in the _NET_WM_ALLOWED_ACTIONS
@@ -926,8 +951,8 @@ void WindowX11::setAllowedActions()
 
   XChangeProperty(
     m_display, m_window, _NET_WM_ALLOWED_ACTIONS,
-    XA_ATOM, 32, (nitems == 0 ? PropModeAppend:
-                                PropModeReplace),
+    XA_ATOM, 32, (allowed.empty() ? PropModeAppend:
+                                    PropModeReplace),
     (const unsigned char*)allowed.data(), allowed.size());
 }
 
@@ -1246,14 +1271,79 @@ void WindowX11::processX11Event(XEvent& event)
         ev.setType(Event::CloseWindow);
         queueEvent(ev);
       }
+      else if (event.xclient.message_type == XdndEnter) {
+        const bool moreThan3Types = (event.xclient.data.l[1] & 1 ? true: false);
+        const int protocol = (event.xclient.data.l[1] >> 8) & 0xFF;
+
+        const ::Window sourceWindow = (::Window)event.xclient.data.l[0];
+
+        g_dndData = std::make_unique<DndDataX11>();
+        g_dndData->sourceWindow = sourceWindow;
+
+        // Ask for the type list
+        std::vector<Atom> types;
+        if (moreThan3Types) {
+          // If the source gives more than 3 data types, we must get
+          // the list of types from its XdndTypeList property.
+          types = get_atom_list_property(
+            m_display, sourceWindow, XdndTypeList, 0, 256);
+        }
+        else {
+          // If the source gives 3 or less data types, we can use the
+          // Atoms specified in the event data.
+          for (int i=2; i<=4; ++i)
+            if (event.xclient.data.l[i])
+              types.push_back((Atom)event.xclient.data.l[i]);
+        }
+        g_dndData->types = types;
+
+        // Ask for the allowed actions list
+        std::vector<Atom> actions = get_atom_list_property(
+          m_display, sourceWindow, XdndActionList, 0, 256);
+        DropOperation ops = DropOperation::None;
+        for (auto action : actions) {
+          if (action == XdndActionCopy) ops |= DropOperation::Copy;
+          if (action == XdndActionMove) ops |= DropOperation::Move;
+          if (action == XdndActionLink) ops |= DropOperation::Link;
+        }
+        g_dndData->supportedOperations = ops;
+
+        DragEvent ev(this, g_dndData->supportedOperations, gfx::Point(), nullptr);
+        notifyDragEnter(ev);
+      }
+      else if (event.xclient.message_type == XdndLeave) {
+        DragEvent ev(this, g_dndData->supportedOperations, gfx::Point(), nullptr);
+        notifyDragLeave(ev);
+
+        ASSERT(g_dndData);
+        g_dndData.reset();
+      }
       else if (event.xclient.message_type == XdndPosition) {
         auto sourceWindow = (::Window)event.xclient.data.l[0];
-        // Save the latest mouse position reported by the source window
-        g_dndPosition.x = event.xclient.data.l[2] >> 16;
-        g_dndPosition.y = event.xclient.data.l[2] & 0xFFFF;
+        ASSERT(g_dndData);
+        ASSERT(g_dndData->sourceWindow == sourceWindow);
 
-        // TODO Ask to the library user if we can drop and the action
-        //      that will take place
+        // Send drag notification with the new position
+        gfx::Point pt(event.xclient.data.l[2] >> 16,
+                      event.xclient.data.l[2] & 0xFFFF);
+
+        // Convert the position relative to this window
+        pt = pointFromScreen(pt);
+
+        // Save the latest mouse position reported by the source
+        // window (absolute position)
+        if (g_dndData)
+          g_dndData->position = pt;
+
+        DragEvent ev(this, g_dndData->supportedOperations, pt, nullptr);
+        notifyDrag(ev);
+
+        DropOperation dropResult = ev.dropResult();
+        if (!hasDragTarget())
+          dropResult = DropOperation::Copy; // For DropFiles event
+
+        // Send to the source if the action is allowed depending on
+        // what notifyDrag() returned.
         XEvent event2;
         memset(&event2, 0, sizeof(event2));
         event2.xany.type = ClientMessage;
@@ -1262,25 +1352,39 @@ void WindowX11::processX11Event(XEvent& event)
         event2.xclient.format = 32;
         event2.xclient.data.l[0] = m_window;
         // Bit 0 = this window accept the drop
-        event2.xclient.data.l[1] = 1;
-        event2.xclient.data.l[4] = XdndActionCopy;
+        event2.xclient.data.l[1] =
+          (dropResult != DropOperation::None ? 1: 0);
+        event2.xclient.data.l[4] =
+          (dropResult == DropOperation::Move ? XdndActionMove:
+           dropResult == DropOperation::Link ? XdndActionLink:
+           dropResult == DropOperation::Copy ? XdndActionCopy: 0);
         XSendEvent(m_display, sourceWindow, 0, 0, &event2);
       }
       else if (event.xclient.message_type == XdndDrop) {
-        // Save the X11 window from where this XdndDrop message came
-        // from, so then we can send a XdndFinished later.
-        g_dndSource = (::Window)event.xclient.data.l[0];
+        const ::Window sourceWindow = (::Window)event.xclient.data.l[0];
 
-        // Ask for the XdndSelection, we're going to receive the
-        // dropped items in the SelectionNotify.
-        XConvertSelection(m_display, XdndSelection,
-                          URI_LIST, XdndSelection,
-                          m_window, CurrentTime);
+        ASSERT(g_dndData);
+        ASSERT(g_dndData->sourceWindow == sourceWindow);
+
+        // TODO in the best case we should notifyDrop() here and add a
+        //      way to get data on demand with DragDataProviderX11
+
+        if (g_dndData->containsType(URI_LIST)) {
+          // Ask for the XdndSelection, we're going to receive the
+          // dropped items in the SelectionNotify.
+          XConvertSelection(m_display, XdndSelection,
+                            URI_LIST, XdndSelection,
+                            m_window, CurrentTime);
+        }
       }
       break;
 
     case SelectionNotify:
       if (event.xselection.property == XdndSelection) {
+        ASSERT(g_dndData);
+        if (!g_dndData)
+          break;
+
         bool successful = false;
         Atom actual_type;
         int actual_format;
@@ -1312,15 +1416,25 @@ void WindowX11::processX11Event(XEvent& event)
             }
 
             if (!files.empty()) {
-              os::Event ev;
-              ev.setType(os::Event::DropFiles);
-              ev.setFiles(files);
-              // Mouse position is relative to the root window, so
-              // we make it relative to the content rect.
-              ev.setPosition(g_dndPosition - contentRect().origin());
-              queueEvent(ev);
+              // Drop notification
+              DragEvent ev(this,
+                           g_dndData->supportedOperations,
+                           g_dndData->position,
+                           std::make_unique<DragDataProviderX11>(
+                             m_display, m_window, files));
+              notifyDrop(ev);
 
-              successful = true;
+              // Send DropFiles event for backward compatibility
+              if (!ev.acceptDrop() &&
+                  !hasDragTarget()) {
+                os::Event ev;
+                ev.setType(os::Event::DropFiles);
+                ev.setFiles(files);
+                ev.setPosition(g_dndData->position);
+                queueEvent(ev);
+
+                successful = true;
+              }
             }
           }
 
@@ -1331,7 +1445,7 @@ void WindowX11::processX11Event(XEvent& event)
         XEvent event2;
         memset(&event2, 0, sizeof(event2));
         event2.xany.type = ClientMessage;
-        event2.xclient.window = g_dndSource;
+        event2.xclient.window = g_dndData->sourceWindow;
         event2.xclient.message_type = XdndFinished;
         event2.xclient.format = 32;
         event2.xclient.data.l[0] = m_window;
@@ -1340,6 +1454,9 @@ void WindowX11::processX11Event(XEvent& event)
         event2.xclient.data.l[2] = 0;
         event2.xclient.data.l[3] = 0;
         XSendEvent(m_display, root, 0, 0, &event2);
+
+        // Delete temporary data.
+        g_dndData.reset();
       }
       break;
 
