@@ -62,7 +62,7 @@ CursorRef SystemX11::getNativeCursor(NativeCursor cursor)
     return g_nativeCursors[i];
 
   ::Display* display = X11::instance()->display();
-  ::Cursor xcursor = None;
+  ::Cursor xcursor = X11_None;
   switch (cursor) {
     case NativeCursor::Hidden: {
       char data = 0;
@@ -156,9 +156,9 @@ CursorRef SystemX11::makeCursor(const Surface* surface,
   const int w = scale*surface->width();
   const int h = scale*surface->height();
 
-  ::Cursor xcursor = None;
+  ::Cursor xcursor = X11_None;
   ::XcursorImage* image = g_cachedCursorImage.recreate(w, h);
-  if (image != None) {
+  if (image != X11_None) {
     XcursorPixel* dst = image->pixels;
     for (int y=0; y<h; ++y) {
       const uint32_t* src = (const uint32_t*)surface->getData(0, y/scale);

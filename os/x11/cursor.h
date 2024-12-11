@@ -19,7 +19,7 @@ class CursorX11 : public Cursor {
 public:
   CursorX11(::Cursor xcursor) : m_xcursor(xcursor) { }
   ~CursorX11() {
-    if (m_xcursor != None) {
+    if (m_xcursor != X11_None) {
       auto x11 = X11::instance();
       ASSERT(x11);
       if (x11)

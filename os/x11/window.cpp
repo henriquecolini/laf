@@ -268,7 +268,7 @@ WindowX11::WindowX11(::Display* display, const WindowSpec& spec)
   if (m_transparent) {
     // If one of these attributes is not specified, XCreateWindow()
     // will crash/fail with a BadMatch error.
-    swa.background_pixmap = None;
+    swa.background_pixmap = X11_None;
     swa.border_pixel = 0;
     swa.colormap = XCreateColormap(m_display, root, vi.visual, AllocNone);
     swa_mask |= CWBackPixmap | CWBorderPixel | CWColormap;
@@ -749,7 +749,7 @@ void WindowX11::captureMouse()
   XGrabPointer(m_display, m_window, False,
                PointerMotionMask | ButtonPressMask | ButtonReleaseMask,
                GrabModeAsync, GrabModeAsync,
-               None, None, CurrentTime);
+               X11_None, X11_None, CurrentTime);
 }
 
 void WindowX11::releaseMouse()
@@ -933,7 +933,7 @@ void WindowX11::setAllowedActions()
 
 bool WindowX11::setX11Cursor(::Cursor xcursor)
 {
-  if (xcursor != None) {
+  if (xcursor != X11_None) {
     XDefineCursor(m_display, m_window, xcursor);
     return true;
   }

@@ -13,11 +13,9 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "os/system.h"
+#include "os/x11/x11.h"
 
 #include <cstring>
-
-#pragma push_macro("None")
-#undef None // Undefine the X11 None macro
 
 namespace os {
 
@@ -255,5 +253,3 @@ void XInput::addEvent(int type, XEventClass eventClass, Event::Type ourEventype)
 }
 
 } // namespace os
-
-#pragma pop_macro("None")

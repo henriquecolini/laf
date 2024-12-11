@@ -17,6 +17,10 @@
 
 #include <memory>
 
+// Use X11_None as None replacement
+#undef None
+#define X11_None 0L
+
 namespace os {
 
 class XInput;

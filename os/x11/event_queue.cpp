@@ -165,12 +165,8 @@ void EventQueueX11::getEvent(Event& ev, double timeout)
     }
   }
 
-  if (!m_events.try_pop(ev)) {
-#pragma push_macro("None")
-#undef None // Undefine the X11 None macro
+  if (!m_events.try_pop(ev))
     ev.setType(Event::None);
-#pragma pop_macro("None")
-  }
 }
 
 void EventQueueX11::clearEvents()
