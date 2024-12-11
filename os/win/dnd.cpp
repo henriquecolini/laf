@@ -360,11 +360,10 @@ DragEvent DragTargetAdapter::newDragEvent(POINTL* pt, DWORD* pdwEffect)
     m_position = m_window->pointFromScreen(gfx::Point(pt->x, pt->y));
   }
 
-  std::unique_ptr<DragDataProvider> ddProvider = std::make_unique<DragDataProviderWin>(m_data.get());
   return DragEvent(m_window,
                    (pdwEffect ? as_dropoperation(*pdwEffect): os::DropOperation::None),
                    m_position,
-                   ddProvider);
+                   std::make_unique<DragDataProviderWin>(m_data.get()));
 }
 
 STDMETHODIMP DragTargetAdapter::DragEnter(IDataObject* pDataObj,

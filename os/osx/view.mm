@@ -660,12 +660,11 @@ using namespace os;
 os::DragEvent newDragEvent(id<NSDraggingInfo> sender)
 {
   NSPasteboard* pasteboard = [sender draggingPasteboard];
-  std::unique_ptr<DragDataProvider> ddProvider = std::make_unique<DragDataProviderOSX>(pasteboard);
   os::Window* window = [(WindowOSXObjc*)sender.draggingDestinationWindow impl];
   return os::DragEvent(window,
                        as_dropoperation([sender draggingSourceOperationMask]),
                        drag_position(sender),
-                       ddProvider);
+                       std::make_unique<DragDataProviderOSX>(pasteboard));
 }
 
 - (BOOL)wantsPeriodicDraggingUpdates

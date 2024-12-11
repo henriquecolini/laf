@@ -78,7 +78,7 @@ namespace os {
     DragEvent(os::Window* target,
               DropOperation supportedOperations,
               const gfx::Point& dragPosition,
-              std::unique_ptr<DragDataProvider>& dataProvider)
+              std::unique_ptr<DragDataProvider>&& dataProvider)
       : m_target(target)
       , m_supportedOperations(supportedOperations)
       , m_position(dragPosition)
