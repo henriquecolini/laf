@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/common/freetype_font.h"
@@ -18,9 +18,7 @@
 
 namespace os {
 
-FreeTypeFont::FreeTypeFont(ft::Lib& lib,
-                           const char* filename,
-                           const int height)
+FreeTypeFont::FreeTypeFont(ft::Lib& lib, const char* filename, const int height)
   : m_face(lib.open(filename))
 {
   if (m_face.isValid())
@@ -71,13 +69,11 @@ bool FreeTypeFont::hasCodePoint(int codepoint) const
   return m_face.hasCodePoint(codepoint);
 }
 
-Ref<FreeTypeFont> load_free_type_font(ft::Lib& lib,
-                                      const char* filename,
-                                      const int height)
+Ref<FreeTypeFont> load_free_type_font(ft::Lib& lib, const char* filename, const int height)
 {
   Ref<FreeTypeFont> font = base::make_ref<FreeTypeFont>(lib, filename, height);
   if (!font->isValid())
-    font.reset();             // delete font
+    font.reset(); // delete font
   return font;
 }
 

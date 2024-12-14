@@ -51,7 +51,8 @@ half4 main(vec2 fragcoord) {
 class ShaderWindow {
 public:
   ShaderWindow(os::System* system)
-    : m_builder(SkRuntimeEffect::MakeForShader(SkString(shaderCode)).effect) {
+    : m_builder(SkRuntimeEffect::MakeForShader(SkString(shaderCode)).effect)
+  {
     m_window = system->makeWindow(256, 256);
     m_window->setCursor(os::NativeCursor::Arrow);
     m_window->setTitle("Shader");
@@ -60,15 +61,12 @@ public:
     m_window->setVisible(true);
   }
 
-  bool processEvent(const os::Event& ev) {
+  bool processEvent(const os::Event& ev)
+  {
     switch (ev.type()) {
+      case os::Event::CloseWindow:  return false;
 
-      case os::Event::CloseWindow:
-        return false;
-
-      case os::Event::ResizeWindow:
-        repaint();
-        break;
+      case os::Event::ResizeWindow: repaint(); break;
 
       case os::Event::KeyDown:
         if (ev.scancode() == os::kKeyEsc)
@@ -85,7 +83,8 @@ public:
     return true;
   }
 
-  void repaint() {
+  void repaint()
+  {
     os::Surface* surface = m_window->surface();
     os::SurfaceLock lock(surface);
 
@@ -95,8 +94,7 @@ public:
     if (m_window->gpuAcceleration()) {
       os::Paint p;
       p.color(gfx::rgba(0, 0, 0));
-      os::draw_text(surface, nullptr, "GPU", gfx::Point(12, 12),
-                    &p, os::TextAlign::Center);
+      os::draw_text(surface, nullptr, "GPU", gfx::Point(12, 12), &p, os::TextAlign::Center);
     }
 
     m_window->invalidate();
@@ -104,13 +102,11 @@ public:
   }
 
 private:
-
-  void skiaPaint(SkCanvas* canvas) {
+  void skiaPaint(SkCanvas* canvas)
+  {
     SkImageInfo ii = canvas->imageInfo();
-    m_builder.uniform("iResolution") = SkV3{float(ii.width()),
-                                            float(ii.height()), 0.0f};
-    m_builder.uniform("iTime") =
-      float((base::current_tick() - startTick) / 1000.0f);
+    m_builder.uniform("iResolution") = SkV3{ float(ii.width()), float(ii.height()), 0.0f };
+    m_builder.uniform("iTime") = float((base::current_tick() - startTick) / 1000.0f);
 
     SkPaint p;
     p.setShader(m_builder.makeShader());
@@ -128,9 +124,7 @@ int app_main(int argc, char* argv[])
 
   ShaderWindow window(system.get());
 
-  system->handleWindowResize = [&window](os::Window* win){
-    window.repaint();
-  };
+  system->handleWindowResize = [&window](os::Window* win) { window.repaint(); };
 
   system->finishLaunching();
   system->activateApp();
@@ -145,8 +139,7 @@ int app_main(int argc, char* argv[])
     os::Event ev;
 
     ASSERT(paintDelay >= 0.0);
-    const double waitSecs =
-      (base::current_tick() - t) / 1000.0 * 60.0 + paintDelay;
+    const double waitSecs = (base::current_tick() - t) / 1000.0 * 60.0 + paintDelay;
 
     queue->getEvent(ev, waitSecs);
     if (!window.processEvent(ev))

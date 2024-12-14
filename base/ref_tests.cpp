@@ -88,7 +88,7 @@ public:
 
 class BVirt : public AVirt {
 public:
-  BVirt(int v) : AVirt(v) { }
+  BVirt(int v) : AVirt(v) {}
   ~BVirt() { ++b_dtors; }
 };
 

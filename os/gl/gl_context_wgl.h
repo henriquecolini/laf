@@ -17,43 +17,47 @@ namespace os {
 
 class GLContextWGL : public GLContext {
 public:
-  GLContextWGL(HWND hwnd)
-    : m_hwnd(hwnd)
-    , m_glrc(nullptr) {
-  }
+  GLContextWGL(HWND hwnd) : m_hwnd(hwnd), m_glrc(nullptr) {}
 
-  ~GLContextWGL() {
-    destroyGLContext();
-  }
+  ~GLContextWGL() { destroyGLContext(); }
 
-  bool isValid() override {
-    return m_glrc != nullptr;
-  }
+  bool isValid() override { return m_glrc != nullptr; }
 
-  bool createGLContext() override {
+  bool createGLContext() override
+  {
     HDC olddc = wglGetCurrentDC();
     HGLRC oldglrc = wglGetCurrentContext();
     HDC hdc = GetDC(m_hwnd);
 
     PIXELFORMATDESCRIPTOR pfd = {
       sizeof(PIXELFORMATDESCRIPTOR),
-      1,                                // version number
-      PFD_DRAW_TO_WINDOW |              // support window
-      PFD_SUPPORT_OPENGL |              // support OpenGL
-      PFD_DOUBLEBUFFER,                 // double buffered
-      PFD_TYPE_RGBA,                    // RGBA type
-      24,                               // 24-bit color depth
-      0, 0, 0, 0, 0, 0,                 // color bits ignored
-      8,                                // 8-bit alpha buffer
-      0,                                // shift bit ignored
-      0,                                // no accumulation buffer
-      0, 0, 0, 0,                       // accum bits ignored
-      0,                                // no z-buffer
-      0,                                // no stencil buffer
-      0,                                // no auxiliary buffer
-      PFD_MAIN_PLANE,                   // main layer
-      0,                                // reserved
-      0, 0, 0                           // layer masks ignored
+      1,                     // version number
+      PFD_DRAW_TO_WINDOW |   // support window
+        PFD_SUPPORT_OPENGL | // support OpenGL
+        PFD_DOUBLEBUFFER,    // double buffered
+      PFD_TYPE_RGBA,         // RGBA type
+      24,                    // 24-bit color depth
+      0,
+      0,
+      0,
+      0,
+      0,
+      0, // color bits ignored
+      8, // 8-bit alpha buffer
+      0, // shift bit ignored
+      0, // no accumulation buffer
+      0,
+      0,
+      0,
+      0,              // accum bits ignored
+      0,              // no z-buffer
+      0,              // no stencil buffer
+      0,              // no auxiliary buffer
+      PFD_MAIN_PLANE, // main layer
+      0,              // reserved
+      0,
+      0,
+      0 // layer masks ignored
     };
     int pixelFormat = ChoosePixelFormat(hdc, &pfd);
     SetPixelFormat(hdc, pixelFormat, &pfd);
@@ -68,7 +72,8 @@ public:
     return true;
   }
 
-  void destroyGLContext() override {
+  void destroyGLContext() override
+  {
     if (m_glrc) {
       wglMakeCurrent(nullptr, nullptr);
       wglDeleteContext(m_glrc);
@@ -76,13 +81,15 @@ public:
     }
   }
 
-  void makeCurrent() override {
+  void makeCurrent() override
+  {
     HDC hdc = GetDC(m_hwnd);
     wglMakeCurrent(hdc, m_glrc);
     ReleaseDC(m_hwnd, hdc);
   }
 
-  void swapBuffers() override {
+  void swapBuffers() override
+  {
     HDC hdc = GetDC(m_hwnd);
     SwapBuffers(hdc);
     ReleaseDC(m_hwnd, hdc);

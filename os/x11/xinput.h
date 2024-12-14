@@ -44,10 +44,7 @@ public:
 
   void selectExtensionEvents(::Display* display, ::Window window);
   bool handleExtensionEvent(const XEvent& xevent);
-  void convertExtensionEvent(const XEvent& xevent,
-                             Event& ev,
-                             int scale,
-                             Time& time);
+  void convertExtensionEvent(const XEvent& xevent, Event& ev, int scale, Time& time);
 
 private:
   void addEvent(int type, XEventClass eventClass, Event::Type ourEventype);

@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/x11/xinput.h"
@@ -36,14 +36,12 @@ void XInput::load(::Display* display)
   int firstError;
 
   // Check that the XInputExtension is available.
-  if (!XQueryExtension(display, "XInputExtension",
-                       &majorOpcode,
-                       &firstEvent,
-                       &firstError))
+  if (!XQueryExtension(display, "XInputExtension", &majorOpcode, &firstEvent, &firstError))
     return;
 
   m_xi = base::load_dll("libXi.so");
-  if (!m_xi) m_xi = base::load_dll("libXi.so.6");
+  if (!m_xi)
+    m_xi = base::load_dll("libXi.so.6");
   if (!m_xi) {
     LOG("XI: Error loading libXi.so library\n");
     return;
@@ -53,12 +51,10 @@ void XInput::load(::Display* display)
   XFreeDeviceList = base::get_dll_proc<XFreeDeviceList_Func>(m_xi, "XFreeDeviceList");
   XOpenDevice = base::get_dll_proc<XOpenDevice_Func>(m_xi, "XOpenDevice");
   XCloseDevice = base::get_dll_proc<XCloseDevice_Func>(m_xi, "XCloseDevice");
-  XSelectExtensionEvent = base::get_dll_proc<XSelectExtensionEvent_Func>(m_xi, "XSelectExtensionEvent");
+  XSelectExtensionEvent = base::get_dll_proc<XSelectExtensionEvent_Func>(m_xi,
+                                                                         "XSelectExtensionEvent");
 
-  if (!XListInputDevices ||
-      !XFreeDeviceList ||
-      !XOpenDevice ||
-      !XCloseDevice ||
+  if (!XListInputDevices || !XFreeDeviceList || !XOpenDevice || !XCloseDevice ||
       !XSelectExtensionEvent) {
     base::unload_dll(m_xi);
     m_xi = nullptr;
@@ -82,8 +78,8 @@ void XInput::load(::Display* display)
     userDefinedTablet = base::string_to_lower(userDefinedTablet);
 
   std::string devName;
-  for (int i=0; i<ndevices; ++i) {
-    XDeviceInfo* devInfo = devices+i;
+  for (int i = 0; i < ndevices; ++i) {
+    XDeviceInfo* devInfo = devices + i;
     if (!devInfo->name)
       continue;
 
@@ -100,8 +96,7 @@ void XInput::load(::Display* display)
         // Detect old Wacom Bamboo devices
         std::strstr(devName.c_str(), "wacom bamboo connect pen pen") ||
         // Detect user-defined strings
-        (!userDefinedTablet.empty() &&
-         std::strstr(devName.c_str(), userDefinedTablet.c_str()))) {
+        (!userDefinedTablet.empty() && std::strstr(devName.c_str(), userDefinedTablet.c_str()))) {
       pointerType = PointerType::Pen;
     }
     // It can be "eraser", or "Tablet Eraser", or "PenTablet
@@ -113,7 +108,7 @@ void XInput::load(::Display* display)
       continue;
 
     auto* p = (uint8_t*)devInfo->inputclassinfo;
-    for (int j=0; j<devInfo->num_classes; ++j, p+=((XAnyClassPtr)p)->length) {
+    for (int j = 0; j < devInfo->num_classes; ++j, p += ((XAnyClassPtr)p)->length) {
       if (((XAnyClassPtr)p)->c_class != ValuatorClass)
         continue;
 
@@ -168,22 +163,16 @@ void XInput::selectExtensionEvents(::Display* display, ::Window window)
     return;
 
   ASSERT(XSelectExtensionEvent);
-  XSelectExtensionEvent(display, window,
-                        m_eventClasses.data(),
-                        int(m_eventClasses.size()));
+  XSelectExtensionEvent(display, window, m_eventClasses.data(), int(m_eventClasses.size()));
 }
 
 bool XInput::handleExtensionEvent(const XEvent& xevent)
 {
-  return (xevent.type >= 0 &&
-          xevent.type < int(m_eventTypes.size()) &&
+  return (xevent.type >= 0 && xevent.type < int(m_eventTypes.size()) &&
           m_eventTypes[xevent.type] != Event::None);
 }
 
-void XInput::convertExtensionEvent(const XEvent& xevent,
-                                   Event& ev,
-                                   int scale,
-                                   Time& time)
+void XInput::convertExtensionEvent(const XEvent& xevent, Event& ev, int scale, Time& time)
 {
   ev.setType(m_eventTypes[xevent.type]);
 
@@ -194,9 +183,8 @@ void XInput::convertExtensionEvent(const XEvent& xevent,
   int pressure;
 
   switch (ev.type()) {
-
     case Event::MouseDown:
-    case Event::MouseUp: {
+    case Event::MouseUp:   {
       const auto* button = (const XDeviceButtonEvent*)&xevent;
       time = button->time;
       deviceid = button->deviceid;
@@ -219,9 +207,7 @@ void XInput::convertExtensionEvent(const XEvent& xevent,
       break;
     }
 
-    default:
-      ASSERT(false);
-      break;
+    default: ASSERT(false); break;
   }
 
   ev.setModifiers(modifiers);
@@ -232,9 +218,8 @@ void XInput::convertExtensionEvent(const XEvent& xevent,
   if (it != m_info.end()) {
     const auto& info = it->second;
     if (info.minPressure != info.maxPressure) {
-      ev.setPressure(
-        float(pressure - info.minPressure) /
-        float(info.maxPressure - info.minPressure));
+      ev.setPressure(float(pressure - info.minPressure) /
+                     float(info.maxPressure - info.minPressure));
     }
     ev.setPointerType(info.pointerType);
   }
@@ -249,7 +234,7 @@ void XInput::addEvent(int type, XEventClass eventClass, Event::Type ourEventype)
 
   if (type >= 0 && type < 256) {
     if (type >= m_eventTypes.size())
-      m_eventTypes.resize(type+1, Event::None);
+      m_eventTypes.resize(type + 1, Event::None);
     m_eventTypes[type] = ourEventype;
   }
 }

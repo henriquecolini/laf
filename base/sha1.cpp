@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/debug.h"
@@ -17,13 +17,11 @@
 
 namespace base {
 
-Sha1::Sha1()
-  : m_digest(20, 0)
+Sha1::Sha1() : m_digest(20, 0)
 {
 }
 
-Sha1::Sha1(const std::vector<uint8_t>& digest)
-  : m_digest(digest)
+Sha1::Sha1(const std::vector<uint8_t>& digest) : m_digest(digest)
 {
   ASSERT(digest.size() == HashSize);
 }

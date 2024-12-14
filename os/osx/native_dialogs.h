@@ -13,11 +13,11 @@
 
 namespace os {
 
-  class NativeDialogsOSX : public NativeDialogs {
-  public:
-    NativeDialogsOSX();
-    FileDialogRef makeFileDialog() override;
-  };
+class NativeDialogsOSX : public NativeDialogs {
+public:
+  NativeDialogsOSX();
+  FileDialogRef makeFileDialog() override;
+};
 
 } // namespace os
 

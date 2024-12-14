@@ -25,9 +25,7 @@ public:
   void makeCurrent() override;
   void swapBuffers() override;
 
-  id nsglContext() {
-    return m_nsgl;
-  }
+  id nsglContext() { return m_nsgl; }
 
 private:
   id m_nsgl = nullptr; // NSOpenGLContext

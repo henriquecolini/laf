@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/log.h"
@@ -29,13 +29,14 @@ static const gfx::Point kUnknownPos(std::numeric_limits<int>::min(),
 
 class HBitmapPtr {
 public:
-  HBitmapPtr() : m_ptr(nullptr) { }
+  HBitmapPtr() : m_ptr(nullptr) {}
   ~HBitmapPtr() { reset(); }
 
   HBitmapPtr(const HBitmapPtr&) = delete;
   HBitmapPtr& operator=(const HBitmapPtr&) = delete;
 
-  void reset(HBITMAP p = nullptr) {
+  void reset(HBITMAP p = nullptr)
+  {
     if (m_ptr)
       DeleteObject(m_ptr);
     m_ptr = p;
@@ -49,8 +50,9 @@ private:
 
 class CursorWin : public Cursor {
 public:
-  CursorWin(HCURSOR hcursor) : m_hcursor(hcursor) { }
-  ~CursorWin() {
+  CursorWin(HCURSOR hcursor) : m_hcursor(hcursor) {}
+  ~CursorWin()
+  {
     // The m_hcursor can be nullptr if the cursor is completelly
     // transparent = equivalent to a Hidden cursor.
     if (m_hcursor) {
@@ -61,9 +63,7 @@ public:
   CursorWin(const CursorWin&) = delete;
   CursorWin& operator=(const CursorWin&) = delete;
 
-  void* nativeHandle() override {
-    return m_hcursor;
-  }
+  void* nativeHandle() override { return m_hcursor; }
 
 private:
   HCURSOR m_hcursor;
@@ -74,10 +74,11 @@ private:
 // re-generate the cursor on each mouse movement).
 class WinCursorCache {
 public:
-  WinCursorCache() { }
-  ~WinCursorCache() { }
+  WinCursorCache() {}
+  ~WinCursorCache() {}
 
-  bool recreate(const gfx::Size& size) {
+  bool recreate(const gfx::Size& size)
+  {
     // Use cached bitmap
     if (m_hbmp && m_hmonobmp && m_size == size)
       return true;
@@ -102,9 +103,7 @@ public:
 
     HDC hdc = GetDC(nullptr);
     m_hbmp.reset(
-      CreateDIBSection(
-        hdc, (BITMAPINFO*)&bi, DIB_RGB_COLORS,
-        (void**)&m_bits, NULL, (DWORD)0));
+      CreateDIBSection(hdc, (BITMAPINFO*)&bi, DIB_RGB_COLORS, (void**)&m_bits, NULL, (DWORD)0));
     ReleaseDC(nullptr, hdc);
     if (!m_hbmp) {
       m_bits = nullptr;
@@ -114,13 +113,15 @@ public:
     return true;
   }
 
-  HBITMAP hbmp() {
+  HBITMAP hbmp()
+  {
     ASSERT(m_hbmp);
     return m_hbmp.get();
   }
 
   // Create an empty mask bitmap.
-  HBITMAP hmonobmp() {
+  HBITMAP hmonobmp()
+  {
     if (!m_hmonobmp) {
       // We must fill the mask bitmap with ones to avoid issues when a cursor is fully
       // transparent. Before this change we were returning a "no cursor" from makeCursor
@@ -138,7 +139,8 @@ public:
     return m_hmonobmp.get();
   }
 
-  uint32_t* bits() const {
+  uint32_t* bits() const
+  {
     ASSERT(m_bits);
     return m_bits;
   }
@@ -152,8 +154,7 @@ private:
 
 static WinCursorCache g_cursor_cache;
 
-SystemWin::SystemWin()
-  : m_screenMousePos(kUnknownPos)
+SystemWin::SystemWin() : m_screenMousePos(kUnknownPos)
 {
 }
 
@@ -181,8 +182,7 @@ void SystemWin::setTabletOptions(const TabletOptions& options)
 
   // If the user selects the wintab API again, we remove any possible
   // file indicating a crash in the past.
-  if (m_tabletOptions.api == TabletAPI::Wintab ||
-      m_tabletOptions.api == TabletAPI::WintabPackets) {
+  if (m_tabletOptions.api == TabletAPI::Wintab || m_tabletOptions.api == TabletAPI::WintabPackets) {
     m_wintabApi.resetCrashFileIfPresent();
   }
 }
@@ -212,23 +212,21 @@ CursorRef SystemWin::makeCursor(const os::Surface* surface,
   if (format.bitsPerPixel != 32)
     return nullptr;
 
-  gfx::Size sz(scale*surface->width(),
-               scale*surface->height());
+  gfx::Size sz(scale * surface->width(), scale * surface->height());
 
   if (!g_cursor_cache.recreate(sz))
     return nullptr;
 
   uint32_t* bits = g_cursor_cache.bits();
-  for (int y=0; y<sz.h; ++y) {
-    const uint32_t* ptr = (const uint32_t*)surface->getData(0, (sz.h-1-y)/scale);
-    for (int x=0, u=0; x<sz.w; ++x, ++bits) {
+  for (int y = 0; y < sz.h; ++y) {
+    const uint32_t* ptr = (const uint32_t*)surface->getData(0, (sz.h - 1 - y) / scale);
+    for (int x = 0, u = 0; x < sz.w; ++x, ++bits) {
       uint32_t c = *ptr;
       uint32_t a = ((c & format.alphaMask) >> format.alphaShift);
 
-      *bits = (a << 24) |
-        (((c & format.redMask  ) >> format.redShift  ) << 16) |
-        (((c & format.greenMask) >> format.greenShift) << 8) |
-        (((c & format.blueMask ) >> format.blueShift ));
+      *bits = (a << 24) | (((c & format.redMask) >> format.redShift) << 16) |
+              (((c & format.greenMask) >> format.greenShift) << 8) |
+              (((c & format.blueMask) >> format.blueShift));
       if (++u == scale) {
         u = 0;
         ++ptr;
@@ -238,8 +236,8 @@ CursorRef SystemWin::makeCursor(const os::Surface* surface,
 
   ICONINFO ii;
   ii.fIcon = FALSE;
-  ii.xHotspot = scale*focus.x + scale/2;
-  ii.yHotspot = scale*focus.y + scale/2;
+  ii.xHotspot = scale * focus.x + scale / 2;
+  ii.yHotspot = scale * focus.y + scale / 2;
   ii.hbmMask = g_cursor_cache.hmonobmp();
   ii.hbmColor = g_cursor_cache.hbmp();
 
@@ -274,9 +272,7 @@ gfx::Color SystemWin::getColorFromScreen(const gfx::Point& screenPosition) const
   HDC dc = GetDC(nullptr);
   COLORREF c = GetPixel(dc, screenPosition.x, screenPosition.y);
   ReleaseDC(nullptr, dc);
-  return gfx::rgba(GetRValue(c),
-                   GetGValue(c),
-                   GetBValue(c));
+  return gfx::rgba(GetRValue(c), GetGValue(c), GetBValue(c));
 }
 
 ScreenRef SystemWin::mainScreen()
@@ -290,9 +286,7 @@ ScreenRef SystemWin::mainScreen()
     return nullptr;
 }
 
-static BOOL CALLBACK list_screen_enumproc(HMONITOR monitor,
-                                          HDC hdc, LPRECT rc,
-                                          LPARAM data)
+static BOOL CALLBACK list_screen_enumproc(HMONITOR monitor, HDC hdc, LPRECT rc, LPARAM data)
 {
   auto list = (ScreenList*)data;
   list->push_back(make_ref<ScreenWin>(monitor));
@@ -301,10 +295,7 @@ static BOOL CALLBACK list_screen_enumproc(HMONITOR monitor,
 
 void SystemWin::listScreens(ScreenList& list)
 {
-  EnumDisplayMonitors(
-    nullptr, nullptr,
-    list_screen_enumproc,
-    (LPARAM)&list);
+  EnumDisplayMonitors(nullptr, nullptr, list_screen_enumproc, (LPARAM)&list);
 }
 
 void SystemWin::_clearInternalMousePosition()
@@ -320,7 +311,7 @@ void SystemWin::_setInternalMousePosition(const gfx::Point& pos)
 void SystemWin::_setInternalMousePosition(const Event& ev)
 {
   ASSERT(ev.window());
-  if (!ev.window()) {           // Invalid Event state
+  if (!ev.window()) { // Invalid Event state
     m_screenMousePos = kUnknownPos;
     return;
   }

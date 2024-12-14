@@ -6,11 +6,11 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
-#include <Cocoa/Cocoa.h>
 #include <Carbon/Carbon.h>
+#include <Cocoa/Cocoa.h>
 
 #include "os/osx/event_queue.h"
 
@@ -18,8 +18,7 @@
 
 namespace os {
 
-EventQueueOSX::EventQueueOSX()
-  : m_sleeping(false)
+EventQueueOSX::EventQueueOSX() : m_sleeping(false)
 {
 }
 
@@ -64,8 +63,7 @@ void EventQueueOSX::getEvent(Event& ev, double timeout)
         // combinations, and send them directly to the main
         // NSView. Without this, the NSApplication intercepts the key
         // combination and use it to go to the next key view.
-        if (event.type == NSEventTypeKeyDown &&
-            app.keyWindow) {
+        if (event.type == NSEventTypeKeyDown && app.keyWindow) {
           [app.keyWindow.contentView keyDown:event];
         }
         else {

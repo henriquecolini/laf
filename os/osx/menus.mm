@@ -15,7 +15,7 @@
 #include "os/shortcut.h"
 
 namespace os {
-  class MenuItemOSX;
+class MenuItemOSX;
 }
 
 @interface NSMenuOSX : NSMenu
@@ -70,6 +70,7 @@ public:
   void insertItem(const int index, const MenuItemRef& item) override;
   void removeItem(const MenuItemRef& item) override;
   NSMenu* handle() { return m_handle; }
+
 private:
   NSMenu* m_handle;
 };
@@ -110,7 +111,7 @@ private:
   // mouse (i.e. some kind of event is generated).
   os::Event ev;
   ev.setType(os::Event::Callback);
-  ev.setCallback([self]{ original->execute(); });
+  ev.setCallback([self] { original->execute(); });
   os::queue_event(ev);
 }
 - (void)validateLafMenuItem
@@ -125,17 +126,13 @@ namespace os {
 //////////////////////////////////////////////////////////////////////
 // os::MenuItem impl
 
-MenuItemOSX::MenuItemOSX(const MenuItemInfo& info)
-  : m_handle(nullptr)
-  , m_submenu(nullptr)
+MenuItemOSX::MenuItemOSX(const MenuItemInfo& info) : m_handle(nullptr), m_submenu(nullptr)
 {
   switch (info.type) {
-
     case MenuItemInfo::Normal: {
       SEL sel = nil;
       id target = nil;
       switch (info.action) {
-
         case MenuItemInfo::UserDefined:
           sel = @selector(executeMenuItem:);
 
@@ -146,36 +143,23 @@ MenuItemOSX::MenuItemOSX(const MenuItemInfo& info)
           target = m_handle;
           break;
 
-        case MenuItemInfo::Hide:
-          sel = @selector(hide:);
-          break;
+        case MenuItemInfo::Hide:       sel = @selector(hide:); break;
 
-        case MenuItemInfo::HideOthers:
-          sel = @selector(hideOtherApplications:);
-          break;
+        case MenuItemInfo::HideOthers: sel = @selector(hideOtherApplications:); break;
 
-        case MenuItemInfo::ShowAll:
-          sel = @selector(unhideAllApplications:);
-          break;
+        case MenuItemInfo::ShowAll:    sel = @selector(unhideAllApplications:); break;
 
-        case MenuItemInfo::Quit:
-          sel = @selector(terminate:);
-          break;
+        case MenuItemInfo::Quit:       sel = @selector(terminate:); break;
 
-        case MenuItemInfo::Minimize:
-          sel = @selector(performMiniaturize:);
-          break;
+        case MenuItemInfo::Minimize:   sel = @selector(performMiniaturize:); break;
 
-        case MenuItemInfo::Zoom:
-          sel = @selector(performZoom:);
-          break;
+        case MenuItemInfo::Zoom:       sel = @selector(performZoom:); break;
       }
 
-      m_handle =
-        [[NSMenuItemOSX alloc:AddRef(this)]
-            initWithTitle:[NSString stringWithUTF8String:info.text.c_str()]
-                   action:sel
-            keyEquivalent:@""];
+      m_handle = [[NSMenuItemOSX alloc:AddRef(this)]
+        initWithTitle:[NSString stringWithUTF8String:info.text.c_str()]
+               action:sel
+        keyEquivalent:@""];
 
       m_handle.target = target;
       m_execute = info.execute;
@@ -186,9 +170,7 @@ MenuItemOSX::MenuItemOSX(const MenuItemInfo& info)
       break;
     }
 
-    case MenuItemInfo::Separator:
-      m_handle = [NSMenuItem separatorItem];
-      break;
+    case MenuItemInfo::Separator: m_handle = [NSMenuItem separatorItem]; break;
   }
 }
 
@@ -245,10 +227,14 @@ void MenuItemOSX::setShortcut(const Shortcut& shortcut)
 {
   KeyModifiers mods = shortcut.modifiers();
   NSEventModifierFlags nsFlags = 0;
-  if (mods & kKeyShiftModifier) nsFlags |= NSEventModifierFlagShift;
-  if (mods & kKeyCtrlModifier) nsFlags |= NSEventModifierFlagControl;
-  if (mods & kKeyAltModifier) nsFlags |= NSEventModifierFlagOption;
-  if (mods & kKeyCmdModifier) nsFlags |= NSEventModifierFlagCommand;
+  if (mods & kKeyShiftModifier)
+    nsFlags |= NSEventModifierFlagShift;
+  if (mods & kKeyCtrlModifier)
+    nsFlags |= NSEventModifierFlagControl;
+  if (mods & kKeyAltModifier)
+    nsFlags |= NSEventModifierFlagOption;
+  if (mods & kKeyCmdModifier)
+    nsFlags |= NSEventModifierFlagCommand;
 
   NSString* keyStr;
   if (shortcut.unicode()) {
@@ -322,8 +308,7 @@ void MenuOSX::addItem(const MenuItemRef& item)
 void MenuOSX::insertItem(const int index, const MenuItemRef& item)
 {
   ASSERT(item);
-  [m_handle insertItem:((MenuItemOSX*)item.get())->handle()
-               atIndex:index];
+  [m_handle insertItem:((MenuItemOSX*)item.get())->handle() atIndex:index];
 }
 
 void MenuOSX::removeItem(const MenuItemRef& item)

@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/memory_dump.h"
@@ -19,8 +19,7 @@
 
 namespace base {
 
-MemoryDump::MemoryDump()
-  : m_impl(new MemoryDumpImpl)
+MemoryDump::MemoryDump() : m_impl(new MemoryDumpImpl)
 {
 }
 

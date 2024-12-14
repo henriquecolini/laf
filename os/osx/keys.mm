@@ -8,13 +8,13 @@
 #define KEY_TRACE(...)
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/osx/keys.h"
 
-#include <Cocoa/Cocoa.h>
 #include <Carbon/Carbon.h> // TIS functions
+#include <Cocoa/Cocoa.h>
 
 namespace os {
 
@@ -163,7 +163,7 @@ static KeyScancode from_keycode_to_scancode(UInt16 keyCode)
 {
   // Converts macOS virtual key code into a os::KeyScancode
   static KeyScancode map[256] = {
-                    // 0x00
+    // 0x00
     kKeyA,          // 0x00 - kVK_ANSI_A
     kKeyS,          // 0x01 - kVK_ANSI_S
     kKeyD,          // 0x02 - kVK_ANSI_D
@@ -323,7 +323,7 @@ KeyScancode scancode_from_nsevent(NSEvent* event)
     // QWERTY Cmd" keyboard layout.
     NSString* chars = event.characters;
     if (chars.length > 0) {
-      int chr = [chars characterAtIndex:chars.length-1];
+      int chr = [chars characterAtIndex:chars.length - 1];
 
       // Avoid activating space bar modifier. E.g. pressing
       // Ctrl+Alt+Shift+S on "Spanish ISO" layout generates a
@@ -332,8 +332,7 @@ KeyScancode scancode_from_nsevent(NSEvent* event)
       if (chr != 32) {
         code = from_char_to_scancode(chr);
         if (code != kKeyNil) {
-          KEY_TRACE("scancode_from_nsevent %d -> %d (characters)\n",
-                    (int)chr, (int)code);
+          KEY_TRACE("scancode_from_nsevent %d -> %d (characters)\n", (int)chr, (int)code);
           return code;
         }
       }
@@ -341,11 +340,12 @@ KeyScancode scancode_from_nsevent(NSEvent* event)
 
     chars = event.charactersIgnoringModifiers;
     if (chars.length > 0) {
-      int chr = [chars characterAtIndex:chars.length-1];
+      int chr = [chars characterAtIndex:chars.length - 1];
       code = from_char_to_scancode(chr);
       if (code != kKeyNil) {
         KEY_TRACE("scancode_from_nsevent %d -> %d (charactersIgnoringModifiers)\n",
-                  (int)chr, (int)code);
+                  (int)chr,
+                  (int)code);
         return code;
       }
     }
@@ -353,9 +353,8 @@ KeyScancode scancode_from_nsevent(NSEvent* event)
 #else // Don't use this code, it reports scancodes always as QWERTY
       // and doesn't work for Dvorak or AZERTY layouts.
   {
-    CFStringRef strRef = get_unicode_from_key_code(
-      event.keyCode,
-      event.modifierFlags & NSCommandKeyMask);
+    CFStringRef strRef = get_unicode_from_key_code(event.keyCode,
+                                                   event.modifierFlags & NSCommandKeyMask);
 
     if (strRef) {
       KeyScancode code = kKeyNil;
@@ -363,11 +362,12 @@ KeyScancode scancode_from_nsevent(NSEvent* event)
       int length = CFStringGetLength(strRef);
       if (length > 0) {
         // Converts the first unicode char into a macOS virtual key
-        UInt16 chr = CFStringGetCharacterAtIndex(strRef, length-1);
+        UInt16 chr = CFStringGetCharacterAtIndex(strRef, length - 1);
         code = from_char_to_scancode(chr);
         if (code != kKeyNil) {
           KEY_TRACE("scancode_from_nsevent %d -> %d (get_unicode_from_key_code)\n",
-                    (int)chr, (int)code);
+                    (int)chr,
+                    (int)code);
         }
       }
 
@@ -380,8 +380,7 @@ KeyScancode scancode_from_nsevent(NSEvent* event)
 #endif
 
   KeyScancode code = from_keycode_to_scancode(event.keyCode);
-  KEY_TRACE("scancode_from_nsevent %d -> %d (keyCode)\n",
-            (int)event.keyCode, (int)code);
+  KEY_TRACE("scancode_from_nsevent %d -> %d (keyCode)\n", (int)event.keyCode, (int)code);
   return code;
 }
 
@@ -400,13 +399,14 @@ CFStringRef get_unicode_from_key_code(const UInt16 keyCode,
   // kTISPropertyUnicodeKeyLayoutData (returns nullptr) when the input
   // source is Japanese (Romaji/Hiragana/Katakana).
 
-  //TISInputSourceRef inputSource = TISCopyCurrentKeyboardInputSource();
+  // TISInputSourceRef inputSource = TISCopyCurrentKeyboardInputSource();
   TISInputSourceRef inputSource = TISCopyCurrentKeyboardLayoutInputSource();
-  CFDataRef keyLayoutData = (CFDataRef)TISGetInputSourceProperty(inputSource, kTISPropertyUnicodeKeyLayoutData);
+  CFDataRef keyLayoutData = (CFDataRef)TISGetInputSourceProperty(inputSource,
+                                                                 kTISPropertyUnicodeKeyLayoutData);
   const UCKeyboardLayout* keyLayout =
-    (keyLayoutData ? (const UCKeyboardLayout*)CFDataGetBytePtr(keyLayoutData): nullptr);
+    (keyLayoutData ? (const UCKeyboardLayout*)CFDataGetBytePtr(keyLayoutData) : nullptr);
 
-  UInt32 deadKeyStateWrap = (deadKeyState ? *deadKeyState: 0);
+  UInt32 deadKeyStateWrap = (deadKeyState ? *deadKeyState : 0);
   UniChar output[4];
   UniCharCount length;
 
@@ -427,17 +427,16 @@ CFStringRef get_unicode_from_key_code(const UInt16 keyCode,
 
   // Reference here:
   // https://developer.apple.com/reference/coreservices/1390584-uckeytranslate?language=objc
-  UCKeyTranslate(
-    keyLayout,
-    keyCode,
-    kUCKeyActionDown,
-    modifier_key_state,
-    LMGetKbdType(),
-    (deadKeyState ? 0: kUCKeyTranslateNoDeadKeysMask),
-    &deadKeyStateWrap,
-    sizeof(output) / sizeof(output[0]),
-    &length,
-    output);
+  UCKeyTranslate(keyLayout,
+                 keyCode,
+                 kUCKeyActionDown,
+                 modifier_key_state,
+                 LMGetKbdType(),
+                 (deadKeyState ? 0 : kUCKeyTranslateNoDeadKeysMask),
+                 &deadKeyStateWrap,
+                 sizeof(output) / sizeof(output[0]),
+                 &length,
+                 output);
 
   if (deadKeyState)
     *deadKeyState = deadKeyStateWrap;

@@ -14,17 +14,15 @@
 namespace base {
 
 template<typename Pred>
-void trim_string(const std::string& input,
-                 std::string& output,
-                 const Pred& pred)
+void trim_string(const std::string& input, std::string& output, const Pred& pred)
 {
   int i, j;
 
-  for (i=0; i<(int)input.size(); ++i)
+  for (i = 0; i < (int)input.size(); ++i)
     if (!pred(input.at(i)))
       break;
 
-  for (j=(int)input.size()-1; j>i; --j)
+  for (j = (int)input.size() - 1; j > i; --j)
     if (!pred(input.at(j)))
       break;
 
@@ -34,11 +32,11 @@ void trim_string(const std::string& input,
     output = std::string();
 }
 
-inline void trim_string(const std::string& input,
-                        std::string& output) {
+inline void trim_string(const std::string& input, std::string& output)
+{
   trim_string<int(int)>(input, output, std::isspace);
 }
 
-}
+} // namespace base
 
 #endif

@@ -17,71 +17,54 @@ class Hsl;
 
 class Rgb {
 public:
-  Rgb()
-    : m_red(0)
-    , m_green(0)
-    , m_blue(0)
-  { }
+  Rgb() : m_red(0), m_green(0), m_blue(0) {}
 
-  Rgb(int red, int green, int blue)
-    : m_red(red)
-    , m_green(green)
-    , m_blue(blue)
+  Rgb(int red, int green, int blue) : m_red(red), m_green(green), m_blue(blue)
   {
-    ASSERT(red   >= 0 && red   <= 255);
+    ASSERT(red >= 0 && red <= 255);
     ASSERT(green >= 0 && green <= 255);
-    ASSERT(blue  >= 0 && blue  <= 255);
+    ASSERT(blue >= 0 && blue <= 255);
   }
 
-  Rgb(const Rgb& rgb)
-    : m_red(rgb.red())
-    , m_green(rgb.green())
-    , m_blue(rgb.blue())
-  { }
+  Rgb(const Rgb& rgb) : m_red(rgb.red()), m_green(rgb.green()), m_blue(rgb.blue()) {}
 
   // Conversions
   explicit Rgb(const Hsv& hsv);
   explicit Rgb(const Hsl& hsl);
 
-  int red() const {
-    return m_red;
-  }
+  int red() const { return m_red; }
 
-  int green() const {
-    return m_green;
-  }
+  int green() const { return m_green; }
 
-  int blue() const {
-    return m_blue;
-  }
+  int blue() const { return m_blue; }
 
   int maxComponent() const;
   int minComponent() const;
 
-  void red(int red) {
+  void red(int red)
+  {
     ASSERT(red >= 0 && red <= 255);
     m_red = red;
   }
 
-  void green(int green) {
+  void green(int green)
+  {
     ASSERT(green >= 0 && green <= 255);
     m_green = green;
   }
 
-  void blue(int blue) {
+  void blue(int blue)
+  {
     ASSERT(blue >= 0 && blue <= 255);
     m_blue = blue;
   }
 
-  bool operator==(const Rgb& other) const {
-    return (m_red == other.m_red &&
-            m_green == other.m_green &&
-            m_blue == other.m_blue);
+  bool operator==(const Rgb& other) const
+  {
+    return (m_red == other.m_red && m_green == other.m_green && m_blue == other.m_blue);
   }
 
-  bool operator!=(const Rgb& other) const {
-    return !operator==(other);
-  }
+  bool operator!=(const Rgb& other) const { return !operator==(other); }
 
 private:
   int m_red;

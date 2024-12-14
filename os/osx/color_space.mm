@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/osx/color_space.h"
@@ -21,12 +21,9 @@ os::ColorSpaceRef convert_nscolorspace_to_os_colorspace(NSColorSpace* nsColorSpa
   if (cgCS) {
     CFDataRef icc = CGColorSpaceCopyICCProfile(cgCS);
     if (icc) {
-      auto gfxCS = gfx::ColorSpace::MakeICC(CFDataGetBytePtr(icc),
-                                            CFDataGetLength(icc));
+      auto gfxCS = gfx::ColorSpace::MakeICC(CFDataGetBytePtr(icc), CFDataGetLength(icc));
 
-      gfxCS->setName(
-        std::string("Display Profile: ") +
-        [[nsColorSpace localizedName] UTF8String]);
+      gfxCS->setName(std::string("Display Profile: ") + [[nsColorSpace localizedName] UTF8String]);
 
       osCS = os::instance()->makeColorSpace(gfxCS);
       CFRelease(icc);
@@ -39,8 +36,7 @@ void list_display_colorspaces(std::vector<os::ColorSpaceRef>& list)
 {
   // One color profile for each screen
   for (NSScreen* screen in [NSScreen screens]) {
-    os::ColorSpaceRef osCS =
-      convert_nscolorspace_to_os_colorspace([screen colorSpace]);
+    os::ColorSpaceRef osCS = convert_nscolorspace_to_os_colorspace([screen colorSpace]);
     if (osCS)
       list.push_back(osCS);
   }

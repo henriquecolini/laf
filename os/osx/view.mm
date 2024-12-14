@@ -8,16 +8,16 @@
 #define KEY_TRACE(...)
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/osx/view.h"
 
 #include "base/debug.h"
 #include "gfx/point.h"
-#include "os/osx/dnd.h"
 #include "os/event.h"
 #include "os/event_queue.h"
+#include "os/osx/dnd.h"
 #include "os/osx/generate_drop_files.h"
 #include "os/osx/keys.h"
 #include "os/osx/window.h"
@@ -49,15 +49,13 @@ Event::MouseButton g_lastMouseButton = Event::NoneButton;
 
 gfx::Point get_local_mouse_pos(NSView* view, NSEvent* event)
 {
-  NSPoint point = [view convertPoint:[event locationInWindow]
-                            fromView:nil];
+  NSPoint point = [view convertPoint:[event locationInWindow] fromView:nil];
   int scale = 1;
   if ([view window])
     scale = [(WindowOSXObjc*)[view window] scale];
 
   // "os" layer coordinates expect (X,Y) origin at the top-left corner.
-  return gfx::Point(point.x / scale,
-                    (view.bounds.size.height - point.y) / scale);
+  return gfx::Point(point.x / scale, (view.bounds.size.height - point.y) / scale);
 }
 
 Event::MouseButton get_mouse_buttons(NSEvent* event)
@@ -67,14 +65,11 @@ Event::MouseButton get_mouse_buttons(NSEvent* event)
   switch (event.type) {
     case NSEventTypeLeftMouseDown:
     case NSEventTypeLeftMouseUp:
-    case NSEventTypeLeftMouseDragged:
-      return Event::LeftButton;
+    case NSEventTypeLeftMouseDragged:  return Event::LeftButton;
     case NSEventTypeRightMouseDown:
     case NSEventTypeRightMouseUp:
-    case NSEventTypeRightMouseDragged:
-      return Event::RightButton;
-    default:
-      break;
+    case NSEventTypeRightMouseDragged: return Event::RightButton;
+    default:                           break;
   }
 
   switch (event.buttonNumber) {
@@ -93,11 +88,16 @@ KeyModifiers get_modifiers_from_nsevent(NSEvent* event)
 {
   int modifiers = kKeyNoneModifier;
   NSEventModifierFlags nsFlags = event.modifierFlags;
-  if (nsFlags & NSEventModifierFlagShift) modifiers |= kKeyShiftModifier;
-  if (nsFlags & NSEventModifierFlagControl) modifiers |= kKeyCtrlModifier;
-  if (nsFlags & NSEventModifierFlagOption) modifiers |= kKeyAltModifier;
-  if (nsFlags & NSEventModifierFlagCommand) modifiers |= kKeyCmdModifier;
-  if (osx_is_key_pressed(kKeySpace)) modifiers |= kKeySpaceModifier;
+  if (nsFlags & NSEventModifierFlagShift)
+    modifiers |= kKeyShiftModifier;
+  if (nsFlags & NSEventModifierFlagControl)
+    modifiers |= kKeyCtrlModifier;
+  if (nsFlags & NSEventModifierFlagOption)
+    modifiers |= kKeyAltModifier;
+  if (nsFlags & NSEventModifierFlagCommand)
+    modifiers |= kKeyCmdModifier;
+  if (osx_is_key_pressed(kKeySpace))
+    modifiers |= kKeySpaceModifier;
   return (KeyModifiers)modifiers;
 }
 
@@ -145,13 +145,11 @@ using namespace os;
     self = [super initWithFrame:frameRect];
     if (self != nil) {
       [self createMouseTrackingArea];
-      [self registerForDraggedTypes:
-              [NSArray arrayWithObjects:
-                         NSFilenamesPboardType,
-                         NSPasteboardTypePNG,
-                         NSPasteboardTypeTIFF,
-                         NSURLPboardType,
-                       nil]];
+      [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType,
+                                                              NSPasteboardTypePNG,
+                                                              NSPasteboardTypeTIFF,
+                                                              NSURLPboardType,
+                                                              nil]];
 
       // Create a CALayer for backing content with async drawing. This
       // fixes performance issues on Retina displays with wide color
@@ -262,13 +260,12 @@ using namespace os;
   ev.setType(Event::KeyDown);
   ev.setScancode(scancode);
   ev.setModifiers(get_modifiers_from_nsevent(event));
-  ev.setRepeat(event.ARepeat ? 1: 0);
+  ev.setRepeat(event.ARepeat ? 1 : 0);
   ev.setUnicodeChar(0);
 
   bool sendMsg = true;
 
-  CFStringRef strRef = get_unicode_from_key_code(event.keyCode,
-                                                 event.modifierFlags);
+  CFStringRef strRef = get_unicode_from_key_code(event.keyCode, event.modifierFlags);
   if (strRef) {
     int length = CFStringGetLength(strRef);
     if (length == 1)
@@ -277,17 +274,15 @@ using namespace os;
   }
 
   if (scancode >= 0 && scancode < kKeyScancodes)
-    g_pressedKeys[scancode] = (ev.unicodeChar() ? ev.unicodeChar(): 1);
+    g_pressedKeys[scancode] = (ev.unicodeChar() ? ev.unicodeChar() : 1);
 
   if (g_translateDeadKeys) {
-    strRef = get_unicode_from_key_code(event.keyCode,
-                                       event.modifierFlags,
-                                       &g_lastDeadKeyState);
+    strRef = get_unicode_from_key_code(event.keyCode, event.modifierFlags, &g_lastDeadKeyState);
     if (strRef) {
       int length = CFStringGetLength(strRef);
       if (length > 0) {
         sendMsg = false;
-        for (int i=0; i<length; ++i) {
+        for (int i = 0; i < length; ++i) {
           ev.setUnicodeChar(CFStringGetCharacterAtIndex(strRef, i));
           [self queueEvent:ev];
         }
@@ -301,8 +296,10 @@ using namespace os;
   }
 
   KEY_TRACE("View keyDown: unicode=%d (%c) scancode=%d modifiers=%d\n",
-            ev.unicodeChar(), ev.unicodeChar(),
-            ev.scancode(), ev.modifiers());
+            ev.unicodeChar(),
+            ev.unicodeChar(),
+            ev.scancode(),
+            ev.modifiers());
 
   if (sendMsg)
     [self queueEvent:ev];
@@ -320,7 +317,7 @@ using namespace os;
   ev.setType(Event::KeyUp);
   ev.setScancode(scancode);
   ev.setModifiers(get_modifiers_from_nsevent(event));
-  ev.setRepeat(event.ARepeat ? 1: 0);
+  ev.setRepeat(event.ARepeat ? 1 : 0);
   ev.setUnicodeChar(0);
 
   [self queueEvent:ev];
@@ -335,28 +332,19 @@ using namespace os;
 + (void)updateKeyFlags:(NSEvent*)event
 {
   static int lastFlags = 0;
-  static int flags[] = {
-    NSEventModifierFlagShift,
-    NSEventModifierFlagControl,
-    NSEventModifierFlagOption,
-    NSEventModifierFlagCommand
-  };
-  static KeyScancode scancodes[] = {
-    kKeyLShift,
-    kKeyLControl,
-    kKeyAlt,
-    kKeyCommand
-  };
+  static int flags[] = { NSEventModifierFlagShift,
+                         NSEventModifierFlagControl,
+                         NSEventModifierFlagOption,
+                         NSEventModifierFlagCommand };
+  static KeyScancode scancodes[] = { kKeyLShift, kKeyLControl, kKeyAlt, kKeyCommand };
 
   KeyModifiers modifiers = get_modifiers_from_nsevent(event);
   int newFlags = event.modifierFlags;
 
-  for (int i=0; i<sizeof(flags)/sizeof(flags[0]); ++i) {
+  for (int i = 0; i < sizeof(flags) / sizeof(flags[0]); ++i) {
     if ((lastFlags & flags[i]) != (newFlags & flags[i])) {
       Event ev;
-      ev.setType(
-        ((newFlags & flags[i]) != 0 ? Event::KeyDown:
-                                      Event::KeyUp));
+      ev.setType(((newFlags & flags[i]) != 0 ? Event::KeyDown : Event::KeyUp));
 
       g_pressedKeys[scancodes[i]] = ((newFlags & flags[i]) != 0);
 
@@ -460,8 +448,7 @@ using namespace os;
   Event::MouseButton button = get_mouse_buttons(event);
   Event ev;
 
-  if (event.clickCount == 2 &&
-      button == g_lastMouseButton) {
+  if (event.clickCount == 2 && button == g_lastMouseButton) {
     ev.setType(Event::MouseDoubleClick);
   }
   else {
@@ -520,8 +507,7 @@ using namespace os;
 
   // Call WindowOSX::onResize handler
   if (m_impl) {
-    m_impl->onResize(gfx::Size(newSize.width,
-                               newSize.height));
+    m_impl->onResize(gfx::Size(newSize.width, newSize.height));
   }
 }
 
@@ -545,12 +531,10 @@ using namespace os;
       // preciseScrollingDelta, resulting in unexpected behavior as we
       // don't know how to interpret the scrollingDelta values
       // accurately from those devices.
-      (event.phase != NSEventPhaseNone ||
-       event.momentumPhase != NSEventPhaseNone)) {
+      (event.phase != NSEventPhaseNone || event.momentumPhase != NSEventPhaseNone)) {
     ev.setPointerType(os::PointerType::Touchpad);
     // TODO we shouldn't change the sign
-    ev.setWheelDelta(gfx::Point(-event.scrollingDeltaX / scale,
-                                -event.scrollingDeltaY / scale));
+    ev.setWheelDelta(gfx::Point(-event.scrollingDeltaX / scale, -event.scrollingDeltaY / scale));
     ev.setPreciseWheel(true);
   }
   else {
@@ -587,12 +571,10 @@ using namespace os;
 {
   if (event.isEnteringProximity == YES) {
     switch (event.pointingDeviceType) {
-      case NSPointingDeviceTypePen: m_pointerType = os::PointerType::Pen; break;
+      case NSPointingDeviceTypePen:    m_pointerType = os::PointerType::Pen; break;
       case NSPointingDeviceTypeCursor: m_pointerType = os::PointerType::Cursor; break;
       case NSPointingDeviceTypeEraser: m_pointerType = os::PointerType::Eraser; break;
-      default:
-        m_pointerType = os::PointerType::Unknown;
-        break;
+      default:                         m_pointerType = os::PointerType::Unknown; break;
     }
   }
   else {
@@ -614,16 +596,13 @@ using namespace os;
 - (void)createMouseTrackingArea
 {
   // Create a tracking area to receive mouseMoved events
-  m_trackingArea =
-    [[NSTrackingArea alloc]
-        initWithRect:self.bounds
-             options:(NSTrackingMouseEnteredAndExited |
-                      NSTrackingMouseMoved |
-                      NSTrackingActiveInActiveApp |
-                      NSTrackingEnabledDuringMouseDrag |
-                      NSTrackingCursorUpdate)
-               owner:self
-            userInfo:nil];
+  m_trackingArea = [[NSTrackingArea alloc]
+    initWithRect:self.bounds
+         options:(NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved |
+                  NSTrackingActiveInActiveApp | NSTrackingEnabledDuringMouseDrag |
+                  NSTrackingCursorUpdate)
+           owner:self
+        userInfo:nil];
   [self addTrackingArea:m_trackingArea];
 }
 
@@ -650,8 +629,7 @@ using namespace os;
     // functions are hard to balance.
     if (!g_emptyNsCursor) {
       NSImage* img = [[NSImage alloc] initWithSize:NSMakeSize(1, 1)];
-      g_emptyNsCursor = [[NSCursor alloc] initWithImage:img
-                                                hotSpot:NSMakePoint(0, 0)];
+      g_emptyNsCursor = [[NSCursor alloc] initWithImage:img hotSpot:NSMakePoint(0, 0)];
     }
     [g_emptyNsCursor set];
   }
@@ -713,7 +691,7 @@ os::DragEvent newDragEvent(id<NSDraggingInfo> sender)
   window->notifyDragLeave(ev);
 }
 
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+- (BOOL)performDragOperation:(id<NSDraggingInfo>)sender
 {
   NSPasteboard* pasteboard = [sender draggingPasteboard];
   WindowOSXObjc* target = (WindowOSXObjc*)sender.draggingDestinationWindow;
@@ -743,7 +721,7 @@ os::DragEvent newDragEvent(id<NSDraggingInfo> sender)
 
 - (void)setTranslateDeadKeys:(BOOL)state
 {
-  g_translateDeadKeys = (state ? true: false);
+  g_translateDeadKeys = (state ? true : false);
   g_lastDeadKeyState = 0;
 }
 

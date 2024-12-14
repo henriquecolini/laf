@@ -4,10 +4,10 @@
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
 
-#include "base/fs.h"
-#include "os/window.h"
 #include "os/win/dnd.h"
+#include "base/fs.h"
 #include "os/system.h"
+#include "os/window.h"
 
 #include "clip/clip.h"
 #include "clip/clip_win.h"
@@ -52,9 +52,7 @@ class GLock {
 public:
   GLock() = delete;
   GLock(const GLock&) = delete;
-  explicit GLock(HGLOBAL hglobal) : m_hmem(hglobal) {
-    m_data = static_cast<T>(GlobalLock(m_hmem));
-  }
+  explicit GLock(HGLOBAL hglobal) : m_hmem(hglobal) { m_data = static_cast<T>(GlobalLock(m_hmem)); }
 
   virtual ~GLock() { GlobalUnlock(m_hmem); }
 
@@ -83,12 +81,8 @@ class Medium : public GLock<T> {
 public:
   Medium() = delete;
   Medium(const Medium&) = delete;
-  Medium(std::nullptr_t) : GLock<T>(nullptr) {
-    std::memset(&m_medium, 0, sizeof(STGMEDIUM));
-  }
-  explicit Medium(const STGMEDIUM& medium) : GLock<T>(medium.hGlobal) {
-    m_medium = medium;
-  }
+  Medium(std::nullptr_t) : GLock<T>(nullptr) { std::memset(&m_medium, 0, sizeof(STGMEDIUM)); }
+  explicit Medium(const STGMEDIUM& medium) : GLock<T>(medium.hGlobal) { m_medium = medium; }
 
   ~Medium() override { ReleaseStgMedium(&m_medium); }
 
@@ -175,7 +169,8 @@ base::paths DragDataProviderWin::getPaths()
     for (int index = 0; index < count; ++index) {
       int length = DragQueryFile(hdrop, index, nullptr, 0);
       if (length > 0) {
-        // From Win32 docs: https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragqueryfilew
+        // From Win32 docs:
+        // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragqueryfilew
         // the DragQueryFile() doesn't include the null character in its return value.
         std::vector<TCHAR> str(length + 1);
         DragQueryFile(hdrop, index, str.data(), str.size());
@@ -221,7 +216,7 @@ SurfaceRef DragDataProviderWin::getImage()
   UINT fileContentsFormat = RegisterClipboardFormat(CFSTR_FILECONTENTS);
   if (fileDescriptorFormat) {
     Medium<FILEGROUPDESCRIPTOR*> fgd = data.get<FILEGROUPDESCRIPTOR*>(fileDescriptorFormat);
-    if (fgd != nullptr &&  fgd->cItems > 0) {
+    if (fgd != nullptr && fgd->cItems > 0) {
       // Get content of the first file on the group.
       Medium<uint8_t*> content = data.get<uint8_t*>(fileContentsFormat, 0);
       if (content != nullptr) {
@@ -296,13 +291,14 @@ bool DragDataProviderWin::contains(DragDataItemType type)
 
             if (fmt.cfFormat == fileDescriptorFormat) {
               DataWrapper data(m_data);
-              Medium<FILEGROUPDESCRIPTOR*> fgd = data.get<FILEGROUPDESCRIPTOR*>(fileDescriptorFormat);
+              Medium<FILEGROUPDESCRIPTOR*> fgd = data.get<FILEGROUPDESCRIPTOR*>(
+                fileDescriptorFormat);
               if (fgd != nullptr && fgd->cItems > 0) {
                 const std::string filename(base::to_utf8(fgd->fgd->cFileName));
                 std::string ext = base::get_file_extension(filename);
                 std::transform(ext.begin(), ext.end(), ext.begin(), ::toupper);
-                if (ext == "PNG" || ext == "JPG" || ext == "JPEG" ||
-                    ext == "JPE" || ext == "GIF" || ext == "BMP")
+                if (ext == "PNG" || ext == "JPG" || ext == "JPEG" || ext == "JPE" || ext == "GIF" ||
+                    ext == "BMP")
                   return true;
               }
             }
@@ -355,11 +351,9 @@ DragEvent DragTargetAdapter::newDragEvent(POINTL* pt, DWORD* pdwEffect)
     // Get drag position
     m_position = m_window->pointFromScreen(gfx::Point(pt->x, pt->y));
 
-  std::unique_ptr<DragDataProvider> ddProvider = std::make_unique<DragDataProviderWin>(m_data.get());
-  return DragEvent(m_window,
-                   as_dropoperation(*pdwEffect),
-                   m_position,
-                   ddProvider);
+  std::unique_ptr<DragDataProvider> ddProvider = std::make_unique<DragDataProviderWin>(
+    m_data.get());
+  return DragEvent(m_window, as_dropoperation(*pdwEffect), m_position, ddProvider);
 }
 
 STDMETHODIMP DragTargetAdapter::DragEnter(IDataObject* pDataObj,
@@ -380,9 +374,7 @@ STDMETHODIMP DragTargetAdapter::DragEnter(IDataObject* pDataObj,
   return S_OK;
 }
 
-STDMETHODIMP DragTargetAdapter::DragOver(DWORD grfKeyState,
-                                         POINTL pt,
-                                         DWORD* pdwEffect)
+STDMETHODIMP DragTargetAdapter::DragOver(DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
 {
   if (!m_window->hasDragTarget())
     return E_NOTIMPL;
@@ -423,4 +415,4 @@ STDMETHODIMP DragTargetAdapter::Drop(IDataObject* pDataObj,
   return S_OK;
 }
 
-} // namespase os
+} // namespace os

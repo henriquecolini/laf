@@ -10,16 +10,17 @@
 
 #ifdef __OBJC__
 
-#include "os/osx/color_space.h"
-#include "os/screen.h"
+  #include "os/osx/color_space.h"
+  #include "os/screen.h"
 
-#include <Cocoa/Cocoa.h>
+  #include <Cocoa/Cocoa.h>
 
 namespace os {
 
 class ScreenOSX : public Screen {
 public:
-  ScreenOSX(NSScreen* screen) : m_screen(screen) {
+  ScreenOSX(NSScreen* screen) : m_screen(screen)
+  {
     auto rc = screen.frame;
     auto wa = screen.visibleFrame;
 
@@ -33,17 +34,15 @@ public:
     m_workarea.w = wa.size.width;
     m_workarea.h = wa.size.height;
   }
-  bool isMainScreen() const override {
-    return m_screen == [NSScreen mainScreen];
-  }
-  gfx::Rect bounds() const override { return  m_bounds; }
+  bool isMainScreen() const override { return m_screen == [NSScreen mainScreen]; }
+  gfx::Rect bounds() const override { return m_bounds; }
   gfx::Rect workarea() const override { return m_workarea; }
-  os::ColorSpaceRef colorSpace() const override {
+  os::ColorSpaceRef colorSpace() const override
+  {
     return convert_nscolorspace_to_os_colorspace([m_screen colorSpace]);
   }
-  void* nativeHandle() const override {
-    return (__bridge void*)m_screen;
-  }
+  void* nativeHandle() const override { return (__bridge void*)m_screen; }
+
 private:
   NSScreen* m_screen;
   gfx::Rect m_bounds;

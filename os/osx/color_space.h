@@ -11,7 +11,7 @@
 #include "os/color_space.h"
 
 #ifdef __OBJC__
-#include <Cocoa/Cocoa.h>
+  #include <Cocoa/Cocoa.h>
 #endif
 
 #include <vector>

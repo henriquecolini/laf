@@ -10,14 +10,16 @@
 
 class MyDrawTextDelegate : public os::DrawTextDelegate {
   gfx::Point m_mousePos;
+
 public:
-  MyDrawTextDelegate(const gfx::Point& mousePos) : m_mousePos(mousePos) { }
+  MyDrawTextDelegate(const gfx::Point& mousePos) : m_mousePos(mousePos) {}
 
   void preProcessChar(const int index,
                       const int codepoint,
                       gfx::Color& fg,
                       gfx::Color& bg,
-                      const gfx::Rect& charBounds) override {
+                      const gfx::Rect& charBounds) override
+  {
     if (charBounds.contains(m_mousePos)) {
       fg = gfx::rgba(0, 0, 0);
       bg = gfx::rgba(255, 255, 255);
@@ -31,8 +33,7 @@ public:
 
 os::FontRef font = nullptr;
 
-void draw_window(os::Window* window,
-                  const gfx::Point& mousePos)
+void draw_window(os::Window* window, const gfx::Point& mousePos)
 {
   os::Surface* surface = window->surface();
   os::SurfaceLock lock(surface);
@@ -49,21 +50,24 @@ void draw_window(os::Window* window,
   p.color(gfx::rgba(255, 255, 255));
 
   const wchar_t* lines[] = { L"English",
-                             L"Русский язык", // Russian
-                             L"汉语",         // Simplified Chinese
-                             L"日本語",       // Japanese
-                             L"한국어",       // Korean
-                             L"العَرَبِيَّة‎" };     // Arabic
+                             L"Русский язык",                  // Russian
+                             L"汉语",                          // Simplified Chinese
+                             L"日本語",                        // Japanese
+                             L"한국어",                        // Korean
+                             L"العَرَبِيَّة‎" }; // Arabic
 
   MyDrawTextDelegate delegate(mousePos);
   gfx::Point pos(0, 0);
   for (auto line : lines) {
     std::string s = base::to_utf8(line);
-    os::draw_text(
-      backSurface.get(), font.get(), s,
-      gfx::rgba(255, 255, 255), gfx::ColorNone,
-      pos.x, pos.y,
-      &delegate);
+    os::draw_text(backSurface.get(),
+                  font.get(),
+                  s,
+                  gfx::rgba(255, 255, 255),
+                  gfx::ColorNone,
+                  pos.x,
+                  pos.y,
+                  &delegate);
 
     pos.y += font->height() + 4;
   }
@@ -115,16 +119,11 @@ int app_main(int argc, char* argv[])
     queue->getEvent(ev);
 
     switch (ev.type()) {
-
-      case os::Event::CloseWindow:
-        running = false;
-        break;
+      case os::Event::CloseWindow: running = false; break;
 
       case os::Event::KeyDown:
         switch (ev.scancode()) {
-          case os::kKeyEsc:
-            running = false;
-            break;
+          case os::kKeyEsc: running = false; break;
           case os::kKey1:
           case os::kKey2:
           case os::kKey3:
@@ -144,9 +143,7 @@ int app_main(int argc, char* argv[])
         }
         break;
 
-      case os::Event::ResizeWindow:
-        redraw = true;
-        break;
+      case os::Event::ResizeWindow: redraw = true; break;
 
       case os::Event::MouseEnter:
       case os::Event::MouseMove:

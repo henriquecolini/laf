@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/x11/native_dialogs.h"
@@ -18,7 +18,7 @@
 #include "os/common/file_dialog.h"
 #include "os/x11/x11.h"
 
-#include <cstdio>              // popen/pclose()
+#include <cstdio> // popen/pclose()
 #include <cstring>
 
 namespace os {
@@ -26,12 +26,11 @@ namespace os {
 static std::string quote_for_shell(const std::string& in)
 {
   std::string out;
-  out.reserve(in.size()+2);
+  out.reserve(in.size() + 2);
   out.push_back('\"');
   for (auto chr : in) {
     // Add escape char '\' to double quotes and backslashes
-    if (chr == '\"' ||
-        chr == '\\') {
+    if (chr == '\"' || chr == '\\') {
       out.push_back('\\');
       out.push_back(chr);
     }
@@ -49,22 +48,18 @@ public:
   enum class CLITool {
     Unknown,
     NotFound,
-    Zenity,                     // Used for GNOME/GTK+
-    KDialog,                    // Used for KDE
+    Zenity,  // Used for GNOME/GTK+
+    KDialog, // Used for KDE
   };
 
-  FileDialogX11() {
-  }
+  FileDialogX11() {}
 
-  std::string fileName() override {
-    return m_filename;
-  }
+  std::string fileName() override { return m_filename; }
 
-  void getMultipleFileNames(base::paths& output) override {
-    output = m_filenames;
-  }
+  void getMultipleFileNames(base::paths& output) override { output = m_filenames; }
 
-  void setFileName(const std::string& filename) override {
+  void setFileName(const std::string& filename) override
+  {
     m_filename = filename;
     if (base::is_directory(m_filename))
       m_initialDir = m_filename;
@@ -89,9 +84,9 @@ public:
     }
   }
 
-  Result show(Window* parent) override {
+  Result show(Window* parent) override
+  {
     switch (s_cliTool) {
-
       case CLITool::Zenity: {
         std::string cmd;
         cmd = "zenity --file-selection --title " + quote_for_shell(m_title);
@@ -160,8 +155,8 @@ public:
             continue;
           if (buf[0]) {
             int n = std::strlen(buf);
-            while (buf[0] && std::isspace(buf[n-1])) {
-              buf[n-1] = 0;
+            while (buf[0] && std::isspace(buf[n - 1])) {
+              buf[n - 1] = 0;
               --n;
             }
             allFiles += buf;
@@ -184,11 +179,8 @@ public:
             }
             return Result::OK;
           case 1:
-          case 256:
-            return Result::Cancel;
-          default:
-            LOG(ERROR, "Error running zenity command %d", ret);
-            break;
+          case 256: return Result::Cancel;
+          default:  LOG(ERROR, "Error running zenity command %d", ret); break;
         }
         break;
       }
@@ -197,14 +189,14 @@ public:
         // TODO
         break;
 
-      default:
-        break;
+      default: break;
     }
 
     return Result::Error;
   }
 
-  static bool AreCLIToolsAvailable() {
+  static bool AreCLIToolsAvailable()
+  {
     if (s_cliTool == CLITool::Unknown) {
       FILE* f = popen("zenity --version", "r");
       if (f && pclose(f) == 0) {
@@ -228,8 +220,7 @@ private:
   static CLITool s_cliTool;
 };
 
-FileDialogX11::CLITool FileDialogX11::s_cliTool =
-  FileDialogX11::CLITool::Unknown;
+FileDialogX11::CLITool FileDialogX11::s_cliTool = FileDialogX11::CLITool::Unknown;
 
 NativeDialogsX11::NativeDialogsX11()
 {

@@ -10,8 +10,8 @@
 #pragma once
 
 #ifdef LAF_FREETYPE
-#include "ft/lib.h"
-#include "os/common/freetype_font.h"
+  #include "ft/lib.h"
+  #include "os/common/freetype_font.h"
 #endif
 #include "os/common/sprite_sheet_font.h"
 #include "os/event_queue.h"
@@ -19,7 +19,7 @@
 #include "os/system.h"
 
 #if CLIP_ENABLE_IMAGE
-#include "clip/clip.h"
+  #include "clip/clip.h"
 #endif
 
 namespace os {
@@ -31,30 +31,24 @@ public:
 
   const std::string& appName() const override { return m_appName; }
   void setAppName(const std::string& appName) override { m_appName = appName; }
-  void setAppMode(AppMode appMode) override { }
+  void setAppMode(AppMode appMode) override {}
 
-  void markCliFileAsProcessed(const std::string& fn) override { }
-  void finishLaunching() override { }
-  void activateApp() override { }
+  void markCliFileAsProcessed(const std::string& fn) override {}
+  void finishLaunching() override {}
+  void activateApp() override {}
 
   // Do nothing options (these functions are for Windows-only at the
   // moment)
-  void setTabletOptions(const TabletOptions&) override { }
+  void setTabletOptions(const TabletOptions&) override {}
   TabletOptions tabletOptions() const override { return TabletOptions(); }
 
-  Logger* logger() override {
-    return nullptr;
-  }
+  Logger* logger() override { return nullptr; }
 
-  Menus* menus() override {
-    return nullptr;
-  }
+  Menus* menus() override { return nullptr; }
 
   NativeDialogs* nativeDialogs() override;
 
-  EventQueue* eventQueue() override {
-    return EventQueue::instance();
-  }
+  EventQueue* eventQueue() override { return EventQueue::instance(); }
 
   FontRef loadSpriteSheetFont(const char* filename, int scale) override;
   FontRef loadTrueTypeFont(const char* filename, int height) override;

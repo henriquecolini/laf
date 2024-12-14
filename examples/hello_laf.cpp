@@ -17,16 +17,22 @@ void draw_window(os::Window* window)
   p.style(os::Paint::Fill);
   surface->drawRect(rc, p);
 
-  p.color(gfx::rgba(255, 0, 0)); surface->drawLine(0     , 0,   rc.w, rc.h, p);
-  p.color(gfx::rgba(0, 128, 0)); surface->drawLine(rc.w/2, 0, rc.w/2, rc.h, p);
-  p.color(gfx::rgba(0, 0, 255)); surface->drawLine(rc.w  , 0,      0, rc.h, p);
+  p.color(gfx::rgba(255, 0, 0));
+  surface->drawLine(0, 0, rc.w, rc.h, p);
+  p.color(gfx::rgba(0, 128, 0));
+  surface->drawLine(rc.w / 2, 0, rc.w / 2, rc.h, p);
+  p.color(gfx::rgba(0, 0, 255));
+  surface->drawLine(rc.w, 0, 0, rc.h, p);
   p.color(gfx::rgba(255, 255, 255));
-  os::draw_text(surface, nullptr, "Hello World", rc.center(),
-                &p, os::TextAlign::Center);
+  os::draw_text(surface, nullptr, "Hello World", rc.center(), &p, os::TextAlign::Center);
 
   if (window->gpuAcceleration())
-    os::draw_text(surface, nullptr, "(GPU)", rc.center()+gfx::Point(0, 24),
-                  &p, os::TextAlign::Center);
+    os::draw_text(surface,
+                  nullptr,
+                  "(GPU)",
+                  rc.center() + gfx::Point(0, 24),
+                  &p,
+                  os::TextAlign::Center);
 
   // Invalidates the whole window to show it on the screen.
   if (window->isVisible())
@@ -83,17 +89,12 @@ int app_main(int argc, char* argv[])
     queue->getEvent(ev);
 
     switch (ev.type()) {
-
       case os::Event::CloseApp:
-      case os::Event::CloseWindow:
-        running = false;
-        break;
+      case os::Event::CloseWindow: running = false; break;
 
       case os::Event::KeyDown:
         switch (ev.scancode()) {
-          case os::kKeyEsc:
-            running = false;
-            break;
+          case os::kKeyEsc: running = false; break;
 
           case os::kKeyG:
             window->setGpuAcceleration(!window->gpuAcceleration());
@@ -116,9 +117,7 @@ int app_main(int argc, char* argv[])
             break;
 
           case os::kKeyF:
-          case os::kKeyF11:
-            window->setFullscreen(!window->isFullscreen());
-            break;
+          case os::kKeyF11: window->setFullscreen(!window->isFullscreen()); break;
 
           default:
             // Do nothing
@@ -126,9 +125,7 @@ int app_main(int argc, char* argv[])
         }
         break;
 
-      case os::Event::ResizeWindow:
-        redraw = true;
-        break;
+      case os::Event::ResizeWindow: redraw = true; break;
 
       default:
         // Do nothing

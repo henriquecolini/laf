@@ -27,7 +27,8 @@ static void redraw_window(os::Window* window);
 
 class DragTarget : public os::DragTarget {
 public:
-  void dragEnter(os::DragEvent& ev) override {
+  void dragEnter(os::DragEvent& ev) override
+  {
     if (!windowData.dropZone.contains(ev.position()) ||
         !ev.sourceSupports(os::DropOperation::Copy)) {
       ev.dropResult(os::DropOperation::None);
@@ -43,20 +44,23 @@ public:
     redraw_window(ev.target());
   }
 
-  void dragLeave(os::DragEvent& ev) override {
+  void dragLeave(os::DragEvent& ev) override
+  {
     windowData.dragEnter = false;
     windowData.dragLeave = true;
     windowData.dragPosition = ev.position();
     redraw_window(ev.target());
   }
 
-  void drag(os::DragEvent& ev) override {
+  void drag(os::DragEvent& ev) override
+  {
     ++windowData.drag;
     windowData.dragPosition = ev.position();
     redraw_window(ev.target());
   }
 
-  void drop(os::DragEvent& ev) override {
+  void drop(os::DragEvent& ev) override
+  {
     windowData.dragEnter = false;
     windowData.dragLeave = false;
     windowData.dragPosition = { 0, 0 };
@@ -98,7 +102,11 @@ static void redraw_window(os::Window* window)
 
   char buf[2049];
   int y = 12;
-  std::snprintf(buf, sizeof(buf), "Drag Position = [%d, %d]", windowData.dragPosition.x, windowData.dragPosition.y);
+  std::snprintf(buf,
+                sizeof(buf),
+                "Drag Position = [%d, %d]",
+                windowData.dragPosition.x,
+                windowData.dragPosition.y);
   os::draw_text(s, nullptr, buf, gfx::Point(0, y), &paint);
   y += 12;
   std::snprintf(buf, sizeof(buf), "Drag Enter = %s", windowData.dragEnter ? "true" : "false");
@@ -155,7 +163,12 @@ static void redraw_window(os::Window* window)
 
   paint.color(textColor);
   paint.style(os::Paint::Style::Fill);
-  os::draw_text(s, nullptr, "Drop here!", windowData.dropZone.center(), &paint, os::TextAlign::Center);
+  os::draw_text(s,
+                nullptr,
+                "Drop here!",
+                windowData.dropZone.center(),
+                &paint,
+                os::TextAlign::Center);
 
   if (window->isVisible())
     window->invalidateRegion(gfx::Region(rc));
@@ -169,7 +182,7 @@ static os::WindowRef create_window(os::DragTarget& dragTarget)
   os::WindowSpec spec;
   spec.titled(true);
   spec.position(os::WindowSpec::Position::Frame);
-  spec.frame(screen->workarea()/2);
+  spec.frame(screen->workarea() / 2);
   spec.screen(screen);
   spec.scale(2);
 
@@ -178,7 +191,7 @@ static os::WindowRef create_window(os::DragTarget& dragTarget)
   newWindow->setTitle("Drag & Drop");
   newWindow->setDragTarget(&dragTarget);
 
-  windowData.dropZone = gfx::Rect(spec.frame().w-64-12, 12, 64, 64);
+  windowData.dropZone = gfx::Rect(spec.frame().w - 64 - 12, 12, 64, 64);
   redraw_window(newWindow.get());
   return newWindow;
 }
@@ -203,23 +216,16 @@ int app_main(int argc, char* argv[])
     queue->getEvent(ev);
 
     switch (ev.type()) {
-
       case os::Event::KeyDown:
         switch (ev.scancode()) {
-          case os::kKeyEsc:
-            running = false;
-            break;
+          case os::kKeyEsc: running = false; break;
         }
         break;
 
       case os::Event::CloseApp:
-      case os::Event::CloseWindow:
-        running = false;
-        break;
+      case os::Event::CloseWindow:  running = false; break;
 
-      case os::Event::ResizeWindow:
-        redraw_window(ev.window().get());
-        break;
+      case os::Event::ResizeWindow: redraw_window(ev.window().get()); break;
 
       default:
         // Do nothing

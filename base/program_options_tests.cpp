@@ -13,10 +13,8 @@ using namespace base;
 TEST(ProgramOptions, OptionMembers)
 {
   ProgramOptions po;
-  ProgramOptions::Option& help =
-    po.add("help").mnemonic('h').description("Show the help");
-  ProgramOptions::Option& output =
-    po.add("output").mnemonic('O').requiresValue("OUTPUT");
+  ProgramOptions::Option& help = po.add("help").mnemonic('h').description("Show the help");
+  ProgramOptions::Option& output = po.add("output").mnemonic('O').requiresValue("OUTPUT");
 
   EXPECT_EQ("help", help.name());
   EXPECT_EQ("Show the help", help.description());
@@ -104,7 +102,8 @@ TEST(ProgramOptions, Parse)
   EXPECT_EQ("output.html", po.values()[2].value());
   EXPECT_EQ("extra-file.txt", po.values()[3].value());
 
-  const char* argv6[] = { "program.exe", "value1", "value2", "-o", "output", "value3", "--input=input", "value4" };
+  const char* argv6[] = { "program.exe", "value1", "value2",        "-o",
+                          "output",      "value3", "--input=input", "value4" };
   po.reset();
   po.parse(8, argv6);
   ASSERT_EQ(6, po.values().size());
@@ -136,7 +135,7 @@ TEST(ProgramOptions, ParseErrors)
   po.reset();
   EXPECT_FALSE(po.enabled(help));
   EXPECT_THROW(po.parse(2, argv4), InvalidProgramOption);
-  EXPECT_TRUE(po.enabled(help));  // -? is parsed anyway, -a is the invalid option
+  EXPECT_TRUE(po.enabled(help)); // -? is parsed anyway, -a is the invalid option
 
   const char* argv5[] = { "program.exe", "-io", "input-and-output.txt" };
   po.reset();

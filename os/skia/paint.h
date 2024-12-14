@@ -14,63 +14,56 @@
 
 namespace os {
 
-  // SkPaint wrapper, information how to paint a shape/primitive in a
-  // canvas (stroke, fill or both; stroke width; color, etc.).
-  class Paint : public PaintBase {
-  public:
-    bool antialias() const { return m_skPaint.isAntiAlias(); }
-    void antialias(const bool state) {
-      m_skPaint.setAntiAlias(state);
-    }
+// SkPaint wrapper, information how to paint a shape/primitive in a
+// canvas (stroke, fill or both; stroke width; color, etc.).
+class Paint : public PaintBase {
+public:
+  bool antialias() const { return m_skPaint.isAntiAlias(); }
+  void antialias(const bool state) { m_skPaint.setAntiAlias(state); }
 
-    Style style() const {
-      return static_cast<Style>(m_skPaint.getStyle());
-    }
-    void style(const Style style) {
-      m_skPaint.setStyle(static_cast<SkPaint::Style>(style));
-    }
+  Style style() const { return static_cast<Style>(m_skPaint.getStyle()); }
+  void style(const Style style) { m_skPaint.setStyle(static_cast<SkPaint::Style>(style)); }
 
-    gfx::Color color() const {
-      const SkColor c = m_skPaint.getColor();
-      return gfx::rgba(SkColorGetR(c),
-                       SkColorGetG(c),
-                       SkColorGetB(c),
-                       SkColorGetA(c));
-    }
-    void color(const gfx::Color c) {
-      m_skPaint.setColor(SkColorSetARGB(gfx::geta(c),
-                                        gfx::getr(c),
-                                        gfx::getg(c),
-                                        gfx::getb(c)));
-    }
+  gfx::Color color() const
+  {
+    const SkColor c = m_skPaint.getColor();
+    return gfx::rgba(SkColorGetR(c), SkColorGetG(c), SkColorGetB(c), SkColorGetA(c));
+  }
+  void color(const gfx::Color c)
+  {
+    m_skPaint.setColor(SkColorSetARGB(gfx::geta(c), gfx::getr(c), gfx::getg(c), gfx::getb(c)));
+  }
 
-    float strokeWidth() const { return m_skPaint.getStrokeWidth(); }
-    void strokeWidth(const float strokeWidth) {
-      return m_skPaint.setStrokeWidth(strokeWidth);
+  float strokeWidth() const { return m_skPaint.getStrokeWidth(); }
+  void strokeWidth(const float strokeWidth) { return m_skPaint.setStrokeWidth(strokeWidth); }
+
+  BlendMode blendMode() const
+  {
+    auto bm = m_skPaint.asBlendMode();
+    if (bm.has_value()) {
+      return static_cast<BlendMode>(*bm);
     }
+    else
+      return BlendMode::Src;
+  }
+  void blendMode(const BlendMode blendMode)
+  {
+    m_skPaint.setBlendMode(static_cast<SkBlendMode>(blendMode));
+  }
 
-    BlendMode blendMode() const {
-      auto bm = m_skPaint.asBlendMode();
-      if (bm.has_value()) { return static_cast<BlendMode>(*bm); }
-      else return BlendMode::Src;
-    }
-    void blendMode(const BlendMode blendMode) {
-      m_skPaint.setBlendMode(static_cast<SkBlendMode>(blendMode));
-    }
+  const SkPaint& skPaint() const { return m_skPaint; }
+  SkPaint& skPaint() { return m_skPaint; }
 
-    const SkPaint& skPaint() const { return m_skPaint; }
-    SkPaint& skPaint() { return m_skPaint; }
+private:
+  SkPaint m_skPaint;
+};
 
-  private:
-    SkPaint m_skPaint;
-  };
-
-  static_assert((int)SkPaint::kFill_Style == (int)Paint::Fill &&
+static_assert((int)SkPaint::kFill_Style == (int)Paint::Fill &&
                 (int)SkPaint::kStroke_Style == (int)Paint::Stroke &&
                 (int)SkPaint::kStrokeAndFill_Style == (int)Paint::StrokeAndFill,
-                "Paint styles don't match with Skia");
+              "Paint styles don't match with Skia");
 
-  static_assert((int)SkBlendMode::kClear == (int)BlendMode::Clear &&
+static_assert((int)SkBlendMode::kClear == (int)BlendMode::Clear &&
                 (int)SkBlendMode::kSrc == (int)BlendMode::Src &&
                 (int)SkBlendMode::kDst == (int)BlendMode::Dst &&
                 (int)SkBlendMode::kSrcOver == (int)BlendMode::SrcOver &&
@@ -102,7 +95,7 @@ namespace os {
                 (int)SkBlendMode::kColor == (int)BlendMode::Color &&
                 (int)SkBlendMode::kLuminosity == (int)BlendMode::Luminosity &&
                 (int)SkBlendMode::kLastMode == (int)BlendMode::LastMode,
-                "Blend modes don't match with Skia");
+              "Blend modes don't match with Skia");
 
 } // namespace os
 

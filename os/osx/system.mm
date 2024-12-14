@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/osx/system.h"
@@ -16,15 +16,13 @@ namespace os {
 
 class CursorOSX : public os::Cursor {
 public:
-  CursorOSX(NSCursor* nsCursor) : m_nsCursor(nsCursor) { }
+  CursorOSX(NSCursor* nsCursor) : m_nsCursor(nsCursor) {}
   ~CursorOSX() { m_nsCursor = nil; }
 
   CursorOSX(const CursorOSX&) = delete;
   CursorOSX& operator=(const CursorOSX&) = delete;
 
-  void* nativeHandle() override {
-    return (__bridge void*)m_nsCursor;
-  }
+  void* nativeHandle() override { return (__bridge void*)m_nsCursor; }
 
 private:
   NSCursor* m_nsCursor;
@@ -35,9 +33,7 @@ SystemOSX::~SystemOSX()
   destroyInstance();
 }
 
-CursorRef SystemOSX::makeCursor(const Surface* surface,
-                                const gfx::Point& focus,
-                                const int scale)
+CursorRef SystemOSX::makeCursor(const Surface* surface, const gfx::Point& focus, const int scale)
 {
   ASSERT(surface);
   SurfaceFormatData format;
@@ -45,33 +41,32 @@ CursorRef SystemOSX::makeCursor(const Surface* surface,
   if (format.bitsPerPixel != 32)
     return nullptr;
 
-  const int w = scale*surface->width();
-  const int h = scale*surface->height();
+  const int w = scale * surface->width();
+  const int h = scale * surface->height();
 
-  if (4*w*h == 0)
+  if (4 * w * h == 0)
     return nullptr;
 
   @autoreleasepool {
-    NSBitmapImageRep* bmp =
-      [[NSBitmapImageRep alloc]
-        initWithBitmapDataPlanes:nil
-                      pixelsWide:w
-                      pixelsHigh:h
-                   bitsPerSample:8
-                 samplesPerPixel:4
-                        hasAlpha:YES
-                        isPlanar:NO
-                  colorSpaceName:NSDeviceRGBColorSpace
-                    bitmapFormat:NSAlphaNonpremultipliedBitmapFormat
-                     bytesPerRow:w*4
-                    bitsPerPixel:32];
+    NSBitmapImageRep* bmp = [[NSBitmapImageRep alloc]
+      initWithBitmapDataPlanes:nil
+                    pixelsWide:w
+                    pixelsHigh:h
+                 bitsPerSample:8
+               samplesPerPixel:4
+                      hasAlpha:YES
+                      isPlanar:NO
+                colorSpaceName:NSDeviceRGBColorSpace
+                  bitmapFormat:NSAlphaNonpremultipliedBitmapFormat
+                   bytesPerRow:w * 4
+                  bitsPerPixel:32];
     if (!bmp)
       return nullptr;
 
     uint32_t* dst = (uint32_t*)[bmp bitmapData];
-    for (int y=0; y<h; ++y) {
-      const uint32_t* src = (const uint32_t*)surface->getData(0, y/scale);
-      for (int x=0, u=0; x<w; ++x, ++dst) {
+    for (int y = 0; y < h; ++y) {
+      const uint32_t* src = (const uint32_t*)surface->getData(0, y / scale);
+      for (int x = 0, u = 0; x < w; ++x, ++dst) {
         *dst = *src;
         if (++u == scale) {
           u = 0;
@@ -86,10 +81,9 @@ CursorRef SystemOSX::makeCursor(const Surface* surface,
 
     [img addRepresentation:bmp];
 
-    NSCursor* nsCursor =
-      [[NSCursor alloc] initWithImage:img
-                              hotSpot:NSMakePoint(scale*focus.x + scale/2,
-                                                  scale*focus.y + scale/2)];
+    NSCursor* nsCursor = [[NSCursor alloc]
+      initWithImage:img
+            hotSpot:NSMakePoint(scale * focus.x + scale / 2, scale * focus.y + scale / 2)];
     if (!nsCursor)
       return nullptr;
 
@@ -108,15 +102,15 @@ void SystemOSX::setMousePosition(const gfx::Point& screenPosition)
 {
   NSScreen* menuBarScreen = [NSScreen screens][0];
   CGWarpMouseCursorPosition(
-    CGPointMake(screenPosition.x,
-                menuBarScreen.frame.size.height - screenPosition.y));
+    CGPointMake(screenPosition.x, menuBarScreen.frame.size.height - screenPosition.y));
 }
 
 gfx::Color SystemOSX::getColorFromScreen(const gfx::Point& screenPosition) const
 {
   gfx::Color color = gfx::ColorNone;
-  CGImageRef image = CGDisplayCreateImageForRect(CGMainDisplayID(),
-                                                 CGRectMake(screenPosition.x, screenPosition.y, 1, 1));
+  CGImageRef image = CGDisplayCreateImageForRect(
+    CGMainDisplayID(),
+    CGRectMake(screenPosition.x, screenPosition.y, 1, 1));
   if (image) {
     CGBitmapInfo info = CGImageGetBitmapInfo(image);
     CGDataProviderRef provider = CGImageGetDataProvider(image);
@@ -137,7 +131,7 @@ gfx::Color SystemOSX::getColorFromScreen(const gfx::Point& screenPosition) const
       }
 
       // If we release the provider then CGImageRelease() crashes
-      //CGDataProviderRelease(provider);
+      // CGDataProviderRelease(provider);
     }
     CGImageRelease(image);
   }
@@ -156,4 +150,4 @@ void SystemOSX::listScreens(ScreenList& list)
     list.push_back(make_ref<ScreenOSX>(screen));
 }
 
-}
+} // namespace os

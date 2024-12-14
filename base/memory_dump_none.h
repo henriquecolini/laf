@@ -8,18 +8,20 @@
 #define BASE_MEMORY_DUMP_NONE_H_INCLUDED
 #pragma once
 
-class base::MemoryDump::MemoryDumpImpl
-{
+class base::MemoryDump::MemoryDumpImpl {
 public:
-  MemoryDumpImpl() {
+  MemoryDumpImpl()
+  {
     // Do nothing
   }
 
-  ~MemoryDumpImpl() {
+  ~MemoryDumpImpl()
+  {
     // Do nothing
   }
 
-  void setFileName(const std::string& fileName) {
+  void setFileName(const std::string& fileName)
+  {
     // Do nothing
   }
 };

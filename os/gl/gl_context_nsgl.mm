@@ -5,15 +5,15 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/gl/gl_context_nsgl.h"
 
 #include <vector>
 
-#include <OpenGL/gl.h>
 #include <Cocoa/Cocoa.h>
+#include <OpenGL/gl.h>
 
 namespace os {
 
@@ -66,12 +66,11 @@ bool GLContextNSGL::createGLContext()
   if (!nsPixelFormat)
     return false;
 
-  m_nsgl = [[NSOpenGLContext alloc] initWithFormat:nsPixelFormat
-                                      shareContext:nil];
+  m_nsgl = [[NSOpenGLContext alloc] initWithFormat:nsPixelFormat shareContext:nil];
   if (!m_nsgl)
     return false;
 
-  GLint swapInterval = 0;   // disable vsync
+  GLint swapInterval = 0; // disable vsync
   [m_nsgl setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
 
   if (m_view)

@@ -46,8 +46,8 @@ namespace {
 //
 class OSXEditMenuHack {
 public:
-  OSXEditMenuHack(NSMenuItem* currentEditMenuItem)
-    : m_editMenuItem(currentEditMenuItem) {
+  OSXEditMenuHack(NSMenuItem* currentEditMenuItem) : m_editMenuItem(currentEditMenuItem)
+  {
     if (!m_editMenuItem)
       return;
 
@@ -64,13 +64,15 @@ public:
     [editMenu addItem:newItem(@"Copy", @selector(copy:), @"c", NSEventModifierFlagCommand)];
     [editMenu addItem:newItem(@"Paste", @selector(paste:), @"v", NSEventModifierFlagCommand)];
     [editMenu addItem:newItem(@"Delete", @selector(delete:), @"", 0)];
-    [editMenu addItem:newItem(@"Select All", @selector(selectAll:), @"a", NSEventModifierFlagCommand)];
+    [editMenu
+      addItem:newItem(@"Select All", @selector(selectAll:), @"a", NSEventModifierFlagCommand)];
 
     m_submenu = m_editMenuItem.submenu;
     m_editMenuItem.submenu = editMenu;
   }
 
-  ~OSXEditMenuHack() {
+  ~OSXEditMenuHack()
+  {
     if (!m_editMenuItem)
       return;
 
@@ -82,30 +84,23 @@ public:
   }
 
 private:
-  NSMenuItem* newItem(NSString* title, SEL sel,
-                      NSString* key,
-                      NSEventModifierFlags flags) {
-    auto item = [[NSMenuItem alloc] initWithTitle:title
-                 action:sel
-                 keyEquivalent:key];
+  NSMenuItem* newItem(NSString* title, SEL sel, NSString* key, NSEventModifierFlags flags)
+  {
+    auto item = [[NSMenuItem alloc] initWithTitle:title action:sel keyEquivalent:key];
     if (flags)
       item.keyEquivalentModifierMask = flags;
 
     // Search for menu items in the main menu that already contain the
     // same keyEquivalent, and disable them temporarily.
-    disableMenuItemsWithKeyEquivalent(
-      [[NSApplication sharedApplication] mainMenu],
-      key, flags);
+    disableMenuItemsWithKeyEquivalent([[NSApplication sharedApplication] mainMenu], key, flags);
 
     return item;
   }
 
-  void disableMenuItemsWithKeyEquivalent(NSMenu* menu,
-                                         NSString* key,
-                                         NSEventModifierFlags flags) {
+  void disableMenuItemsWithKeyEquivalent(NSMenu* menu, NSString* key, NSEventModifierFlags flags)
+  {
     for (NSMenuItem* item in menu.itemArray) {
-      if ([item.keyEquivalent isEqualToString:key] &&
-          item.keyEquivalentModifierMask == flags) {
+      if ([item.keyEquivalent isEqualToString:key] && item.keyEquivalentModifierMask == flags) {
         m_restoreKeys[item] = item.keyEquivalent;
         item.keyEquivalent = @"";
       }
@@ -170,7 +165,7 @@ extern NSMenuItem* g_standardEditMenuItem;
   OSXEditMenuHack hack(os::g_standardEditMenuItem);
   [[[NSApplication sharedApplication] mainMenu] setAutoenablesItems:NO];
 
-#ifndef __MAC_10_6              // runModalForTypes is deprecated in 10.6
+#ifndef __MAC_10_6 // runModalForTypes is deprecated in 10.6
   if ([panel isKindOfClass:[NSOpenPanel class]]) {
     // As we're using OS X 10.4 framework, it looks like runModal
     // doesn't recognize the allowedFileTypes property. So we force it
@@ -185,7 +180,7 @@ extern NSMenuItem* g_standardEditMenuItem;
   }
 
   window->setCursor(oldCursor);
-  NSWindow* nsWindow = (__bridge NSWindow *)window->nativeHandle();
+  NSWindow* nsWindow = (__bridge NSWindow*)window->nativeHandle();
   [nsWindow makeKeyAndOrderFront:nil];
   [[[NSApplication sharedApplication] mainMenu] setAutoenablesItems:YES];
 }
@@ -212,22 +207,16 @@ namespace os {
 
 class FileDialogOSX : public CommonFileDialog {
 public:
-  FileDialogOSX() {
-  }
+  FileDialogOSX() {}
 
-  std::string fileName() override {
-    return m_filename;
-  }
+  std::string fileName() override { return m_filename; }
 
-  void getMultipleFileNames(base::paths& output) override {
-    output = m_filenames;
-  }
+  void getMultipleFileNames(base::paths& output) override { output = m_filenames; }
 
-  void setFileName(const std::string& filename) override {
-    m_filename = filename;
-  }
+  void setFileName(const std::string& filename) override { m_filename = filename; }
 
-  Result show(Window* window) override {
+  Result show(Window* window) override
+  {
     Result retValue = Result::Cancel;
     @autoreleasepool {
       NSSavePanel* panel = nil;
@@ -237,9 +226,9 @@ public:
       }
       else {
         panel = [NSOpenPanel new];
-        [(NSOpenPanel*)panel setAllowsMultipleSelection:(m_type == Type::OpenFiles ? YES: NO)];
-        [(NSOpenPanel*)panel setCanChooseFiles:(m_type != Type::OpenFolder ? YES: NO)];
-        [(NSOpenPanel*)panel setCanChooseDirectories:(m_type == Type::OpenFolder ? YES: NO)];
+        [(NSOpenPanel*)panel setAllowsMultipleSelection:(m_type == Type::OpenFiles ? YES : NO)];
+        [(NSOpenPanel*)panel setCanChooseFiles:(m_type != Type::OpenFolder ? YES : NO)];
+        [(NSOpenPanel*)panel setCanChooseDirectories:(m_type == Type::OpenFolder ? YES : NO)];
       }
 
       [panel setTitle:[NSString stringWithUTF8String:m_title.c_str()]];
@@ -248,8 +237,7 @@ public:
       if (m_type != Type::OpenFolder && !m_filters.empty()) {
         NSMutableArray* types = [[NSMutableArray alloc] init];
 
-        if (m_type == Type::OpenFile ||
-            m_type == Type::OpenFiles) {
+        if (m_type == Type::OpenFile || m_type == Type::OpenFiles) {
           // Empty item so we can show all the allowed file types again
           [types addObject:@""];
         }
@@ -276,7 +264,8 @@ public:
       std::string defPath = base::get_file_path(m_filename);
       std::string defName = base::get_file_name(m_filename);
       if (!defPath.empty())
-        [panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithUTF8String:defPath.c_str()]]];
+        [panel
+          setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithUTF8String:defPath.c_str()]]];
       if (!defName.empty())
         [panel setNameFieldStringValue:[NSString stringWithUTF8String:defName.c_str()]];
 
@@ -307,7 +296,7 @@ public:
 
         // Function to be called when user selects another file type
         // from the combobox.
-        [helper setFileTypeChangeObserver:[this, panel](){
+        [helper setFileTypeChangeObserver:[this, panel]() {
           NSString* extension = m_popup.selectedItem.title;
           if (extension.length == 0) {
             NSMutableArray* allTypes = [[NSMutableArray alloc] init];
@@ -346,11 +335,11 @@ public:
   }
 
 private:
-
   // The accessory view is any extra NSView that we want to show in
   // the NSSavePanel/NSOpenPanel, in our case, we want to show a
   // combobox (NSPopUpButton) with the available file formats.
-  NSView* createAccessoryView(NSSavePanel* panel) {
+  NSView* createAccessoryView(NSSavePanel* panel)
+  {
     auto label = [NSTextField labelWithString:@"File Format:"];
 
     if ([NSFont respondsToSelector:@selector(smallSystemFontSize)])
@@ -359,8 +348,7 @@ private:
       label.textColor = [NSColor secondaryLabelColor];
 
     // Combobox with file formats
-    auto popup = [[NSPopUpButton alloc] initWithFrame:NSZeroRect
-                                            pullsDown:false];
+    auto popup = [[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:false];
     popup.autoenablesItems = false; // All items enabled
     for (NSString* item in panel.allowedFileTypes) {
       [popup addItemWithTitle:item];

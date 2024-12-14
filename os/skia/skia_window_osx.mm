@@ -5,10 +5,10 @@
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
 
-//#define DEBUG_UPDATE_RECTS
+// #define DEBUG_UPDATE_RECTS
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/skia/skia_window_osx.h"
@@ -29,8 +29,8 @@
 #include "include/utils/mac/SkCGUtils.h"
 
 #if SK_SUPPORT_GPU
-  #include <OpenGL/gl.h>
   #include <Cocoa/Cocoa.h>
+  #include <OpenGL/gl.h>
 #endif
 
 #include <algorithm>
@@ -71,7 +71,6 @@ void SkiaWindowOSX::setFullscreen(bool state)
 void SkiaWindowOSX::invalidateRegion(const gfx::Region& rgn)
 {
   switch (backend()) {
-
     case Backend::NONE:
       @autoreleasepool {
         gfx::Rect bounds = rgn.bounds(); // TODO use only the region?
@@ -85,18 +84,17 @@ void SkiaWindowOSX::invalidateRegion(const gfx::Region& rgn)
         // Aseprite, when we move a ui::Display inside other
         // ui::Display, or in the Preview window to update the brush
         // preview in real-time.
-        [view setNeedsDisplayInRect:
-                NSMakeRect(bounds.x*scale,
-                           view.frame.size.height - bounds.y2()*scale - scale,
-                           bounds.w*scale,
-                           bounds.h*scale + scale)];
+        [view setNeedsDisplayInRect:NSMakeRect(bounds.x * scale,
+                                               view.frame.size.height - bounds.y2() * scale - scale,
+                                               bounds.w * scale,
+                                               bounds.h * scale + scale)];
 
-#if 0     // Do not refresh immediately. Note: This might be required
-          // for debugging purposes in some scenarios, but now this is
-          // not required in release mode.
-          //
-          // TODO maybe in a future we could add an Display::update()
-          //      or Display::refresh() member function
+#if 0 // Do not refresh immediately. Note: This might be required
+      // for debugging purposes in some scenarios, but now this is
+      // not required in release mode.
+      //
+      // TODO maybe in a future we could add an Display::update()
+      //      or Display::refresh() member function
         [view displayIfNeeded];
 #endif
       }
@@ -104,19 +102,16 @@ void SkiaWindowOSX::invalidateRegion(const gfx::Region& rgn)
 
 #if SK_SUPPORT_GPU
 
-    case Backend::GL:
-      m_gl.glInterfaces()->fFunctions.fFlush();
-      break;
+    case Backend::GL: m_gl.glInterfaces()->fFunctions.fFlush(); break;
 
 #endif
-
   }
 }
 
 void SkiaWindowOSX::setTranslateDeadKeys(bool state)
 {
   ViewOSX* view = (ViewOSX*)m_nsWindow.contentView;
-  [view setTranslateDeadKeys:(state ? YES: NO)];
+  [view setTranslateDeadKeys:(state ? YES : NO)];
 }
 
 void SkiaWindowOSX::onClose()
@@ -137,15 +132,10 @@ void SkiaWindowOSX::onDrawRect(const gfx::Rect& rect)
   }
 
   switch (backend()) {
-
-    case Backend::NONE:
-      paintGC(rect);
-      break;
+    case Backend::NONE: paintGC(rect); break;
 
 #if SK_SUPPORT_GPU
-    case Backend::GL:
-      m_gl.glInterfaces()->fFunctions.fFlush();
-      break;
+    case Backend::GL: m_gl.glInterfaces()->fFunctions.fFlush(); break;
 #endif
   }
 }
@@ -218,10 +208,8 @@ void SkiaWindowOSX::paintGC(const gfx::Rect& rect)
   if (scale == 1) {
     // Create a subset to draw on the view
     if (!origBitmap.extractSubset(
-          &bitmap, SkIRect::MakeXYWH(rect.x,
-                                     (viewBounds.size.height-(rect.y+rect.h)),
-                                     rect.w,
-                                     rect.h)))
+          &bitmap,
+          SkIRect::MakeXYWH(rect.x, (viewBounds.size.height - (rect.y + rect.h)), rect.w, rect.h)))
       return;
   }
   else {
@@ -238,10 +226,10 @@ void SkiaWindowOSX::paintGC(const gfx::Rect& rect)
 
     SkCanvas canvas(bitmap);
     canvas.drawImageRect(SkImage::MakeFromRaster(origBitmap.pixmap(), nullptr, nullptr),
-                         SkRect::MakeXYWH(rect.x/scale,
-                                          (viewBounds.size.height-(rect.y+rect.h))/scale,
-                                          rect.w/scale,
-                                          rect.h/scale),
+                         SkRect::MakeXYWH(rect.x / scale,
+                                          (viewBounds.size.height - (rect.y + rect.h)) / scale,
+                                          rect.w / scale,
+                                          rect.h / scale),
                          SkRect::MakeXYWH(0, 0, rect.w, rect.h),
                          SkSamplingOptions(),
                          nullptr,
@@ -255,9 +243,8 @@ void SkiaWindowOSX::paintGC(const gfx::Rect& rect)
     CGColorSpaceRef colorSpace = CGDisplayCopyColorSpace(CGMainDisplayID());
     CGImageRef img = SkCreateCGImageRefWithColorspace(bitmap, colorSpace);
     if (img) {
-      CGRect r = CGRectMake(viewBounds.origin.x+rect.x,
-                            viewBounds.origin.y+rect.y,
-                            rect.w, rect.h);
+      CGRect r =
+        CGRectMake(viewBounds.origin.x + rect.x, viewBounds.origin.y + rect.y, rect.w, rect.h);
 
       CGContextSaveGState(cg);
       CGContextSetInterpolationQuality(cg, kCGInterpolationNone);
@@ -265,11 +252,12 @@ void SkiaWindowOSX::paintGC(const gfx::Rect& rect)
 #ifdef DEBUG_UPDATE_RECTS
       {
         static int i = 0;
-        i = (i+1) % 8;
+        i = (i + 1) % 8;
         CGContextSetRGBStrokeColor(cg,
-                                   (i & 1 ? 1.0f: 0.0f),
-                                   (i & 2 ? 1.0f: 0.0f),
-                                   (i & 4 ? 1.0f: 0.0f), 1.0f);
+                                   (i & 1 ? 1.0f : 0.0f),
+                                   (i & 2 ? 1.0f : 0.0f),
+                                   (i & 4 ? 1.0f : 0.0f),
+                                   1.0f);
         CGContextStrokeRectWithWidth(cg, r, 2.0f);
       }
 #endif

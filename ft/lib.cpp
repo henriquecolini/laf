@@ -14,8 +14,7 @@
 
 namespace ft {
 
-Lib::Lib()
-  : m_ft(nullptr)
+Lib::Lib() : m_ft(nullptr)
 {
   FT_Init_FreeType(&m_ft);
 }

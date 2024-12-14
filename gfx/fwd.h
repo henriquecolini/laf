@@ -10,11 +10,16 @@
 
 namespace gfx {
 
-template<typename T> class BorderT;
-template<typename T> class ClipT;
-template<typename T> class PointT;
-template<typename T> class RectT;
-template<typename T> class SizeT;
+template<typename T>
+class BorderT;
+template<typename T>
+class ClipT;
+template<typename T>
+class PointT;
+template<typename T>
+class RectT;
+template<typename T>
+class SizeT;
 
 typedef BorderT<int> Border;
 typedef ClipT<int> Clip;

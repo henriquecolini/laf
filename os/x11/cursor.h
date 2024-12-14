@@ -17,8 +17,9 @@ namespace os {
 
 class CursorX11 : public Cursor {
 public:
-  CursorX11(::Cursor xcursor) : m_xcursor(xcursor) { }
-  ~CursorX11() {
+  CursorX11(::Cursor xcursor) : m_xcursor(xcursor) {}
+  ~CursorX11()
+  {
     if (m_xcursor != None) {
       auto x11 = X11::instance();
       ASSERT(x11);
@@ -27,9 +28,7 @@ public:
     }
   }
 
-  void* nativeHandle() override {
-    return (void*)m_xcursor;
-  }
+  void* nativeHandle() override { return (void*)m_xcursor; }
 
 private:
   ::Cursor m_xcursor;

@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "gfx/packing_rects.h"
@@ -26,9 +26,7 @@ void PackingRects::add(const Rect& rc)
   m_rects.push_back(rc);
 }
 
-Size PackingRects::bestFit(base::task_token& token,
-                           const int fixedWidth,
-                           const int fixedHeight)
+Size PackingRects::bestFit(base::task_token& token, const int fixedWidth, const int fixedHeight)
 {
   Size size(fixedWidth, fixedHeight);
 
@@ -51,9 +49,8 @@ Size PackingRects::bestFit(base::task_token& token,
   int z = 0;
   bool fit = false;
   while (!token.canceled()) {
-    if (w*h >= neededArea) {
-      const Size sizeCandidate = Size(w + 2 * m_borderPadding,
-                                      h + 2 * m_borderPadding);
+    if (w * h >= neededArea) {
+      const Size sizeCandidate = Size(w + 2 * m_borderPadding, h + 2 * m_borderPadding);
       fit = pack(sizeCandidate, token);
       if (fit) {
         size = sizeCandidate;
@@ -78,12 +75,12 @@ Size PackingRects::bestFit(base::task_token& token,
   return size;
 }
 
-static bool by_area(const Rect* a, const Rect* b) {
-  return a->w*a->h > b->w*b->h;
+static bool by_area(const Rect* a, const Rect* b)
+{
+  return a->w * a->h > b->w * b->h;
 }
 
-bool PackingRects::pack(const Size& size,
-                        base::task_token& token)
+bool PackingRects::pack(const Size& size, base::task_token& token)
 {
   m_bounds = Rect(size).shrink(m_borderPadding);
 
@@ -106,8 +103,7 @@ bool PackingRects::pack(const Size& size,
     // The rectangles are treated as its original size +
     // conditional extra border of <shapePadding> during placement.
     for (int v = 0; v <= m_bounds.h - rc.h; ++v) {
-      const int hShapePadding =
-        (v == (m_bounds.h - rc.h) ? 0 : m_shapePadding);
+      const int hShapePadding = (v == (m_bounds.h - rc.h) ? 0 : m_shapePadding);
       for (int u = 0; u <= m_bounds.w - rc.w; ++u) {
         if (token.canceled())
           return false;
@@ -119,13 +115,11 @@ bool PackingRects::pack(const Size& size,
         // This fix resolves the special cases of exporting with
         // sheet type 'Packed' + 'Trim Cels' true +
         // 'Shape padding' > 0 + series of particular image sizes.
-        const int wShapePadding =
-          (u == (m_bounds.w - rc.w) ? 0 : m_shapePadding);
-        const gfx::Rect possible(
-          m_bounds.x + u,
-          m_bounds.y + v,
-          rc.w + wShapePadding,
-          rc.h + hShapePadding);
+        const int wShapePadding = (u == (m_bounds.w - rc.w) ? 0 : m_shapePadding);
+        const gfx::Rect possible(m_bounds.x + u,
+                                 m_bounds.y + v,
+                                 rc.w + wShapePadding,
+                                 rc.h + hShapePadding);
 
         const Region::Overlap overlap = rgn.contains(possible);
         if (overlap == Region::In) {

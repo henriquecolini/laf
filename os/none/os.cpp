@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/memory.h"
@@ -22,57 +22,69 @@ class NoneSystem : public System {
 public:
   const std::string& appName() const override { return m_appName; }
   void setAppName(const std::string& appName) override { m_appName = appName; }
-  void setAppMode(AppMode appMode) override { }
+  void setAppMode(AppMode appMode) override {}
 
-  void markCliFileAsProcessed(const std::string& fn) override { }
-  void finishLaunching() override { }
-  void activateApp() override { }
+  void markCliFileAsProcessed(const std::string& fn) override {}
+  void finishLaunching() override {}
+  void activateApp() override {}
 
   Capabilities capabilities() const override { return (Capabilities)0; }
-  void setTabletOptions(const TabletOptions&) override { }
+  void setTabletOptions(const TabletOptions&) override {}
   TabletOptions tabletOptions() const override { return TabletOptions(); }
   Logger* logger() override { return nullptr; }
   Menus* menus() override { return nullptr; }
   NativeDialogs* nativeDialogs() override { return nullptr; }
   EventQueue* eventQueue() override { return nullptr; }
   ScreenRef mainScreen() override { return nullptr; }
-  void listScreens(ScreenList& screens) override { }
+  void listScreens(ScreenList& screens) override {}
   Window* defaultWindow() override { return nullptr; }
   Ref<Window> makeWindow(const WindowSpec& spec) override { return nullptr; }
-  Ref<Surface> makeSurface(int width, int height,
-                           const os::ColorSpaceRef& colorSpace) override { return nullptr; }
+  Ref<Surface> makeSurface(int width, int height, const os::ColorSpaceRef& colorSpace) override
+  {
+    return nullptr;
+  }
 #if CLIP_ENABLE_IMAGE
   Ref<Surface> makeSurface(const clip::image& image) override { return nullptr; }
 #endif
-  Ref<Surface> makeRgbaSurface(int width, int height,
-                               const os::ColorSpaceRef& colorSpace) override { return nullptr; }
+  Ref<Surface> makeRgbaSurface(int width, int height, const os::ColorSpaceRef& colorSpace) override
+  {
+    return nullptr;
+  }
   Ref<Surface> loadSurface(const char* filename) override { return nullptr; }
   Ref<Surface> loadRgbaSurface(const char* filename) override { return nullptr; }
-  Ref<Cursor> makeCursor(const Surface* surface,
-                         const gfx::Point& focus,
-                         const int scale) override { return nullptr; }
+  Ref<Cursor> makeCursor(const Surface* surface, const gfx::Point& focus, const int scale) override
+  {
+    return nullptr;
+  }
   FontManager* fontManager() override { return nullptr; }
   Ref<Font> loadSpriteSheetFont(const char* filename, int scale) override { return nullptr; }
   Ref<Font> loadTrueTypeFont(const char* filename, int height) override { return nullptr; }
   bool isKeyPressed(KeyScancode scancode) override { return false; }
   KeyModifiers keyModifiers() override { return kKeyNoneModifier; }
   int getUnicodeFromScancode(KeyScancode scancode) override { return 0; }
-  void setTranslateDeadKeys(bool state) override { }
+  void setTranslateDeadKeys(bool state) override {}
   gfx::Point mousePosition() const override { return gfx::Point(0, 0); }
-  void setMousePosition(const gfx::Point& screenPosition) override { }
-  gfx::Color getColorFromScreen(const gfx::Point& screenPosition) const override { return gfx::ColorNone; }
-  void listColorSpaces(std::vector<os::ColorSpaceRef>& list) override { }
+  void setMousePosition(const gfx::Point& screenPosition) override {}
+  gfx::Color getColorFromScreen(const gfx::Point& screenPosition) const override
+  {
+    return gfx::ColorNone;
+  }
+  void listColorSpaces(std::vector<os::ColorSpaceRef>& list) override {}
   os::ColorSpaceRef makeColorSpace(const gfx::ColorSpaceRef& cs) override { return nullptr; }
-  Ref<ColorSpaceConversion> convertBetweenColorSpace(
-    const os::ColorSpaceRef& src, const os::ColorSpaceRef& dst) override { return nullptr; }
-  void setWindowsColorSpace(const os::ColorSpaceRef& cs) override { }
+  Ref<ColorSpaceConversion> convertBetweenColorSpace(const os::ColorSpaceRef& src,
+                                                     const os::ColorSpaceRef& dst) override
+  {
+    return nullptr;
+  }
+  void setWindowsColorSpace(const os::ColorSpaceRef& cs) override {}
   os::ColorSpaceRef windowsColorSpace() override { return nullptr; }
 
 private:
   std::string m_appName;
 };
 
-System* make_system_impl() {
+System* make_system_impl()
+{
   return new NoneSystem;
 }
 

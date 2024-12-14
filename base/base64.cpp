@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/base64.h"
@@ -56,7 +56,7 @@ static inline int base64Inv(int asciiChar)
 
 void encode_base64(const char* input, size_t n, std::string& output)
 {
-  const size_t size = 4*int(std::ceil(n/3.0)); // Estimate encoded string size
+  const size_t size = 4 * int(std::ceil(n / 3.0)); // Estimate encoded string size
   output.resize(size);
 
   auto outIt = output.begin();
@@ -64,7 +64,7 @@ void encode_base64(const char* input, size_t n, std::string& output)
   uint8_t next = 0;
   size_t i = 0;
   size_t j = 0;
-  for (; i<n; ++i, ++input) {
+  for (; i < n; ++i, ++input) {
     auto inputValue = *input;
     switch (j) {
       case 0:
@@ -95,21 +95,20 @@ void encode_base64(const char* input, size_t n, std::string& output)
       *outIt = base64Char(next);
       ++outIt;
     }
-    for (; outIt!=outEnd; ++outIt)
-      *outIt = '=';            // Padding
+    for (; outIt != outEnd; ++outIt)
+      *outIt = '='; // Padding
   }
 }
 
 void decode_base64(const char* input, size_t n, buffer& output)
 {
-  size_t size = 3*int(std::ceil(n/4.0)); // Estimate decoded buffer size
+  size_t size = 3 * int(std::ceil(n / 4.0)); // Estimate decoded buffer size
   output.resize(size);
 
   auto outIt = output.begin();
   size_t i = 0;
-  for (; i+3<n; i+=4, input+=4) {
-    *outIt = (((base64Inv(input[0])           ) << 2) |
-              ((base64Inv(input[1]) & 0b110000) >> 4));
+  for (; i + 3 < n; i += 4, input += 4) {
+    *outIt = (((base64Inv(input[0])) << 2) | ((base64Inv(input[1]) & 0b110000) >> 4));
     ++outIt;
 
     if (input[2] == '=') {
@@ -117,8 +116,7 @@ void decode_base64(const char* input, size_t n, buffer& output)
       break;
     }
 
-    *outIt = (((base64Inv(input[1]) & 0b001111) << 4) |
-              ((base64Inv(input[2]) & 0b111100) >> 2));
+    *outIt = (((base64Inv(input[1]) & 0b001111) << 4) | ((base64Inv(input[2]) & 0b111100) >> 2));
     ++outIt;
 
     if (input[3] == '=') {
@@ -126,8 +124,7 @@ void decode_base64(const char* input, size_t n, buffer& output)
       break;
     }
 
-    *outIt = (((base64Inv(input[2]) & 0b000011) << 6) |
-              ((base64Inv(input[3])           )));
+    *outIt = (((base64Inv(input[2]) & 0b000011) << 6) | ((base64Inv(input[3]))));
     ++outIt;
   }
 

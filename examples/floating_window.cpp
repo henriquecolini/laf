@@ -8,9 +8,8 @@
 
 class CustomWindow {
 public:
-  void create(const std::string& title,
-              int w, int h,
-              os::Window* parent = nullptr) {
+  void create(const std::string& title, int w, int h, os::Window* parent = nullptr)
+  {
     os::WindowSpec spec;
 
     if (parent) {
@@ -19,7 +18,7 @@ public:
       spec.minimizable(false);
 
       gfx::Rect rc = parent->frame();
-      spec.frame(gfx::Rect(rc.x2()-w/2, rc.y+rc.h/2-h/2, w, h));
+      spec.frame(gfx::Rect(rc.x2() - w / 2, rc.y + rc.h / 2 - h / 2, w, h));
       spec.position(os::WindowSpec::Position::Frame);
     }
     else {
@@ -34,19 +33,14 @@ public:
     redraw();
   }
 
-  void close() {
-    m_nativeWindow = nullptr;
-  }
+  void close() { m_nativeWindow = nullptr; }
 
-  void focus() {
-    m_nativeWindow->activate();
-  }
+  void focus() { m_nativeWindow->activate(); }
 
-  bool isVisible() const {
-    return (m_nativeWindow && m_nativeWindow->isVisible());
-  }
+  bool isVisible() const { return (m_nativeWindow && m_nativeWindow->isVisible()); }
 
-  void redraw() {
+  void redraw()
+  {
     auto rc = m_nativeWindow->surface()->bounds();
     onRedraw(m_nativeWindow->surface(), rc);
 
@@ -56,37 +50,30 @@ public:
       m_nativeWindow->setVisible(true);
   }
 
-  virtual bool isFloating() const {
-    return false;
-  }
+  virtual bool isFloating() const { return false; }
 
-  virtual bool handleEvent(os::Event& ev) {
+  virtual bool handleEvent(os::Event& ev)
+  {
     switch (ev.type()) {
+      case os::Event::CloseWindow:  return false;
 
-      case os::Event::CloseWindow:
-        return false;
-
-      case os::Event::ResizeWindow:
-        redraw();
-        break;
+      case os::Event::ResizeWindow: redraw(); break;
 
       case os::Event::KeyDown:
         if (ev.scancode() == os::kKeyEsc)
           return false;
-        else if (ev.scancode() == os::kKeyEnter ||
-                 ev.scancode() == os::kKeyEnterPad)
+        else if (ev.scancode() == os::kKeyEnter || ev.scancode() == os::kKeyEnterPad)
           onEnterKey();
         break;
 
-      default:
-        break;
+      default: break;
     }
     return true;
   }
 
 protected:
-  virtual void onRedraw(os::Surface* surface, const gfx::Rect& rc) { }
-  virtual void onEnterKey() { }
+  virtual void onRedraw(os::Surface* surface, const gfx::Rect& rc) {}
+  virtual void onEnterKey() {}
 
   os::WindowRef nativeWindow() const { return m_nativeWindow; }
 
@@ -96,38 +83,37 @@ private:
 
 class FloatingWindow : public CustomWindow {
 public:
-  void recreate(os::Window* parent) {
-    create("Floating", 200, 200, parent);
-  }
+  void recreate(os::Window* parent) { create("Floating", 200, 200, parent); }
 
-  bool isFloating() const override {
-    return true;
-  }
+  bool isFloating() const override { return true; }
 
 private:
-  void onRedraw(os::Surface* surface, const gfx::Rect& rc) override {
+  void onRedraw(os::Surface* surface, const gfx::Rect& rc) override
+  {
     os::Paint paint;
     paint.color(gfx::rgba(200, 150, 150));
     surface->drawRect(rc, paint);
   }
 
-  bool handleEvent(os::Event& ev) override {
+  bool handleEvent(os::Event& ev) override
+  {
     if (!CustomWindow::handleEvent(ev))
       close();
     return true;
   }
-
 };
 
 class MainWindow : public CustomWindow {
 public:
-  MainWindow() {
+  MainWindow()
+  {
     create("Main", 500, 400);
     createFloating();
   }
 
 private:
-  void onRedraw(os::Surface* surface, const gfx::Rect& rc) override {
+  void onRedraw(os::Surface* surface, const gfx::Rect& rc) override
+  {
     os::Paint p;
     p.color(gfx::rgba(150, 150, 200));
     surface->drawRect(rc, p);
@@ -135,15 +121,19 @@ private:
     p.color(gfx::rgba(50, 50, 100));
 
     gfx::Point pos = rc.center();
-    os::draw_text(surface, nullptr, "Press ENTER key to hide/show the floating window",
-                  pos, &p, os::TextAlign::Center);
+    os::draw_text(surface,
+                  nullptr,
+                  "Press ENTER key to hide/show the floating window",
+                  pos,
+                  &p,
+                  os::TextAlign::Center);
 
     pos.y += 24;
-    os::draw_text(surface, nullptr, "Press ESC to quit",
-                  pos, &p, os::TextAlign::Center);
+    os::draw_text(surface, nullptr, "Press ESC to quit", pos, &p, os::TextAlign::Center);
   }
 
-  void onEnterKey() override {
+  void onEnterKey() override
+  {
     if (m_floating.isVisible())
       m_floating.close();
     else {
@@ -151,7 +141,8 @@ private:
     }
   }
 
-  void createFloating() {
+  void createFloating()
+  {
     m_floating.recreate(nativeWindow().get());
 
     // Focus the main window (so the floating window is not focused by
@@ -166,10 +157,9 @@ int app_main(int argc, char* argv[])
 {
   auto system = os::make_system();
   system->setAppMode(os::AppMode::GUI);
-  system->handleWindowResize =
-    [](os::Window* window){
-      window->userData<CustomWindow>()->redraw();
-    };
+  system->handleWindowResize = [](os::Window* window) {
+    window->userData<CustomWindow>()->redraw();
+  };
 
   MainWindow mainWindow;
 

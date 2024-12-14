@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "gfx/region.h"
@@ -21,13 +21,11 @@ Region::Region()
 {
 }
 
-Region::Region(const Region& copy)
-  : m_region(copy.m_region)
+Region::Region(const Region& copy) : m_region(copy.m_region)
 {
 }
 
-Region::Region(const Rect& rect)
-  : m_region(SkIRect::MakeXYWH(rect.x, rect.y, rect.w, rect.h))
+Region::Region(const Rect& rect) : m_region(SkIRect::MakeXYWH(rect.x, rect.y, rect.w, rect.h))
 {
 }
 
@@ -75,8 +73,10 @@ Rect Region::bounds() const
 Region::Overlap Region::contains(const Rect& rect) const
 {
   auto rc = SkIRect::MakeXYWH(rect.x, rect.y, rect.w, rect.h);
-  if (m_region.contains(rc)) return In;
-  if (m_region.intersects(rc)) return Part;
+  if (m_region.contains(rc))
+    return In;
+  if (m_region.intersects(rc))
+    return Part;
   return Out;
 }
 

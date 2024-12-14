@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include <Cocoa/Cocoa.h>
@@ -21,7 +21,8 @@ namespace os {
 
 class AppOSX::Impl {
 public:
-  bool init() {
+  bool init()
+  {
     m_app = [NSApplicationOSX sharedApplication];
     m_appDelegate = [AppDelegateOSX new];
 
@@ -37,29 +38,25 @@ public:
     return true;
   }
 
-  void setAppMode(AppMode appMode) {
+  void setAppMode(AppMode appMode)
+  {
     switch (appMode) {
       case AppMode::CLI: [m_app setActivationPolicy:NSApplicationActivationPolicyProhibited]; break;
       case AppMode::GUI: [m_app setActivationPolicy:NSApplicationActivationPolicyRegular]; break;
     }
   }
 
-  bool isHidden() const {
-    return [m_appDelegate isHidden];
-  }
+  bool isHidden() const { return [m_appDelegate isHidden]; }
 
-  void markCliFileAsProcessed(const std::string& fn) {
-    [m_appDelegate markCliFileAsProcessed:fn];
-  }
+  void markCliFileAsProcessed(const std::string& fn) { [m_appDelegate markCliFileAsProcessed:fn]; }
 
-  void finishLaunching() {
+  void finishLaunching()
+  {
     [m_app finishLaunching];
     [m_appDelegate resetCliFiles];
   }
 
-  void activateApp() {
-    [m_app activateIgnoringOtherApps:YES];
-  }
+  void activateApp() { [m_app activateIgnoringOtherApps:YES]; }
 
 private:
   NSApplication* m_app;
@@ -74,8 +71,7 @@ AppOSX* AppOSX::instance()
   return g_instance;
 }
 
-AppOSX::AppOSX()
-  : m_impl(new Impl)
+AppOSX::AppOSX() : m_impl(new Impl)
 {
   ASSERT(!g_instance);
   g_instance = this;

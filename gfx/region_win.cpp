@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "gfx/region.h"
@@ -14,19 +14,16 @@
 
 namespace gfx {
 
-Region::Region()
-  : m_hrgn(CreateRectRgn(0, 0, 0, 0))
+Region::Region() : m_hrgn(CreateRectRgn(0, 0, 0, 0))
 {
 }
 
-Region::Region(const Region& copy)
-  : m_hrgn(CreateRectRgn(0, 0, 0, 0))
+Region::Region(const Region& copy) : m_hrgn(CreateRectRgn(0, 0, 0, 0))
 {
   CombineRgn(m_hrgn, copy.m_hrgn, nullptr, RGN_COPY);
 }
 
-Region::Region(const Rect& rect)
-  : m_hrgn(CreateRectRgn(rect.x, rect.y, rect.x2(), rect.y2()))
+Region::Region(const Rect& rect) : m_hrgn(CreateRectRgn(rect.x, rect.y, rect.x2(), rect.y2()))
 {
 }
 
@@ -79,9 +76,7 @@ Rect Region::bounds() const
 {
   RECT rc = { 0, 0, 0, 0 };
   int res = GetRgnBox(m_hrgn, &rc);
-  return gfx::Rect(rc.left, rc.top,
-                   rc.right - rc.left,
-                   rc.bottom - rc.top);
+  return gfx::Rect(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
 }
 
 std::size_t Region::size() const
@@ -125,7 +120,7 @@ Region& Region::createSubtraction(const Region& a, const Region& b)
 
 bool Region::contains(const PointT<int>& pt) const
 {
-  return PtInRegion(m_hrgn, pt.x, pt.y) ? true: false;
+  return PtInRegion(m_hrgn, pt.x, pt.y) ? true : false;
 }
 
 Region::Overlap Region::contains(const Rect& rect) const
