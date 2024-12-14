@@ -17,6 +17,8 @@
 
 namespace base {
 
+// clang-format off
+
 static const char base64Table[] = "ABCDEFGHIJKLMNOP"
                                   "QRSTUVWXYZabcdef"
                                   "ghijklmnopqrstuv"
@@ -35,6 +37,8 @@ static const int invBase64Table[] = {
   0,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
  // From 112 to 122            'z'
  41,42,43,44,45,46,47,48,49,50,51 };
+
+// clang-format on
 
 static inline char base64Char(int index)
 {
