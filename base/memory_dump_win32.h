@@ -11,6 +11,7 @@
 
 #if LAF_WINDOWS
   #include <windows.h>
+
   #include <dbghelp.h>
 #endif
 

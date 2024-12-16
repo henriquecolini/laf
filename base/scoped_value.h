@@ -20,7 +20,8 @@ namespace base {
   public:
     ScopedValue(T& instance, const U inValue)
       : m_instance(instance)
-      , m_outValue(instance) { // Restore the current value
+      // Restore the current value
+      , m_outValue(instance) {
       m_instance = inValue;
     }
 

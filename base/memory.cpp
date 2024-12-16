@@ -58,6 +58,7 @@ char* base_strdup(const char* string)
 
 #ifdef _MSC_VER
   #include <windows.h>
+
   #include <dbghelp.h>
 
   typedef USHORT (WINAPI* RtlCaptureStackBackTraceType)(ULONG, ULONG, PVOID*, PULONG);

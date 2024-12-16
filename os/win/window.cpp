@@ -95,8 +95,10 @@ static PointerType wt_packet_pkcursor_to_pointer_type(int pkCursor)
     case 0: return PointerType::Cursor;
     case 1: return PointerType::Pen;
     case 2: return PointerType::Eraser;
-    // TODO check if pkCursor=6 to notify about an inverted
-    //      stylus/eraser if we enable EnableMouseInPointer()
+    default:
+      // TODO check if pkCursor=6 to notify about an inverted
+      //      stylus/eraser if we enable EnableMouseInPointer()
+      break;
   }
   // Impossible case (negative pkCursor?)
   ASSERT(false);
@@ -801,6 +803,7 @@ std::string WindowWin::getLayout()
   WINDOWPLACEMENT wp;
   wp.length = sizeof(WINDOWPLACEMENT);
   if (GetWindowPlacement(m_hwnd, &wp)) {
+    // clang-format off
     std::ostringstream s;
     s << 1 << ' '
       << wp.flags << ' '
@@ -814,6 +817,7 @@ std::string WindowWin::getLayout()
       << wp.rcNormalPosition.right << ' '
       << wp.rcNormalPosition.bottom;
     return s.str();
+    // clang-format on
   }
   return "";
 }
@@ -827,6 +831,7 @@ void WindowWin::setLayout(const std::string& layout)
   int ver;
   s >> ver;
   if (ver == 1) {
+    // clang-format off
     s >> wp.flags
       >> wp.showCmd
       >> wp.ptMinPosition.x
@@ -837,6 +842,7 @@ void WindowWin::setLayout(const std::string& layout)
       >> wp.rcNormalPosition.top
       >> wp.rcNormalPosition.right
       >> wp.rcNormalPosition.bottom;
+    // clang-format on
   }
   else
     return;
