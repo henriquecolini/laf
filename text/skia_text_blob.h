@@ -17,23 +17,19 @@ namespace text {
 class SkiaTextBlob : public TextBlob {
 public:
   SkiaTextBlob() = delete;
-  SkiaTextBlob(const sk_sp<SkTextBlob>& skTextBlob,
-               const gfx::RectF& bounds = gfx::RectF());
+  SkiaTextBlob(const sk_sp<SkTextBlob>& skTextBlob, const gfx::RectF& bounds = gfx::RectF());
 
   sk_sp<SkTextBlob> skTextBlob() const { return m_skTextBlob; }
 
   void visitRuns(const RunVisitor& visitor) override;
 
-  static TextBlobRef Make(
-    const FontRef& font,
-    const std::string& text);
+  static TextBlobRef Make(const FontRef& font, const std::string& text);
 
-  static TextBlobRef MakeWithShaper(
-    const FontMgrRef& fontMgr,
-    const FontRef& font,
-    const std::string& text,
-    TextBlob::RunHandler* handler,
-    const ShaperFeatures features);
+  static TextBlobRef MakeWithShaper(const FontMgrRef& fontMgr,
+                                    const FontRef& font,
+                                    const std::string& text,
+                                    TextBlob::RunHandler* handler,
+                                    const ShaperFeatures features);
 
 private:
   sk_sp<SkTextBlob> m_skTextBlob;

@@ -13,15 +13,16 @@
 #include <string>
 
 namespace text {
-  class FontStyle;
+class FontStyle;
 
-  class Typeface : public base::RefCount {
-  protected:
-    virtual ~Typeface() { }
-  public:
-    virtual std::string familyName() const = 0;
-    virtual FontStyle fontStyle() const = 0;
-  };
+class Typeface : public base::RefCount {
+protected:
+  virtual ~Typeface() {}
+
+public:
+  virtual std::string familyName() const = 0;
+  virtual FontStyle fontStyle() const = 0;
+};
 
 } // namespace text
 

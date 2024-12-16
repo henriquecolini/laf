@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "text/text_blob.h"
@@ -19,31 +19,26 @@
 
 namespace text {
 
-TextBlobRef TextBlob::MakeWithShaper(
-  const FontMgrRef& fontMgr,
-  const FontRef& font,
-  const std::string& text,
-  TextBlob::RunHandler* handler,
-  const ShaperFeatures features)
+TextBlobRef TextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
+                                     const FontRef& font,
+                                     const std::string& text,
+                                     TextBlob::RunHandler* handler,
+                                     const ShaperFeatures features)
 {
   ASSERT(font);
   switch (font->type()) {
-
-    case FontType::SpriteSheet:
-      return SpriteTextBlob::MakeWithShaper(fontMgr, font, text, handler);
+    case FontType::SpriteSheet: return SpriteTextBlob::MakeWithShaper(fontMgr, font, text, handler);
 
     case FontType::FreeType:
-      ASSERT(false);            // TODO impl
+      ASSERT(false); // TODO impl
       return nullptr;
 
 #if LAF_SKIA
     case FontType::Native:
-      return SkiaTextBlob::MakeWithShaper(
-        fontMgr, font, text, handler, features);
+      return SkiaTextBlob::MakeWithShaper(fontMgr, font, text, handler, features);
 #endif
 
-    default:
-      return nullptr;
+    default: return nullptr;
   }
 }
 

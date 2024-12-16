@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "text/freetype_font.h"
@@ -20,9 +20,7 @@
 
 namespace text {
 
-FreeTypeFont::FreeTypeFont(ft::Lib& lib,
-                           const char* filename,
-                           const int height)
+FreeTypeFont::FreeTypeFont(ft::Lib& lib, const char* filename, const int height)
   : m_face(lib.open(filename))
 {
   if (m_face.isValid())
@@ -45,7 +43,7 @@ FontType FreeTypeFont::type()
 
 TypefaceRef FreeTypeFont::typeface() const
 {
-  return nullptr;               // TODO impl
+  return nullptr; // TODO impl
 }
 
 float FreeTypeFont::metrics(FontMetrics* metrics) const
@@ -55,15 +53,13 @@ float FreeTypeFont::metrics(FontMetrics* metrics) const
   if (metrics) {
     FT_Face ftFace = m_face;
 
-    float yscale =
-      float(m_face->size->metrics.y_ppem)
-      / float(m_face->units_per_EM);
+    float yscale = float(m_face->size->metrics.y_ppem) / float(m_face->units_per_EM);
 
     metrics->ascent = -float(ftFace->ascender) * yscale;
     metrics->descent = -float(ftFace->descender) * yscale;
     metrics->underlineThickness = float(ftFace->underline_thickness) * yscale;
-    metrics->underlinePosition = -float(ftFace->underline_position +
-                                        ftFace->underline_thickness/2) * yscale;
+    metrics->underlinePosition =
+      -float(ftFace->underline_position + ftFace->underline_thickness / 2) * yscale;
   }
 
   return float(m_face.height());
@@ -116,22 +112,19 @@ glyph_t FreeTypeFont::codePointToGlyph(codepoint_t cp) const
 
 gfx::RectF FreeTypeFont::getGlyphBounds(glyph_t glyph) const
 {
-  return gfx::RectF();        // TODO impl
+  return gfx::RectF(); // TODO impl
 }
 
 float FreeTypeFont::getGlyphAdvance(glyph_t glyph) const
 {
-  return 0;                     // TODO impl
+  return 0; // TODO impl
 }
 
-base::Ref<FreeTypeFont> FreeTypeFont::LoadFont(
-  ft::Lib& lib,
-  const char* filename,
-  const int height)
+base::Ref<FreeTypeFont> FreeTypeFont::LoadFont(ft::Lib& lib, const char* filename, const int height)
 {
   auto font = base::make_ref<FreeTypeFont>(lib, filename, height);
   if (!font->isValid())
-    font.reset();             // delete font
+    font.reset(); // delete font
   return font;
 }
 

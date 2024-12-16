@@ -6,12 +6,12 @@
 
 #if CLIP_ENABLE_IMAGE
 
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+  #ifdef HAVE_CONFIG_H
+    #include "config.h"
+  #endif
 
-#include "os/dnd.h"
-#include "os/system.h"
+  #include "os/dnd.h"
+  #include "os/system.h"
 
 namespace os {
 

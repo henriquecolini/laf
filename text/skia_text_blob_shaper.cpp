@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/paint.h"
@@ -36,34 +36,28 @@ public:
                    TextBlob::RunHandler* subHandler)
     : m_builder(utf8Text, os::to_skia(offset))
     , m_subHandler(subHandler)
-    , m_buffer() { }
-
-  sk_sp<SkTextBlob> makeBlob() {
-    return m_builder.makeBlob();
+    , m_buffer()
+  {
   }
 
-  const gfx::RectF& bounds() {
-    return m_bounds;
-  }
+  sk_sp<SkTextBlob> makeBlob() { return m_builder.makeBlob(); }
 
-  void beginLine() override {
-    m_builder.beginLine();
-  }
+  const gfx::RectF& bounds() { return m_bounds; }
 
-  void runInfo(const RunInfo& info) override {
-    m_builder.runInfo(info);
-  }
+  void beginLine() override { m_builder.beginLine(); }
 
-  void commitRunInfo() override {
-    m_builder.commitRunInfo();
-  }
+  void runInfo(const RunInfo& info) override { m_builder.runInfo(info); }
 
-  Buffer runBuffer(const RunInfo& info) override {
+  void commitRunInfo() override { m_builder.commitRunInfo(); }
+
+  Buffer runBuffer(const RunInfo& info) override
+  {
     m_buffer = m_builder.runBuffer(info);
     return m_buffer;
   }
 
-  void commitRunBuffer(const RunInfo& info) override {
+  void commitRunBuffer(const RunInfo& info) override
+  {
     m_builder.commitRunBuffer(info);
 
     // Now the m_buffer field is valid and can be used
@@ -78,18 +72,16 @@ public:
 
     if (m_positions.size() < n)
       m_positions.resize(n);
-    for (size_t i=0; i<n; ++i) {
-      m_positions[i] = gfx::PointF(m_buffer.positions[i].x(),
-                                   m_buffer.positions[i].y());
+    for (size_t i = 0; i < n; ++i) {
+      m_positions[i] = gfx::PointF(m_buffer.positions[i].x(), m_buffer.positions[i].y());
     }
     subInfo.positions = m_positions.data();
 
     if (m_buffer.offsets) {
       if (m_offsets.size() < n)
         m_offsets.resize(n);
-      for (size_t i=0; i<n; ++i) {
-        m_offsets[i] = gfx::PointF(m_buffer.offsets[i].x(),
-                                   m_buffer.offsets[i].y());
+      for (size_t i = 0; i < n; ++i) {
+        m_offsets[i] = gfx::PointF(m_buffer.offsets[i].x(), m_buffer.offsets[i].y());
       }
       subInfo.offsets = m_offsets.data();
     }
@@ -103,13 +95,11 @@ public:
     if (m_subHandler)
       m_subHandler->commitRunBuffer(subInfo);
 
-    for (int i=0; i<subInfo.glyphCount; ++i)
+    for (int i = 0; i < subInfo.glyphCount; ++i)
       m_bounds |= subInfo.getGlyphBounds(i);
   }
 
-  void commitLine() override {
-    m_builder.commitLine();
-  }
+  void commitLine() override { m_builder.commitLine(); }
 
 private:
   SkTextBlobBuilderRunHandler m_builder;
@@ -120,14 +110,13 @@ private:
   gfx::RectF m_bounds;
 };
 
-}
+} // namespace
 
-TextBlobRef SkiaTextBlob::MakeWithShaper(
-  const FontMgrRef& fontMgr,
-  const FontRef& font,
-  const std::string& text,
-  TextBlob::RunHandler* handler,
-  const ShaperFeatures features)
+TextBlobRef SkiaTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
+                                         const FontRef& font,
+                                         const std::string& text,
+                                         TextBlob::RunHandler* handler,
+                                         const ShaperFeatures features)
 {
   ASSERT(font);
   ASSERT(font->type() == FontType::Native);
@@ -154,8 +143,7 @@ TextBlobRef SkiaTextBlob::MakeWithShaper(
 
     std::vector<SkShaper::Feature> ft;
     if (!features.ligatures) {
-      ft.emplace_back(SkShaper::Feature{
-        SkSetFourByteTag('l', 'i', 'g', 'a'), 0, 0, text.size() });
+      ft.emplace_back(SkShaper::Feature{ SkSetFourByteTag('l', 'i', 'g', 'a'), 0, 0, text.size() });
     }
 
     shaper->shape(text.c_str(),
@@ -164,7 +152,8 @@ TextBlobRef SkiaTextBlob::MakeWithShaper(
                   *bidiRun,
                   *scriptRun,
                   *languageRun,
-                  ft.data(), ft.size(),
+                  ft.data(),
+                  ft.size(),
                   std::numeric_limits<float>::max(),
                   &shaperHandler);
 
@@ -172,8 +161,7 @@ TextBlobRef SkiaTextBlob::MakeWithShaper(
     bounds = shaperHandler.bounds();
   }
   else {
-    textBlob = SkTextBlob::MakeFromText(text.c_str(), text.size(),
-                                        skFont, SkTextEncoding::kUTF8);
+    textBlob = SkTextBlob::MakeFromText(text.c_str(), text.size(), skFont, SkTextEncoding::kUTF8);
   }
 
   if (textBlob)

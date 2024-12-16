@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include <Cocoa/Cocoa.h>
@@ -22,7 +22,7 @@
 
 @implementation NSApplicationOSX
 
-- (void)sendEvent:(NSEvent *)event
+- (void)sendEvent:(NSEvent*)event
 {
   if ([event type] == NSKeyDown) {
     if (([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask) {
@@ -47,7 +47,8 @@
           return;
       }
     }
-    else if (([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == (NSCommandKeyMask | NSShiftKeyMask)) {
+    else if (([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) ==
+             (NSCommandKeyMask | NSShiftKeyMask)) {
       if ([[event charactersIgnoringModifiers] isEqualToString:@"Z"]) {
         if ([self sendAction:@selector(redo:) to:nil from:self])
           return;
@@ -120,8 +121,8 @@
   // filter for files that were already processed in the CLI (m_cliFiles)
 
   base::paths files;
-  for (int i=0; i<[filenames count]; ++i) {
-    NSString* fnString = [filenames objectAtIndex: i];
+  for (int i = 0; i < [filenames count]; ++i) {
+    NSString* fnString = [filenames objectAtIndex:i];
     std::string fn = base::normalize_path([fnString UTF8String]);
     if (m_cliFiles.find(fn) == m_cliFiles.end())
       files.push_back(fn);
@@ -145,8 +146,7 @@
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
 {
-  if (menuItem &&
-      [menuItem respondsToSelector:@selector(validateLafMenuItem)]) {
+  if (menuItem && [menuItem respondsToSelector:@selector(validateLafMenuItem)]) {
     [((id<ValidateMenuItemProtocolOSX>)menuItem) validateLafMenuItem];
     return menuItem.enabled;
   }

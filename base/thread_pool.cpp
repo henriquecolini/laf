@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/debug.h"
@@ -14,14 +14,11 @@
 
 namespace base {
 
-thread_pool::thread_pool(const size_t n)
-  : m_running(true)
-  , m_threads(n)
-  , m_doingWork(0)
+thread_pool::thread_pool(const size_t n) : m_running(true), m_threads(n), m_doingWork(0)
 {
   const std::unique_lock lock(m_mutex);
-  for (size_t i=0; i<n; ++i)
-    m_threads[i] = std::thread([this]{ worker(); });
+  for (size_t i = 0; i < n; ++i)
+    m_threads[i] = std::thread([this] { worker(); });
 }
 
 thread_pool::~thread_pool()
@@ -40,11 +37,8 @@ void thread_pool::execute(std::function<void()>&& func)
 void thread_pool::wait_all()
 {
   std::unique_lock<std::mutex> lock(m_mutex);
-  m_cvWait.wait(lock, [this]() -> bool {
-                        return
-                          !m_running ||
-                          (m_work.empty() && m_doingWork == 0);
-                      });
+  m_cvWait.wait(lock,
+                [this]() -> bool { return !m_running || (m_work.empty() && m_doingWork == 0); });
 }
 
 void thread_pool::join_all()
@@ -82,9 +76,7 @@ void thread_pool::worker()
     std::function<void()> func;
     {
       std::unique_lock<std::mutex> lock(m_mutex);
-      m_cv.wait(lock, [this]() -> bool {
-                        return !m_running || !m_work.empty();
-                      });
+      m_cv.wait(lock, [this]() -> bool { return !m_running || !m_work.empty(); });
       running = m_running;
       if (m_running && !m_work.empty()) {
         func = std::move(m_work.front());
@@ -115,4 +107,4 @@ void thread_pool::worker()
   }
 }
 
-}
+} // namespace base

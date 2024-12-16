@@ -27,18 +27,18 @@ class SpriteSheetFont : public Font {
   static constexpr auto kRedColor = gfx::rgba(255, 0, 0);
 
 public:
-  SpriteSheetFont() : m_sheet(nullptr) { }
-  ~SpriteSheetFont() { }
+  SpriteSheetFont() : m_sheet(nullptr) {}
+  ~SpriteSheetFont() {}
 
-  FontType type() override {
-    return FontType::SpriteSheet;
+  FontType type() override { return FontType::SpriteSheet; }
+
+  TypefaceRef typeface() const override
+  {
+    return nullptr; // TODO impl
   }
 
-  TypefaceRef typeface() const override {
-    return nullptr;             // TODO impl
-  }
-
-  float metrics(FontMetrics* metrics) const override {
+  float metrics(FontMetrics* metrics) const override
+  {
     // TODO impl
 
     if (metrics) {
@@ -50,11 +50,10 @@ public:
     return height();
   }
 
-  int height() const override {
-    return getCharBounds(' ').h;
-  }
+  int height() const override { return getCharBounds(' ').h; }
 
-  int textLength(const std::string& str) const override {
+  int textLength(const std::string& str) const override
+  {
     base::utf8_decode decode(str);
     int x = 0;
     while (int chr = decode.next())
@@ -64,63 +63,60 @@ public:
 
   float measureText(const std::string& str,
                     gfx::RectF* bounds,
-                    const os::Paint* paint) const override {
+                    const os::Paint* paint) const override
+  {
     float w = textLength(str);
     if (bounds)
       *bounds = gfx::RectF(0, 0, w, height());
     return w;
   }
 
-  bool isScalable() const override {
-    return false;
-  }
+  bool isScalable() const override { return false; }
 
-  void setSize(int size) override {
+  void setSize(int size) override
+  {
     // Do nothing
   }
 
-  bool antialias() const override {
-    return false;
-  }
+  bool antialias() const override { return false; }
 
-  void setAntialias(bool antialias) override {
+  void setAntialias(bool antialias) override
+  {
     // Do nothing
   }
 
-  glyph_t codePointToGlyph(const codepoint_t codepoint) const override {
+  glyph_t codePointToGlyph(const codepoint_t codepoint) const override
+  {
     glyph_t glyph = codepoint - int(' ') + 2;
-    if (glyph >= 0 &&
-        glyph < int(m_glyphs.size()) &&
-        !m_glyphs[glyph].isEmpty()) {
+    if (glyph >= 0 && glyph < int(m_glyphs.size()) && !m_glyphs[glyph].isEmpty()) {
       return glyph;
     }
     else
       return 0;
   }
 
-  gfx::RectF getGlyphBounds(glyph_t glyph) const override {
+  gfx::RectF getGlyphBounds(glyph_t glyph) const override
+  {
     if (glyph >= 0 && glyph < (int)m_glyphs.size())
       return gfx::RectF(0, 0, m_glyphs[glyph].w, m_glyphs[glyph].h);
 
     return getCharBounds(128);
   }
 
-  float getGlyphAdvance(glyph_t glyph) const override {
-    return getGlyphBounds(glyph).w;
-  }
+  float getGlyphAdvance(glyph_t glyph) const override { return getGlyphBounds(glyph).w; }
 
-  gfx::RectF getGlyphBoundsOnSheet(glyph_t glyph) const {
+  gfx::RectF getGlyphBoundsOnSheet(glyph_t glyph) const
+  {
     if (glyph >= 0 && glyph < (int)m_glyphs.size())
       return m_glyphs[glyph];
 
     return getCharBounds(128);
   }
 
-  os::Surface* sheetSurface() const {
-    return m_sheet.get();
-  }
+  os::Surface* sheetSurface() const { return m_sheet.get(); }
 
-  gfx::Rect getCharBounds(codepoint_t cp) const {
+  gfx::Rect getCharBounds(codepoint_t cp) const
+  {
     glyph_t glyph = codePointToGlyph(cp);
     if (glyph == 0)
       glyph = codePointToGlyph(128);
@@ -131,7 +127,8 @@ public:
       return gfx::Rect();
   }
 
-  static FontRef FromSurface(const os::SurfaceRef& sur) {
+  static FontRef FromSurface(const os::SurfaceRef& sur)
+  {
     auto font = base::make_ref<SpriteSheetFont>();
     font->m_sheet = sur;
     font->m_glyphs.push_back(gfx::Rect()); // glyph index 0 is MISSING CHARACTER glyph
@@ -150,9 +147,12 @@ public:
   }
 
 private:
-
-  bool findGlyph(const os::Surface* sur, int width, int height,
-                 gfx::Rect& bounds, gfx::Rect& glyphBounds) {
+  bool findGlyph(const os::Surface* sur,
+                 int width,
+                 int height,
+                 gfx::Rect& bounds,
+                 gfx::Rect& glyphBounds)
+  {
     gfx::Color keyColor = sur->getPixel(0, 0);
 
     while (sur->getPixel(bounds.x, bounds.y) == keyColor) {
@@ -169,14 +169,14 @@ private:
     gfx::Color firstCharPixel = sur->getPixel(bounds.x, bounds.y);
 
     bounds.w = 0;
-    while ((bounds.x+bounds.w < width) &&
-           (sur->getPixel(bounds.x+bounds.w, bounds.y) != keyColor)) {
+    while ((bounds.x + bounds.w < width) &&
+           (sur->getPixel(bounds.x + bounds.w, bounds.y) != keyColor)) {
       bounds.w++;
     }
 
     bounds.h = 0;
-    while ((bounds.y+bounds.h < height) &&
-           (sur->getPixel(bounds.x, bounds.y+bounds.h) != keyColor)) {
+    while ((bounds.y + bounds.h < height) &&
+           (sur->getPixel(bounds.x, bounds.y + bounds.h) != keyColor)) {
       bounds.h++;
     }
 

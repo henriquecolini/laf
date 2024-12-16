@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/file_handle.h"
@@ -16,16 +16,16 @@
 #include <stdexcept>
 
 #if LAF_WINDOWS
-  #include <windows.h>
   #include <io.h>
+  #include <windows.h>
 #endif
 
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #ifndef O_BINARY
-#define O_BINARY  0
-#define O_TEXT    0
+  #define O_BINARY 0
+  #define O_TEXT   0
 #endif
 
 using namespace std;
@@ -48,8 +48,7 @@ static void throw_cannot_open_exception(const string& filename, const string& mo
 FILE* open_file_raw(const string& filename, const string& mode)
 {
 #if LAF_WINDOWS
-  return _wfopen(from_utf8(filename).c_str(),
-                 from_utf8(mode).c_str());
+  return _wfopen(from_utf8(filename).c_str(), from_utf8(mode).c_str());
 #else
   return fopen(filename.c_str(), mode.c_str());
 #endif
@@ -58,13 +57,11 @@ FILE* open_file_raw(const string& filename, const string& mode)
 FILE* reopen_file_raw(const string& filename, const string& mode, FILE* stream)
 {
 #if LAF_WINDOWS
-  return _wfreopen((!filename.empty() ? from_utf8(filename).c_str(): nullptr),
+  return _wfreopen((!filename.empty() ? from_utf8(filename).c_str() : nullptr),
                    from_utf8(mode).c_str(),
                    stream);
 #else
-  return freopen((!filename.empty() ? filename.c_str(): nullptr),
-                 mode.c_str(),
-                 stream);
+  return freopen((!filename.empty() ? filename.c_str() : nullptr), mode.c_str(), stream);
 #endif
 }
 
@@ -81,7 +78,8 @@ FileHandle open_file_with_exception(const string& filename, const string& mode)
   return f;
 }
 
-FileHandle open_file_with_exception_sync_on_close(const std::string& filename, const std::string& mode)
+FileHandle open_file_with_exception_sync_on_close(const std::string& filename,
+                                                  const std::string& mode)
 {
   FileHandle f(open_file_raw(filename, mode), close_file_and_sync);
   if (!f)
@@ -92,9 +90,12 @@ FileHandle open_file_with_exception_sync_on_close(const std::string& filename, c
 int open_file_descriptor_with_exception(const string& filename, const string& mode)
 {
   int flags = 0;
-  if (mode.find('r') != string::npos) flags |= O_RDONLY;
-  if (mode.find('w') != string::npos) flags |= O_RDWR | O_CREAT | O_TRUNC;
-  if (mode.find('b') != string::npos) flags |= O_BINARY;
+  if (mode.find('r') != string::npos)
+    flags |= O_RDONLY;
+  if (mode.find('w') != string::npos)
+    flags |= O_RDWR | O_CREAT | O_TRUNC;
+  if (mode.find('b') != string::npos)
+    flags |= O_BINARY;
 
   int fd;
 #if LAF_WINDOWS
@@ -132,4 +133,4 @@ void close_file_and_sync(FILE* file)
   fclose(file);
 }
 
-}
+} // namespace base

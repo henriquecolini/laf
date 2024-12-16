@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include <Foundation/Foundation.h>
@@ -16,8 +16,8 @@ namespace base {
 
 std::string get_lib_app_support_path()
 {
-  NSArray* dirs = NSSearchPathForDirectoriesInDomains(
-    NSApplicationSupportDirectory, NSUserDomainMask, YES);
+  NSArray* dirs =
+    NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
   if (dirs) {
     NSString* dir = [dirs firstObject];
     if (dir)

@@ -4,9 +4,9 @@
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
 
+#include "base/utf8_decode.h"
 #include "os/os.h"
 #include "text/text.h"
-#include "base/utf8_decode.h"
 
 #include <cstdio>
 
@@ -17,12 +17,12 @@ const char* kTitle = "CTL";
 const char* kLines[] = {
   "English",
   "Español",
-  "Русский", // Russian
-  "汉语", // Simplified Chinese
-  "日本語", // Japanese
-  "한국어", // Korean
+  "Русский",                     // Russian
+  "汉语",                        // Simplified Chinese
+  "日本語",                      // Japanese
+  "한국어",                      // Korean
   "العَرَبِيَّة‎", // Arabic
-  "👍❤️😂☺️😯😢😡" // Emojis
+  "👍❤️😂☺️😯😢😡"                 // Emojis
 };
 constexpr size_t N = sizeof(kLines) / sizeof(kLines[0]);
 
@@ -79,7 +79,7 @@ void draw_window(Window* window,
   // Create the text blobs just one time, and we cache them in textBlobs array
   if (textBlobs.empty()) {
     textBlobs.resize(N);
-    for (size_t i=0; i<N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
       textBlobs[i] = TextBlob::MakeWithShaper(fontMgr, font, kLines[i]);
     }
   }
@@ -87,18 +87,17 @@ void draw_window(Window* window,
   gfx::RectF focusedGlyph;
   base::codepoint_t focusedCodepoint = 0;
 
-  gfx::PointF pos(rc.w/2, 0);
-  for (size_t i=0; i<N; ++i) {
+  gfx::PointF pos(rc.w / 2, 0);
+  for (size_t i = 0; i < N; ++i) {
     auto& blob = textBlobs[i];
-    gfx::PointF textPos(pos.x - blob->bounds().w/2, pos.y);
+    gfx::PointF textPos(pos.x - blob->bounds().w / 2, pos.y);
 
     draw_text(surface, blob, textPos, &p);
 
     // Check if the mouse is over one glyph of this text blob.
     if (!focusedCodepoint) {
       focusedCodepoint =
-        inside_glyph_bounds(blob.get(), kLines[i],
-                            mousePos - textPos, focusedGlyph);
+        inside_glyph_bounds(blob.get(), kLines[i], mousePos - textPos, focusedGlyph);
       if (focusedCodepoint)
         focusedGlyph.offset(textPos);
     }
@@ -151,9 +150,7 @@ int app_main(int argc, char* argv[])
   bool running = true;
   bool redraw = true;
 
-  system->handleWindowResize = [&](Window* w) {
-    draw_window(w, fontMgr, font, mousePos);
-  };
+  system->handleWindowResize = [&](Window* w) { draw_window(w, fontMgr, font, mousePos); };
 
   while (running) {
     // Pick next event in the queue (without waiting)
@@ -174,16 +171,11 @@ int app_main(int argc, char* argv[])
     }
 
     switch (ev.type()) {
-
-      case Event::CloseWindow:
-        running = false;
-        break;
+      case Event::CloseWindow: running = false; break;
 
       case Event::KeyDown:
         switch (ev.scancode()) {
-          case kKeyEsc:
-            running = false;
-            break;
+          case kKeyEsc: running = false; break;
           case kKey1:
           case kKey2:
           case kKey3:
@@ -203,9 +195,7 @@ int app_main(int argc, char* argv[])
         }
         break;
 
-      case Event::ResizeWindow:
-        redraw = true;
-        break;
+      case Event::ResizeWindow: redraw = true; break;
 
       case Event::MouseEnter:
       case Event::MouseMove:

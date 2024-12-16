@@ -13,29 +13,27 @@
 
 namespace os {
 
-  // Same as SkSamplingOptions struct
-  struct Sampling {
-    enum class Filter { Nearest, Linear };
-    enum class Mipmap { None, Nearest, Linear };
-    struct Cubic {
-      float B, C;
-      static constexpr Cubic Mitchell() { return { 1/3.0f, 1/3.0f }; }
-      static constexpr Cubic CatmullRom() { return { 0.0f, 1/2.0f }; }
-    };
-
-    bool useCubic = false;
-    Cubic cubic = { 0, 0 };
-    Filter filter = Filter::Nearest;
-    Mipmap mipmap = Mipmap::None;
-
-    Sampling() = default;
-    Sampling(const Sampling&) = default;
-    Sampling& operator=(const Sampling&) = default;
-    Sampling(Filter f, Mipmap m = Mipmap::None)
-      : filter(f), mipmap(m) { }
-    Sampling(Cubic c)
-      : useCubic(true), cubic(c) { }
+// Same as SkSamplingOptions struct
+struct Sampling {
+  enum class Filter { Nearest, Linear };
+  enum class Mipmap { None, Nearest, Linear };
+  struct Cubic {
+    float B, C;
+    static constexpr Cubic Mitchell() { return { 1 / 3.0f, 1 / 3.0f }; }
+    static constexpr Cubic CatmullRom() { return { 0.0f, 1 / 2.0f }; }
   };
+
+  bool useCubic = false;
+  Cubic cubic = { 0, 0 };
+  Filter filter = Filter::Nearest;
+  Mipmap mipmap = Mipmap::None;
+
+  Sampling() = default;
+  Sampling(const Sampling&) = default;
+  Sampling& operator=(const Sampling&) = default;
+  Sampling(Filter f, Mipmap m = Mipmap::None) : filter(f), mipmap(m) {}
+  Sampling(Cubic c) : useCubic(true), cubic(c) {}
+};
 
 } // namespace os
 

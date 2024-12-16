@@ -36,9 +36,7 @@ public:
   SkiaFontStyleSet(sk_sp<SkFontStyleSet> set);
 
   int count() override;
-  void getStyle(int index,
-                FontStyle& style,
-                std::string& name) override;
+  void getStyle(int index, FontStyle& style, std::string& name) override;
   TypefaceRef typeface(int index) override;
   TypefaceRef matchStyle(const FontStyle& style) override;
 

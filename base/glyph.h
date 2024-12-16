@@ -12,11 +12,11 @@
 
 namespace base {
 
-  // A font file is a set of glyphs that represent one (or a
-  // combination) of code points (base::codepoint_t). This value is
-  // like a reference/index in a font glyph table.
-  using glyph_t = uint16_t;
+// A font file is a set of glyphs that represent one (or a
+// combination) of code points (base::codepoint_t). This value is
+// like a reference/index in a font glyph table.
+using glyph_t = uint16_t;
 
-}
+} // namespace base
 
 #endif

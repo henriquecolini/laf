@@ -32,32 +32,27 @@ public:
     size_t size() const { return glyphs.size(); }
     bool empty() const { return glyphs.empty(); }
 
-    void add(glyph_t glyph,
-             const gfx::PointF& pos,
-             uint32_t cluster);
+    void add(glyph_t glyph, const gfx::PointF& pos, uint32_t cluster);
     void clear();
   };
   using Runs = std::vector<Run>;
 
-  SpriteTextBlob(const gfx::RectF& bounds,
-                 const FontRef& font,
-                 Runs&& runs)
+  SpriteTextBlob(const gfx::RectF& bounds, const FontRef& font, Runs&& runs)
     : TextBlob(bounds)
     , m_font(font)
-    , m_runs(std::move(runs)) { }
-  ~SpriteTextBlob() { }
+    , m_runs(std::move(runs))
+  {
+  }
+  ~SpriteTextBlob() {}
 
   void visitRuns(const RunVisitor& visitor) override;
 
-  static TextBlobRef Make(
-    const FontRef& font,
-    const std::string& text);
+  static TextBlobRef Make(const FontRef& font, const std::string& text);
 
-  static TextBlobRef MakeWithShaper(
-    const FontMgrRef& fontMgr,
-    const FontRef& font,
-    const std::string& text,
-    TextBlob::RunHandler* handler);
+  static TextBlobRef MakeWithShaper(const FontMgrRef& fontMgr,
+                                    const FontRef& font,
+                                    const std::string& text,
+                                    TextBlob::RunHandler* handler);
 
   const FontRef& font() const { return m_font; }
   const Runs& runs() const { return m_runs; }

@@ -4,11 +4,11 @@
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
 
+#include "os/dnd.h"
 #include "base/exception.h"
 #include "base/fs.h"
 #include "clip/clip.h"
 #include "clip/clip_osx.h"
-#include "os/dnd.h"
 #include "os/osx/dnd.h"
 #include "os/osx/window.h"
 #include "os/surface_format.h"
@@ -26,8 +26,8 @@ base::paths DragDataProviderOSX::getPaths()
 
   if ([m_pasteboard.types containsObject:NSFilenamesPboardType]) {
     NSArray* filenames = [m_pasteboard propertyListForType:NSFilenamesPboardType];
-    for (int i=0; i<[filenames count]; ++i) {
-      NSString* fn = [filenames objectAtIndex: i];
+    for (int i = 0; i < [filenames count]; ++i) {
+      NSString* fn = [filenames objectAtIndex:i];
 
       files.push_back(base::normalize_path([fn UTF8String]));
     }
@@ -47,24 +47,21 @@ SurfaceRef DragDataProviderOSX::getImage()
 
 std::string DragDataProviderOSX::getUrl()
 {
-  NSURL* url = [NSURL URLFromPasteboard: m_pasteboard];
+  NSURL* url = [NSURL URLFromPasteboard:m_pasteboard];
   return url ? url.absoluteString.UTF8String : "";
 }
 
 bool DragDataProviderOSX::contains(DragDataItemType type)
 {
   for (NSPasteboardType t in m_pasteboard.types) {
-    if (type == DragDataItemType::Paths &&
-        [t isEqual: NSFilenamesPboardType])
+    if (type == DragDataItemType::Paths && [t isEqual:NSFilenamesPboardType])
       return true;
 
     if (type == DragDataItemType::Image &&
-        ([t isEqual: NSPasteboardTypeTIFF] ||
-          [t isEqual: NSPasteboardTypePNG]))
+        ([t isEqual:NSPasteboardTypeTIFF] || [t isEqual:NSPasteboardTypePNG]))
       return true;
 
-    if (type == DragDataItemType::Url &&
-        [t isEqual: NSURLPboardType])
+    if (type == DragDataItemType::Url && [t isEqual:NSURLPboardType])
       return true;
   }
   return false;

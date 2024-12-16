@@ -20,110 +20,106 @@
 
 namespace gfx {
 
-  class ColorSpace;
-  using ColorSpaceRef = base::Ref<ColorSpace>;
+class ColorSpace;
+using ColorSpaceRef = base::Ref<ColorSpace>;
 
-  // Gamut white point and primaries as in Skia's SkColorSpacePrimaries.
-  struct ColorSpacePrimaries {
-    float rx, ry, gx, gy, bx, by; // Red/Green/Blue XY
-    float wx, wy;                 // White point XY
-  };
+// Gamut white point and primaries as in Skia's SkColorSpacePrimaries.
+struct ColorSpacePrimaries {
+  float rx, ry, gx, gy, bx, by; // Red/Green/Blue XY
+  float wx, wy;                 // White point XY
+};
 
-  // Transfer coefficients as in Skia's skcms_TransferFunction, to
-  // transform from a curved space to linear:
-  //
-  //   LinearVal = C*InputVal + F        , for 0.0f <= InputVal <  D
-  //   LinearVal = (A*InputVal + B)^G + E, for D    <= InputVal <= 1.0f
-  //
-  struct ColorSpaceTransferFn {
-    float g, a, b, c, d, e, f;
-  };
+// Transfer coefficients as in Skia's skcms_TransferFunction, to
+// transform from a curved space to linear:
+//
+//   LinearVal = C*InputVal + F        , for 0.0f <= InputVal <  D
+//   LinearVal = (A*InputVal + B)^G + E, for D    <= InputVal <= 1.0f
+//
+struct ColorSpaceTransferFn {
+  float g, a, b, c, d, e, f;
+};
 
-  class ColorSpace : public base::RefCountT<ColorSpace> {
-  public:
-    enum Type { None,
-                sRGB,
-                RGB,
-                ICC };
+class ColorSpace : public base::RefCountT<ColorSpace> {
+public:
+  enum Type { None, sRGB, RGB, ICC };
 
-    enum Flag { NoFlags = 0,
-                HasGamma = 1,
-                HasTransferFn = 2,
-                HasPrimaries = 4,
-                HasICC = 8 };
+  enum Flag { NoFlags = 0, HasGamma = 1, HasTransferFn = 2, HasPrimaries = 4, HasICC = 8 };
 
-    ColorSpace(Type type,
-               Flag flags = NoFlags,
-               float gamma = 1.0,
-               std::vector<uint8_t>&& rawData = std::vector<uint8_t>());
+  ColorSpace(Type type,
+             Flag flags = NoFlags,
+             float gamma = 1.0,
+             std::vector<uint8_t>&& rawData = std::vector<uint8_t>());
 
-    static ColorSpaceRef MakeNone();   // Use display color space
-    static ColorSpaceRef MakeSRGB();
-    static ColorSpaceRef MakeLinearSRGB();
-    static ColorSpaceRef MakeSRGBWithGamma(float gamma);
-    static ColorSpaceRef MakeRGB(const ColorSpaceTransferFn& fn,
-                                 const ColorSpacePrimaries& p);
-    static ColorSpaceRef MakeRGBWithSRGBGamut(const ColorSpaceTransferFn& fn);
-    static ColorSpaceRef MakeRGBWithSRGBGamma(const ColorSpacePrimaries& p);
-    static ColorSpaceRef MakeICC(const void* data, size_t n);
-    static ColorSpaceRef MakeICC(std::vector<uint8_t>&& data);
+  static ColorSpaceRef MakeNone(); // Use display color space
+  static ColorSpaceRef MakeSRGB();
+  static ColorSpaceRef MakeLinearSRGB();
+  static ColorSpaceRef MakeSRGBWithGamma(float gamma);
+  static ColorSpaceRef MakeRGB(const ColorSpaceTransferFn& fn, const ColorSpacePrimaries& p);
+  static ColorSpaceRef MakeRGBWithSRGBGamut(const ColorSpaceTransferFn& fn);
+  static ColorSpaceRef MakeRGBWithSRGBGamma(const ColorSpacePrimaries& p);
+  static ColorSpaceRef MakeICC(const void* data, size_t n);
+  static ColorSpaceRef MakeICC(std::vector<uint8_t>&& data);
 
-    Type type() const { return m_type; }
-    Flag flags() const { return m_flags; }
+  Type type() const { return m_type; }
+  Flag flags() const { return m_flags; }
 
-    const std::string& name() const { return m_name; }
-    void setName(const std::string& name) { m_name = name; }
+  const std::string& name() const { return m_name; }
+  void setName(const std::string& name) { m_name = name; }
 
-    float gamma() const { return m_gamma; }
+  float gamma() const { return m_gamma; }
 
-    bool hasGamma() const { return has(HasGamma); }
-    bool hasTransferFn() const { return has(HasTransferFn); }
-    bool hasPrimaries() const { return has(HasPrimaries); }
+  bool hasGamma() const { return has(HasGamma); }
+  bool hasTransferFn() const { return has(HasTransferFn); }
+  bool hasPrimaries() const { return has(HasPrimaries); }
 
-    size_t iccSize() const {
-      if (has(HasICC))
-        return m_data.size();
-      return 0;
-    }
+  size_t iccSize() const
+  {
+    if (has(HasICC))
+      return m_data.size();
+    return 0;
+  }
 
-    const void* iccData() const {
-      if (has(HasICC))
-        return m_data.data();
-      return nullptr;
-    }
+  const void* iccData() const
+  {
+    if (has(HasICC))
+      return m_data.data();
+    return nullptr;
+  }
 
-    const ColorSpaceTransferFn* transferFn() const {
+  const ColorSpaceTransferFn* transferFn() const
+  {
+    if (has(HasTransferFn))
+      return (const ColorSpaceTransferFn*)m_data.data();
+    return nullptr;
+  }
+
+  const ColorSpacePrimaries* primaries() const
+  {
+    if (has(HasPrimaries)) {
       if (has(HasTransferFn))
-        return (const ColorSpaceTransferFn*)m_data.data();
-      return nullptr;
+        return (const ColorSpacePrimaries*)&m_data[sizeof(ColorSpaceTransferFn)];
+      return (const ColorSpacePrimaries*)m_data.data();
     }
+    return nullptr;
+  }
 
-    const ColorSpacePrimaries* primaries() const {
-      if (has(HasPrimaries)) {
-        if (has(HasTransferFn))
-          return (const ColorSpacePrimaries*)&m_data[sizeof(ColorSpaceTransferFn)];
-        return (const ColorSpacePrimaries*)m_data.data();
-      }
-      return nullptr;
-    }
+  bool operator==(const ColorSpace& that) const = delete;
+  bool operator!=(const ColorSpace& that) const = delete;
+  bool nearlyEqual(const ColorSpace& that) const;
 
-    bool operator==(const ColorSpace& that) const = delete;
-    bool operator!=(const ColorSpace& that) const = delete;
-    bool nearlyEqual(const ColorSpace& that) const;
+  // This data can be used
+  const std::vector<uint8_t>& rawData() const { return m_data; }
 
-    // This data can be used
-    const std::vector<uint8_t>& rawData() const { return m_data; }
+private:
+  bool has(const Flag flag) const { return (m_flags & int(flag)) == int(flag); }
 
-  private:
-    bool has(const Flag flag) const { return (m_flags & int(flag)) == int(flag); }
-
-    Type m_type;
-    Flag m_flags;
-    std::string m_name;
-    float m_gamma = 1.0f;
-    // ColorSpacePrimaries + ColorSpaceTransferFn or raw ICC profile data
-    std::vector<uint8_t> m_data;
-  };
+  Type m_type;
+  Flag m_flags;
+  std::string m_name;
+  float m_gamma = 1.0f;
+  // ColorSpacePrimaries + ColorSpaceTransferFn or raw ICC profile data
+  std::vector<uint8_t> m_data;
+};
 
 } // namespace gfx
 

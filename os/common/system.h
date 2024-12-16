@@ -22,38 +22,30 @@ public:
 
   const std::string& appName() const override { return m_appName; }
   void setAppName(const std::string& appName) override { m_appName = appName; }
-  void setAppMode(AppMode appMode) override { }
+  void setAppMode(AppMode appMode) override {}
 
-  void markCliFileAsProcessed(const std::string& fn) override { }
-  void finishLaunching() override { }
-  void activateApp() override { }
+  void markCliFileAsProcessed(const std::string& fn) override {}
+  void finishLaunching() override {}
+  void activateApp() override {}
 
-  Capabilities capabilities() const override {
-    return (Capabilities)0;
-  }
+  Capabilities capabilities() const override { return (Capabilities)0; }
 
   // Do nothing options (these functions are for Windows-only at the
   // moment)
-  void setTabletOptions(const TabletOptions&) override { }
+  void setTabletOptions(const TabletOptions&) override {}
   TabletOptions tabletOptions() const override { return TabletOptions(); }
 
   void errorMessage(const char* msg) override;
 
-  Logger* logger() override {
-    return nullptr;
-  }
+  Logger* logger() override { return nullptr; }
 
-  Menus* menus() override {
-    return nullptr;
-  }
+  Menus* menus() override { return nullptr; }
 
-  EventQueue* eventQueue() override {
-    return EventQueue::instance();
-  }
+  EventQueue* eventQueue() override { return EventQueue::instance(); }
 
   KeyModifiers keyModifiers() override;
   ScreenRef mainScreen() override { return nullptr; }
-  void listScreens(ScreenList& screens) override { }
+  void listScreens(ScreenList& screens) override {}
   Window* defaultWindow() override { return nullptr; }
   Ref<Window> makeWindow(const WindowSpec&) override { return nullptr; }
   Ref<Surface> makeSurface(int, int, const os::ColorSpaceRef&) override { return nullptr; }
@@ -66,17 +58,18 @@ public:
   Ref<Cursor> makeCursor(const Surface*, const gfx::Point&, int) override { return nullptr; }
   bool isKeyPressed(KeyScancode) override { return false; }
   int getUnicodeFromScancode(KeyScancode) override { return 0; }
-  void setTranslateDeadKeys(bool) override { }
+  void setTranslateDeadKeys(bool) override {}
   gfx::Point mousePosition() const override { return gfx::Point(0, 0); }
-  void setMousePosition(const gfx::Point&) override { }
+  void setMousePosition(const gfx::Point&) override {}
   gfx::Color getColorFromScreen(const gfx::Point&) const override { return gfx::ColorNone; }
-  void listColorSpaces(std::vector<os::ColorSpaceRef>&) override { }
+  void listColorSpaces(std::vector<os::ColorSpaceRef>&) override {}
   os::ColorSpaceRef makeColorSpace(const gfx::ColorSpaceRef&) override { return nullptr; }
-  Ref<ColorSpaceConversion> convertBetweenColorSpace(
-    const os::ColorSpaceRef&, const os::ColorSpaceRef&) override {
-      return nullptr;
+  Ref<ColorSpaceConversion> convertBetweenColorSpace(const os::ColorSpaceRef&,
+                                                     const os::ColorSpaceRef&) override
+  {
+    return nullptr;
   }
-  void setWindowsColorSpace(const os::ColorSpaceRef&) override { }
+  void setWindowsColorSpace(const os::ColorSpaceRef&) override {}
   os::ColorSpaceRef windowsColorSpace() override { return nullptr; }
 
 protected:

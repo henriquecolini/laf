@@ -11,14 +11,14 @@
 #include "os/ref.h"
 
 namespace os {
-  class Cursor;
-  using CursorRef = Ref<Cursor>;
+class Cursor;
+using CursorRef = Ref<Cursor>;
 
-  class Cursor : public RefCount {
-  public:
-    virtual ~Cursor() { }
-    virtual void* nativeHandle() = 0;
-  };
+class Cursor : public RefCount {
+public:
+  virtual ~Cursor() {}
+  virtual void* nativeHandle() = 0;
+};
 
 } // namespace os
 

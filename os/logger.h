@@ -10,11 +10,11 @@
 
 namespace os {
 
-  class Logger {
-  public:
-    virtual ~Logger() { }
-    virtual void logError(const char* error) = 0;
-  };
+class Logger {
+public:
+  virtual ~Logger() {}
+  virtual void logError(const char* error) = 0;
+};
 
 } // namespace os
 

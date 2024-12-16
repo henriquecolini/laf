@@ -31,8 +31,7 @@ const char* lines[] = { "A: Switch mouse cursor to Arrow <-> Move",
                         "Q: Close all windows",
                         "ESC: Close this window" };
 
-static void redraw_window(Window* window,
-                          const FontRef& font)
+static void redraw_window(Window* window, const FontRef& font)
 {
   Surface* s = window->surface();
   Paint paint;
@@ -45,14 +44,12 @@ static void redraw_window(Window* window,
   int y = 12;
 
   gfx::Rect rc = window->frame();
-  std::snprintf(buf, sizeof(buf),
-                "Frame = (%d %d %d %d)", rc.x, rc.y, rc.w, rc.h);
+  std::snprintf(buf, sizeof(buf), "Frame = (%d %d %d %d)", rc.x, rc.y, rc.w, rc.h);
   draw_text(s, font, buf, gfx::Point(0, y), &paint);
   y += 12;
 
   rc = window->contentRect();
-  std::snprintf(buf, sizeof(buf),
-                "Content Rect = (%d %d %d %d)", rc.x, rc.y, rc.w, rc.h);
+  std::snprintf(buf, sizeof(buf), "Content Rect = (%d %d %d %d)", rc.x, rc.y, rc.w, rc.h);
   draw_text(s, font, buf, gfx::Point(0, y), &paint);
   y += 12;
 
@@ -65,9 +62,7 @@ static void redraw_window(Window* window,
   s->drawRect(window->bounds(), paint);
 }
 
-static WindowRef add_window(const std::string& title,
-                            const WindowSpec& spec,
-                            const FontRef& font)
+static WindowRef add_window(const std::string& title, const WindowSpec& spec, const FontRef& font)
 {
   WindowRef newWindow = System::instance()->makeWindow(spec);
   newWindow->setCursor(NativeCursor::Arrow);
@@ -82,15 +77,13 @@ static WindowRef add_window(const std::string& title,
 static void check_show_all_windows()
 {
   // If all windows are hidden, show then again
-  auto hidden = std::count_if(windows.begin(), windows.end(),
-                              [](WindowRef window){
-                                return !window->isVisible();
-                              });
+  auto hidden = std::count_if(windows.begin(), windows.end(), [](WindowRef window) {
+    return !window->isVisible();
+  });
   if (hidden == windows.size()) {
-    std::for_each(windows.begin(), windows.end(),
-                  [](WindowRef window){
-                    window->setVisible(true);
-                  });
+    std::for_each(windows.begin(), windows.end(), [](WindowRef window) {
+      window->setVisible(true);
+    });
   }
 }
 
@@ -109,9 +102,7 @@ int app_main(int argc, char* argv[])
   FontRef font = FontMgr::Make()->defaultFont(12);
 
   system->setAppMode(AppMode::GUI);
-  system->handleWindowResize = [&font](Window* w){
-    redraw_window(w, font);
-  };
+  system->handleWindowResize = [&font](Window* w) { redraw_window(w, font); };
 
   // Create four windows for each screen with the bounds of the
   // workarea.
@@ -132,8 +123,8 @@ int app_main(int argc, char* argv[])
     for (auto& p : pos) {
       WindowSpec s = spec;
       gfx::Rect frame = s.frame();
-      frame.x += frame.w*p.x;
-      frame.y += frame.h*p.y;
+      frame.x += frame.w * p.x;
+      frame.y += frame.h * p.y;
       frame.w /= 2;
       frame.h /= 2;
       s.frame(frame);
@@ -150,14 +141,11 @@ int app_main(int argc, char* argv[])
     queue->getEvent(ev);
 
     switch (ev.type()) {
-
       case Event::CloseApp:
         windows.clear(); // Close all windows
         break;
 
-      case Event::CloseWindow:
-        destroy_window(ev.window());
-        break;
+      case Event::CloseWindow: destroy_window(ev.window()); break;
 
       case Event::ResizeWindow:
         redraw_window(ev.window().get(), font);
@@ -166,21 +154,15 @@ int app_main(int argc, char* argv[])
 
       case Event::KeyDown:
         switch (ev.scancode()) {
+          case kKeyQ:   windows.clear(); break;
 
-          case kKeyQ:
-            windows.clear();
-            break;
-
-          case kKeyEsc:
-            destroy_window(ev.window());
-            break;
+          case kKeyEsc: destroy_window(ev.window()); break;
 
           // Switch between Arrow/Move cursor in this specific window
           case kKeyA:
-            ev.window()->setCursor(
-              ev.window()->nativeCursor() == NativeCursor::Arrow ?
-                NativeCursor::Move:
-                NativeCursor::Arrow);
+            ev.window()->setCursor(ev.window()->nativeCursor() == NativeCursor::Arrow ?
+                                     NativeCursor::Move :
+                                     NativeCursor::Arrow);
             break;
 
           case kKeyH:
@@ -226,14 +208,14 @@ int app_main(int argc, char* argv[])
           case kKeyLeft:
           case kKeyUp:
           case kKeyRight:
-          case kKeyDown: {
+          case kKeyDown:  {
             gfx::Rect rc = ev.window()->frame();
             switch (ev.scancode()) {
               case kKeyLeft:  rc.x -= rc.w; break;
               case kKeyUp:    rc.y -= rc.h; break;
               case kKeyRight: rc.x += rc.w; break;
               case kKeyDown:  rc.y += rc.h; break;
-              default: break;
+              default:        break;
             }
             ev.window()->setFrame(rc);
 
@@ -244,8 +226,7 @@ int app_main(int argc, char* argv[])
             break;
           }
 
-          default:
-            break;
+          default: break;
         }
         break;
 

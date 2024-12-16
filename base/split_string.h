@@ -13,13 +13,13 @@
 #include <vector>
 
 namespace base {
-  void split_string(const std::string& string,
-                    std::vector<std::string>& parts,
-                    const std::string& separators);
+void split_string(const std::string& string,
+                  std::vector<std::string>& parts,
+                  const std::string& separators);
 
-  void split_string(const std::string_view& string,
-                    std::vector<std::string_view>& parts,
-                    const std::string_view& separators);
-}
+void split_string(const std::string_view& string,
+                  std::vector<std::string_view>& parts,
+                  const std::string_view& separators);
+} // namespace base
 
 #endif

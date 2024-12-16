@@ -30,10 +30,10 @@ base::paths DragDataProviderX11::getPaths()
 
 SurfaceRef DragDataProviderX11::getImage()
 {
-  return {};                    // TODO add support to drop images
+  return {}; // TODO add support to drop images
 }
 
-#endif  // CLIP_ENABLE_IMAGE
+#endif // CLIP_ENABLE_IMAGE
 
 std::string DragDataProviderX11::getUrl()
 {
@@ -42,8 +42,7 @@ std::string DragDataProviderX11::getUrl()
 
 bool DragDataProviderX11::contains(DragDataItemType type)
 {
-  return (type == DragDataItemType::Paths &&
-          !m_urls.empty());
+  return (type == DragDataItemType::Paths && !m_urls.empty());
 }
 
-}  // namespace os
+} // namespace os

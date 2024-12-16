@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "text/sprite_text_blob.h"
@@ -30,16 +30,16 @@ namespace {
 // range and the output position.
 class OffsetHandler : public TextBlob::RunHandler {
 public:
-  OffsetHandler(RunHandler* original,
-                const int offsetUtf8,
-                const gfx::PointF& offsetOrigin)
+  OffsetHandler(RunHandler* original, const int offsetUtf8, const gfx::PointF& offsetOrigin)
     : m_original(original)
     , m_offsetUtf8(offsetUtf8)
     , m_offsetOrigin(offsetOrigin)
-  { }
+  {
+  }
 
   // TextBlob::RunHandler impl
-  void commitRunBuffer(TextBlob::RunInfo& info) override {
+  void commitRunBuffer(TextBlob::RunInfo& info) override
+  {
     // Adjust UTF8 range and position.
     info.utf8Range.begin += m_offsetUtf8;
     info.utf8Range.end += m_offsetUtf8;
@@ -58,9 +58,7 @@ private:
 
 } // anonymous namespace
 
-void SpriteTextBlob::Run::add(const glyph_t glyph,
-                              const gfx::PointF& pos,
-                              const uint32_t cluster)
+void SpriteTextBlob::Run::add(const glyph_t glyph, const gfx::PointF& pos, const uint32_t cluster)
 {
   glyphs.push_back(glyph);
   positions.push_back(pos);
@@ -95,9 +93,7 @@ void SpriteTextBlob::visitRuns(const RunVisitor& visitor)
   }
 }
 
-TextBlobRef SpriteTextBlob::Make(
-  const FontRef& font,
-  const std::string& text)
+TextBlobRef SpriteTextBlob::Make(const FontRef& font, const std::string& text)
 {
   ASSERT(font);
   ASSERT(font->type() == FontType::SpriteSheet);

@@ -14,34 +14,34 @@
 
 namespace text {
 
-  class SkiaFont : public Font {
-  public:
-    SkiaFont(const SkFont& skFont);
-    ~SkiaFont();
+class SkiaFont : public Font {
+public:
+  SkiaFont(const SkFont& skFont);
+  ~SkiaFont();
 
-    bool isValid() const;
-    FontType type() override;
-    TypefaceRef typeface() const override;
-    float metrics(FontMetrics* metrics) const override;
-    int height() const override;
-    int textLength(const std::string& str) const override;
-    float measureText(const std::string& str,
-                      gfx::RectF* bounds,
-                      const os::Paint* paint) const override;
-    bool isScalable() const override;
-    void setSize(int size) override;
-    bool antialias() const override;
-    void setAntialias(bool antialias) override;
+  bool isValid() const;
+  FontType type() override;
+  TypefaceRef typeface() const override;
+  float metrics(FontMetrics* metrics) const override;
+  int height() const override;
+  int textLength(const std::string& str) const override;
+  float measureText(const std::string& str,
+                    gfx::RectF* bounds,
+                    const os::Paint* paint) const override;
+  bool isScalable() const override;
+  void setSize(int size) override;
+  bool antialias() const override;
+  void setAntialias(bool antialias) override;
 
-    glyph_t codePointToGlyph(codepoint_t codepoint) const override;
-    gfx::RectF getGlyphBounds(glyph_t glyph) const override;
-    float getGlyphAdvance(glyph_t glyph) const override;
+  glyph_t codePointToGlyph(codepoint_t codepoint) const override;
+  gfx::RectF getGlyphBounds(glyph_t glyph) const override;
+  float getGlyphAdvance(glyph_t glyph) const override;
 
-    SkFont& skFont() { return m_skFont; }
+  SkFont& skFont() { return m_skFont; }
 
-  private:
-    SkFont m_skFont;
-  };
+private:
+  SkFont m_skFont;
+};
 
 } // namespace text
 

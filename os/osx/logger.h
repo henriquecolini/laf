@@ -13,10 +13,10 @@
 
 namespace os {
 
-  class LoggerOSX : public Logger {
-  public:
-    void logError(const char* error) override;
-  };
+class LoggerOSX : public Logger {
+public:
+  void logError(const char* error) override;
+};
 
 } // namespace os
 

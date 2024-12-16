@@ -30,6 +30,6 @@ struct CoInit {
   }
 };
 
-}  // namespace base
+} // namespace base
 
 #endif

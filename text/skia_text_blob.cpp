@@ -16,8 +16,7 @@
 
 namespace text {
 
-SkiaTextBlob::SkiaTextBlob(const sk_sp<SkTextBlob>& skTextBlob,
-                           const gfx::RectF& bounds)
+SkiaTextBlob::SkiaTextBlob(const sk_sp<SkTextBlob>& skTextBlob, const gfx::RectF& bounds)
   : TextBlob(bounds)
   , m_skTextBlob(skTextBlob)
 {
@@ -38,9 +37,8 @@ void SkiaTextBlob::visitRuns(const RunVisitor& visitor)
     subInfo.glyphs = const_cast<glyph_t*>(run.glyphs);
     if (positions.size() < n)
       positions.resize(n);
-    for (size_t i=0; i<n; ++i) {
-      positions[i] = gfx::PointF(run.positions[i].x(),
-                                 run.positions[i].y());
+    for (size_t i = 0; i < n; ++i) {
+      positions[i] = gfx::PointF(run.positions[i].x(), run.positions[i].y());
     }
     subInfo.positions = positions.data();
 
@@ -48,9 +46,7 @@ void SkiaTextBlob::visitRuns(const RunVisitor& visitor)
   }
 }
 
-TextBlobRef SkiaTextBlob::Make(
-  const FontRef& font,
-  const std::string& text)
+TextBlobRef SkiaTextBlob::Make(const FontRef& font, const std::string& text)
 {
   ASSERT(font);
   ASSERT(font->type() == FontType::Native);
@@ -58,8 +54,7 @@ TextBlobRef SkiaTextBlob::Make(
 
   SkFont skFont = static_cast<SkiaFont*>(font.get())->skFont();
   sk_sp<SkTextBlob> textBlob;
-  textBlob = SkTextBlob::MakeFromText(text.c_str(), text.size(),
-                                      skFont, SkTextEncoding::kUTF8);
+  textBlob = SkTextBlob::MakeFromText(text.c_str(), text.size(), skFont, SkTextEncoding::kUTF8);
   if (textBlob)
     return base::make_ref<SkiaTextBlob>(textBlob);
 

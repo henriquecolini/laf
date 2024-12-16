@@ -17,9 +17,7 @@ namespace os {
 
 class SystemWin : public CommonSystem {
 public:
-  static Ref<SystemWin> instance() {
-    return Ref<SystemWin>(System::instance());
-  }
+  static Ref<SystemWin> instance() { return Ref<SystemWin>(System::instance()); }
 
   SystemWin();
   ~SystemWin();
@@ -35,9 +33,7 @@ public:
   bool isKeyPressed(KeyScancode scancode) override;
   int getUnicodeFromScancode(KeyScancode scancode) override;
 
-  CursorRef makeCursor(const Surface* surface,
-                       const gfx::Point& focus,
-                       const int scale) override;
+  CursorRef makeCursor(const Surface* surface, const gfx::Point& focus, const int scale) override;
 
   gfx::Point mousePosition() const override;
   void setMousePosition(const gfx::Point& screenPosition) override;
@@ -46,7 +42,8 @@ public:
   ScreenRef mainScreen() override;
   void listScreens(ScreenList& list) override;
 
-  void setWintabDelegate(void* delegate) override {
+  void setWintabDelegate(void* delegate) override
+  {
     m_wintabApi.setDelegate((WintabAPI::Delegate*)delegate);
   }
 

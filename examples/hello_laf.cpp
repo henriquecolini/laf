@@ -19,9 +19,12 @@ void draw_window(Window* window)
   p.style(Paint::Fill);
   surface->drawRect(rc, p);
 
-  p.color(gfx::rgba(255, 0, 0)); surface->drawLine(0     , 0,   rc.w, rc.h, p);
-  p.color(gfx::rgba(0, 128, 0)); surface->drawLine(rc.w/2, 0, rc.w/2, rc.h, p);
-  p.color(gfx::rgba(0, 0, 255)); surface->drawLine(rc.w  , 0,      0, rc.h, p);
+  p.color(gfx::rgba(255, 0, 0));
+  surface->drawLine(0, 0, rc.w, rc.h, p);
+  p.color(gfx::rgba(0, 128, 0));
+  surface->drawLine(rc.w / 2, 0, rc.w / 2, rc.h, p);
+  p.color(gfx::rgba(0, 0, 255));
+  surface->drawLine(rc.w, 0, 0, rc.h, p);
 
   // Invalidates the whole window to show it on the screen.
   if (window->isVisible())
@@ -78,17 +81,12 @@ int app_main(int argc, char* argv[])
     queue->getEvent(ev);
 
     switch (ev.type()) {
-
       case Event::CloseApp:
-      case Event::CloseWindow:
-        running = false;
-        break;
+      case Event::CloseWindow: running = false; break;
 
       case Event::KeyDown:
         switch (ev.scancode()) {
-          case kKeyEsc:
-            running = false;
-            break;
+          case kKeyEsc: running = false; break;
 
           case os::kKeyG:
             window->setGpuAcceleration(!window->gpuAcceleration());
@@ -110,9 +108,7 @@ int app_main(int argc, char* argv[])
             break;
 
           case kKeyF:
-          case kKeyF11:
-            window->setFullscreen(!window->isFullscreen());
-            break;
+          case kKeyF11: window->setFullscreen(!window->isFullscreen()); break;
 
           default:
             // Do nothing
@@ -120,9 +116,7 @@ int app_main(int argc, char* argv[])
         }
         break;
 
-      case Event::ResizeWindow:
-        redraw = true;
-        break;
+      case Event::ResizeWindow: redraw = true; break;
 
       default:
         // Do nothing

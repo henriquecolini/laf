@@ -25,29 +25,26 @@ public:
     , m_font(FontMgr::Make()->defaultFont(12))
     , m_scroll(0.0, 0.0)
     , m_zoom(1.0)
-    , m_hasCapture(false) {
+    , m_hasCapture(false)
+  {
     m_window->setCursor(os::NativeCursor::Arrow);
     m_window->setTitle("Pan Viewport");
     repaint();
     m_window->setVisible(true);
   }
 
-  bool processEvent(const os::Event& ev) {
+  bool processEvent(const os::Event& ev)
+  {
     switch (ev.type()) {
+      case os::Event::CloseWindow:  return false;
 
-      case os::Event::CloseWindow:
-        return false;
+      case os::Event::ResizeWindow: repaint(); break;
 
-      case os::Event::ResizeWindow:
-        repaint();
-        break;
-
-      case os::Event::MouseEnter: break;
-      case os::Event::MouseLeave: break;
+      case os::Event::MouseEnter:   break;
+      case os::Event::MouseLeave:   break;
       case os::Event::MouseMove:
         if (m_hasCapture) {
-          m_scroll = m_captureScroll
-            + gfx::PointF(ev.position() - m_capturePos);
+          m_scroll = m_captureScroll + gfx::PointF(ev.position() - m_capturePos);
           repaint();
         }
         break;
@@ -80,34 +77,32 @@ public:
       case os::Event::MouseWheel:
         if (ev.modifiers() & os::kKeyCtrlModifier) {
           int z = (ev.wheelDelta().x + ev.wheelDelta().y);
-          setZoom(gfx::PointF(ev.position()),
-                  m_zoom - z/10.0);
+          setZoom(gfx::PointF(ev.position()), m_zoom - z / 10.0);
         }
         else if (ev.preciseWheel()) {
           // TODO we have plans to change the sign of wheelDelta() when preciseWheel() is true
           m_scroll += gfx::PointF(-ev.wheelDelta());
         }
         else {
-          m_scroll += gfx::PointF(-ev.wheelDelta().x*m_window->width()/32,
-                                  -ev.wheelDelta().y*m_window->height()/32);
+          m_scroll += gfx::PointF(-ev.wheelDelta().x * m_window->width() / 32,
+                                  -ev.wheelDelta().y * m_window->height() / 32);
         }
         repaint();
         break;
 
       case os::Event::TouchMagnify:
-        setZoom(gfx::PointF(ev.position()),
-                m_zoom + m_zoom * ev.magnification());
+        setZoom(gfx::PointF(ev.position()), m_zoom + m_zoom * ev.magnification());
         break;
 
       case os::Event::KeyDown:
         if (ev.scancode() == os::kKeyEsc)
           return false;
         // Toggle full-screen
-        else if (// F11 for Windows/Linux
-                 (ev.scancode() == os::kKeyF11) ||
-                 // Ctrl+Command+F for macOS
-                 (ev.scancode() == os::kKeyF &&
-                  ev.modifiers() == (os::kKeyCmdModifier | os::kKeyCtrlModifier))) {
+        else if ( // F11 for Windows/Linux
+          (ev.scancode() == os::kKeyF11) ||
+          // Ctrl+Command+F for macOS
+          (ev.scancode() == os::kKeyF &&
+           ev.modifiers() == (os::kKeyCmdModifier | os::kKeyCtrlModifier))) {
           m_window->setFullscreen(!m_window->isFullscreen());
         }
         break;
@@ -119,7 +114,8 @@ public:
     return true;
   }
 
-  void repaint() {
+  void repaint()
+  {
     os::Surface* surface = m_window->surface();
     os::SurfaceLock lock(surface);
     const gfx::Rect rc(surface->bounds());
@@ -140,20 +136,22 @@ public:
       rc2.offset(m_scroll);
       surface->drawRect(rc2, p);
 
-      for (int i=1; i<8; ++i) {
+      for (int i = 1; i < 8; ++i) {
         int v = i * rc2.w / 8;
-        surface->drawLine(int(rc2.x + v), int(rc2.y),
-                          int(rc2.x + v), int(rc2.y + rc2.h), p);
+        surface->drawLine(int(rc2.x + v), int(rc2.y), int(rc2.x + v), int(rc2.y + rc2.h), p);
         v = i * rc2.h / 8;
-        surface->drawLine(int(rc2.x),         int(rc2.y + v),
-                          int(rc2.x + rc2.w), int(rc2.y + v), p);
+        surface->drawLine(int(rc2.x), int(rc2.y + v), int(rc2.x + rc2.w), int(rc2.y + v), p);
       }
     }
 
     {
       std::vector<char> buf(256);
-      std::snprintf(buf.data(), buf.size(),
-                    "Scroll=%.2f %.2f  Zoom=%.2f", m_scroll.x, m_scroll.y, m_zoom);
+      std::snprintf(buf.data(),
+                    buf.size(),
+                    "Scroll=%.2f %.2f  Zoom=%.2f",
+                    m_scroll.x,
+                    m_scroll.y,
+                    m_zoom);
       p.style(os::Paint::Fill);
       draw_text(surface, m_font, &buf[0], gfx::Point(12, 12), &p);
     }
@@ -163,7 +161,8 @@ public:
   }
 
 private:
-  void setZoom(const gfx::PointF& mousePos, double newZoom) {
+  void setZoom(const gfx::PointF& mousePos, double newZoom)
+  {
     double oldZoom = m_zoom;
     m_zoom = std::clamp(newZoom, 0.01, 10.0);
 
@@ -183,10 +182,7 @@ private:
     repaint();
   }
 
-  gfx::Point center() const {
-    return gfx::Point(m_window->width()/2,
-                      m_window->height()/2);
-  }
+  gfx::Point center() const { return gfx::Point(m_window->width() / 2, m_window->height() / 2); }
 
   os::WindowRef m_window;
   FontRef m_font;
@@ -206,9 +202,7 @@ int app_main(int argc, char* argv[])
 
   PanWindow window(system.get());
 
-  system->handleWindowResize = [&window](os::Window* win){
-    window.repaint();
-  };
+  system->handleWindowResize = [&window](os::Window* win) { window.repaint(); };
 
   system->finishLaunching();
   system->activateApp();

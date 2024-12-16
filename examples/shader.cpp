@@ -54,7 +54,8 @@ class ShaderWindow {
 public:
   ShaderWindow(const SystemRef& system)
     : m_system(system)
-    , m_builder(SkRuntimeEffect::MakeForShader(SkString(shaderCode)).effect) {
+    , m_builder(SkRuntimeEffect::MakeForShader(SkString(shaderCode)).effect)
+  {
     m_window = m_system->makeWindow(256, 256);
     m_window->setCursor(NativeCursor::Arrow);
     m_window->setTitle("Shader - GPU");
@@ -63,25 +64,19 @@ public:
     m_window->setVisible(true);
   }
 
-  bool processEvent(const Event& ev) {
+  bool processEvent(const Event& ev)
+  {
     switch (ev.type()) {
+      case Event::CloseWindow:  return false;
 
-      case Event::CloseWindow:
-        return false;
-
-      case Event::ResizeWindow:
-        repaint();
-        break;
+      case Event::ResizeWindow: repaint(); break;
 
       case Event::KeyDown:
         if (ev.scancode() == kKeyEsc)
           return false;
         else if (ev.scancode() == os::kKeyG) {
           m_window->setGpuAcceleration(!m_window->gpuAcceleration());
-          m_window->setTitle(
-            m_window->gpuAcceleration() ?
-            "Shader - GPU":
-            "Shader");
+          m_window->setTitle(m_window->gpuAcceleration() ? "Shader - GPU" : "Shader");
         }
         break;
 
@@ -92,7 +87,8 @@ public:
     return true;
   }
 
-  void repaint() {
+  void repaint()
+  {
     Surface* surface = m_window->surface();
     SurfaceLock lock(surface);
 
@@ -104,13 +100,11 @@ public:
   }
 
 private:
-
-  void skiaPaint(SkCanvas* canvas) {
+  void skiaPaint(SkCanvas* canvas)
+  {
     SkImageInfo ii = canvas->imageInfo();
-    m_builder.uniform("iResolution") = SkV3{float(ii.width()),
-                                            float(ii.height()), 0.0f};
-    m_builder.uniform("iTime") =
-      float((base::current_tick() - startTick) / 1000.0f);
+    m_builder.uniform("iResolution") = SkV3{ float(ii.width()), float(ii.height()), 0.0f };
+    m_builder.uniform("iTime") = float((base::current_tick() - startTick) / 1000.0f);
 
     SkPaint p;
     p.setShader(m_builder.makeShader());
@@ -129,9 +123,7 @@ int app_main(int argc, char* argv[])
 
   ShaderWindow window(system);
 
-  system->handleWindowResize = [&window](Window* win){
-    window.repaint();
-  };
+  system->handleWindowResize = [&window](Window* win) { window.repaint(); };
 
   system->finishLaunching();
   system->activateApp();
@@ -146,8 +138,7 @@ int app_main(int argc, char* argv[])
     Event ev;
 
     ASSERT(paintDelay >= 0.0);
-    const double waitSecs =
-      (base::current_tick() - t) / 1000.0 * 60.0 + paintDelay;
+    const double waitSecs = (base::current_tick() - t) / 1000.0 * 60.0 + paintDelay;
 
     queue->getEvent(ev, waitSecs);
     if (!window.processEvent(ev))

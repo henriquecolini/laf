@@ -31,7 +31,7 @@ public:
   void invalidateRegion(const gfx::Region& rgn) override;
 
   std::string getLayout() override { return ""; }
-  void setLayout(const std::string& layout) override { }
+  void setLayout(const std::string& layout) override {}
   void setTranslateDeadKeys(bool state);
 
   // WindowOSX overrides

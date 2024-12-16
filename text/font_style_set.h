@@ -12,17 +12,16 @@
 
 namespace text {
 
-  class FontStyleSet : public base::RefCount {
-  protected:
-    virtual ~FontStyleSet() { }
-  public:
-    virtual int count() = 0;
-    virtual void getStyle(int index,
-                          FontStyle& style,
-                          std::string& name) = 0;
-    virtual TypefaceRef typeface(int index) = 0;
-    virtual TypefaceRef matchStyle(const FontStyle& style) = 0;
-  };
+class FontStyleSet : public base::RefCount {
+protected:
+  virtual ~FontStyleSet() {}
+
+public:
+  virtual int count() = 0;
+  virtual void getStyle(int index, FontStyle& style, std::string& name) = 0;
+  virtual TypefaceRef typeface(int index) = 0;
+  virtual TypefaceRef matchStyle(const FontStyle& style) = 0;
+};
 
 } // namespace text
 

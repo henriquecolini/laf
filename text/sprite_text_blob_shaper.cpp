@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "text/sprite_text_blob.h"
@@ -30,16 +30,16 @@ namespace {
 // range and the output position.
 class OffsetHandler : public TextBlob::RunHandler {
 public:
-  OffsetHandler(RunHandler* original,
-                const int offsetUtf8,
-                const gfx::PointF& offsetOrigin)
+  OffsetHandler(RunHandler* original, const int offsetUtf8, const gfx::PointF& offsetOrigin)
     : m_original(original)
     , m_offsetUtf8(offsetUtf8)
     , m_offsetOrigin(offsetOrigin)
-  { }
+  {
+  }
 
   // TextBlob::RunHandler impl
-  void commitRunBuffer(TextBlob::RunInfo& info) override {
+  void commitRunBuffer(TextBlob::RunInfo& info) override
+  {
     // Adjust UTF8 range and position.
     info.utf8Range.begin += m_offsetUtf8;
     info.utf8Range.end += m_offsetUtf8;
@@ -58,11 +58,10 @@ private:
 
 } // anonymous namespace
 
-TextBlobRef SpriteTextBlob::MakeWithShaper(
-  const FontMgrRef& fontMgr,
-  const FontRef& font,
-  const std::string& text,
-  TextBlob::RunHandler* handler)
+TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
+                                           const FontRef& font,
+                                           const std::string& text,
+                                           TextBlob::RunHandler* handler)
 {
   ASSERT(font);
   ASSERT(font->type() == FontType::SpriteSheet);
@@ -72,7 +71,7 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(
 
   Runs runs;
   Run run;
-  auto addRun = [&runs, &run, &font, &text, handler](){
+  auto addRun = [&runs, &run, &font, &text, handler]() {
     if (handler && !run.subBlob) {
       TextBlob::RunInfo info;
 
@@ -147,10 +146,10 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(
       alignedPos.y = pos.y - metrics.ascent + fallbackMetrics.ascent;
 
       OffsetHandler subHandler(handler, i, alignedPos);
-      run.subBlob = TextBlob::MakeWithShaper(
-        fontMgr, fallbackFont,
-        text.substr(i, j-i), // TODO use std::string_view
-        &subHandler);
+      run.subBlob = TextBlob::MakeWithShaper(fontMgr,
+                                             fallbackFont,
+                                             text.substr(i, j - i), // TODO use std::string_view
+                                             &subHandler);
       if (run.subBlob) {
         run.positions.push_back(pos);
 

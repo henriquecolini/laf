@@ -15,8 +15,7 @@
 
 namespace text {
 
-SkiaFont::SkiaFont(const SkFont& skFont)
-  : m_skFont(skFont)
+SkiaFont::SkiaFont(const SkFont& skFont) : m_skFont(skFont)
 {
 }
 
@@ -36,8 +35,7 @@ FontType SkiaFont::type()
 
 TypefaceRef SkiaFont::typeface() const
 {
-  return base::make_ref<SkiaTypeface>(
-    sk_ref_sp(m_skFont.getTypeface()));
+  return base::make_ref<SkiaTypeface>(sk_ref_sp(m_skFont.getTypeface()));
 }
 
 float SkiaFont::metrics(FontMetrics* metrics) const
@@ -71,13 +69,7 @@ int SkiaFont::height() const
 
 int SkiaFont::textLength(const std::string& str) const
 {
-  return std::ceil(
-    m_skFont.measureText(
-      str.c_str(),
-      str.size(),
-      SkTextEncoding::kUTF8,
-      nullptr)
-  );
+  return std::ceil(m_skFont.measureText(str.c_str(), str.size(), SkTextEncoding::kUTF8, nullptr));
 }
 
 float SkiaFont::measureText(const std::string& str,
@@ -85,12 +77,11 @@ float SkiaFont::measureText(const std::string& str,
                             const os::Paint* paint) const
 {
   SkRect bounds;
-  float width = m_skFont.measureText(
-    str.c_str(),
-    str.size(),
-    SkTextEncoding::kUTF8,
-    &bounds,
-    paint ? &paint->skPaint(): nullptr);
+  float width = m_skFont.measureText(str.c_str(),
+                                     str.size(),
+                                     SkTextEncoding::kUTF8,
+                                     &bounds,
+                                     paint ? &paint->skPaint() : nullptr);
   if (outBounds)
     *outBounds = os::from_skia(bounds);
   return width;
@@ -113,8 +104,7 @@ bool SkiaFont::antialias() const
 
 void SkiaFont::setAntialias(bool antialias)
 {
-  m_skFont.setEdging(antialias ? SkFont::Edging::kAntiAlias:
-                                 SkFont::Edging::kAlias);
+  m_skFont.setEdging(antialias ? SkFont::Edging::kAntiAlias : SkFont::Edging::kAlias);
 }
 
 glyph_t SkiaFont::codePointToGlyph(codepoint_t codepoint) const

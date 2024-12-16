@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 namespace os {
-  class WindowOSX;
+class WindowOSX;
 }
 
 @interface WindowOSXDelegate : NSObject {
@@ -97,8 +97,7 @@ namespace os {
     m_impl->onEndResizing();
 }
 
-- (NSRect)windowWillUseStandardFrame:(NSWindow*)window
-                        defaultFrame:(NSRect)newFrame
+- (NSRect)windowWillUseStandardFrame:(NSWindow*)window defaultFrame:(NSRect)newFrame
 {
   // In "newFrame" is the frame size when a window is maximized in the
   // current screen. We can cache this value to know when we are
@@ -107,8 +106,7 @@ namespace os {
   return newFrame;
 }
 
-- (BOOL)windowShouldZoom:(NSWindow*)window
-                 toFrame:(NSRect)newFrame
+- (BOOL)windowShouldZoom:(NSWindow*)window toFrame:(NSRect)newFrame
 {
   if (m_impl) {
     if (NSEqualRects(newFrame, m_maximizedFrame))
@@ -117,7 +115,7 @@ namespace os {
   return YES;
 }
 
-- (BOOL)windowShouldBecomeKey:(NSWindow *)sender
+- (BOOL)windowShouldBecomeKey:(NSWindow*)sender
 {
   NSWindow* modalWindow = [NSApp modalWindow];
   return !modalWindow || modalWindow == sender;

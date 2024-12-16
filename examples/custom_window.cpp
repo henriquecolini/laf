@@ -22,8 +22,7 @@ const gfx::Color kContentHigh = gfx::rgba(50, 55, 45);
 const gfx::Color kContentText = gfx::rgba(105, 115, 85);
 const gfx::Color kContentEdge = gfx::rgba(200, 200, 100);
 
-Hit hit_test(Window* window,
-             const gfx::Point& pos)
+Hit hit_test(Window* window, const gfx::Point& pos)
 {
   // For a full screen window, we are always in the content area
   if (window->isFullscreen())
@@ -42,22 +41,30 @@ Hit hit_test(Window* window,
       // macOS cannot start the resizing actions (just the window movement)
       System::instance()->hasCapability(Capabilities::CanStartWindowResize)) {
     if (pos.y < kResizeBorder) {
-      if (pos.x < kResizeBorder) return Hit::TopLeft;
-      if (pos.x > rc.x2()-kResizeBorder) return Hit::TopRight;
+      if (pos.x < kResizeBorder)
+        return Hit::TopLeft;
+      if (pos.x > rc.x2() - kResizeBorder)
+        return Hit::TopRight;
       return Hit::Top;
     }
-    if (pos.y > rc.y2()-kResizeBorder) {
-      if (pos.x < kResizeBorder) return Hit::BottomLeft;
-      if (pos.x > rc.x2()-kResizeBorder) return Hit::BottomRight;
+    if (pos.y > rc.y2() - kResizeBorder) {
+      if (pos.x < kResizeBorder)
+        return Hit::BottomLeft;
+      if (pos.x > rc.x2() - kResizeBorder)
+        return Hit::BottomRight;
       return Hit::Bottom;
     }
-    if (pos.x < rc.w/2) return Hit::Left;
+    if (pos.x < rc.w / 2)
+      return Hit::Left;
     return Hit::Right;
   }
   if (pos.y <= kTitleBarSize) {
-    if (pos.x > rc.x2()-kButtonSize) return Hit::CloseButton;
-    if (pos.x > rc.x2()-kButtonSize*2) return Hit::MaximizeButton;
-    if (pos.x > rc.x2()-kButtonSize*3) return Hit::MinimizeButton;
+    if (pos.x > rc.x2() - kButtonSize)
+      return Hit::CloseButton;
+    if (pos.x > rc.x2() - kButtonSize * 2)
+      return Hit::MaximizeButton;
+    if (pos.x > rc.x2() - kButtonSize * 3)
+      return Hit::MinimizeButton;
     return Hit::TitleBar;
   }
   return Hit::Content;
@@ -68,7 +75,7 @@ void draw_button(Surface* surface, int x, Hit button, const Hit hit)
   Paint p;
   gfx::Rect box(x, 0, kButtonSize, kButtonSize);
 
-  p.color(hit == button ? kTitleBarHigh: kTitleBarBase);
+  p.color(hit == button ? kTitleBarHigh : kTitleBarBase);
   p.style(Paint::Fill);
   surface->drawRect(box, p);
 
@@ -82,13 +89,9 @@ void draw_button(Surface* surface, int x, Hit button, const Hit hit)
   p.strokeWidth(1.5f);
   p.antialias(true);
   switch (button) {
-    case Hit::MinimizeButton:
-      surface->drawRect(gfx::Rect(box.x, box.y2()-2, box.w, 1), p);
-      break;
-    case Hit::MaximizeButton:
-      surface->drawRect(gfx::Rect(box), p);
-      break;
-    case Hit::CloseButton: {
+    case Hit::MinimizeButton: surface->drawRect(gfx::Rect(box.x, box.y2() - 2, box.w, 1), p); break;
+    case Hit::MaximizeButton: surface->drawRect(gfx::Rect(box), p); break;
+    case Hit::CloseButton:    {
       gfx::Path path;
       path.moveTo(box.x, box.y);
       path.lineTo(box.x2(), box.y2());
@@ -97,14 +100,11 @@ void draw_button(Surface* surface, int x, Hit button, const Hit hit)
       surface->drawPath(path, p);
       break;
     }
-    default:
-      break;
+    default: break;
   }
 }
 
-void draw_window(Window* window,
-                 const FontRef& font,
-                 const Hit hit)
+void draw_window(Window* window, const FontRef& font, const Hit hit)
 {
   Surface* surface = window->surface();
   SurfaceLock lock(surface);
@@ -117,19 +117,18 @@ void draw_window(Window* window,
   if (!window->isFullscreen()) {
     rc2.h = kTitleBarSize;
 
-    p.color(hit == Hit::TitleBar ? kTitleBarHigh: kTitleBarBase);
-    surface->drawRect(gfx::Rect(rc2).inflate(-kButtonSize*3, 0), p);
+    p.color(hit == Hit::TitleBar ? kTitleBarHigh : kTitleBarBase);
+    surface->drawRect(gfx::Rect(rc2).inflate(-kButtonSize * 3, 0), p);
 
-    rc2.y += kTitleBarSize/2 - 10;
+    rc2.y += kTitleBarSize / 2 - 10;
 
     p.color(kTitleBarText);
-    draw_text(surface, font, "Custom Window",
-              rc2.center(), &p, TextAlign::Center);
+    draw_text(surface, font, "Custom Window", rc2.center(), &p, TextAlign::Center);
 
     // Draw buttons
-    draw_button(surface, rc.x2()-kButtonSize, Hit::CloseButton, hit);
-    draw_button(surface, rc.x2()-kButtonSize*2, Hit::MaximizeButton, hit);
-    draw_button(surface, rc.x2()-kButtonSize*3, Hit::MinimizeButton, hit);
+    draw_button(surface, rc.x2() - kButtonSize, Hit::CloseButton, hit);
+    draw_button(surface, rc.x2() - kButtonSize * 2, Hit::MaximizeButton, hit);
+    draw_button(surface, rc.x2() - kButtonSize * 3, Hit::MinimizeButton, hit);
 
     // Client area
     rc2 = rc;
@@ -138,7 +137,7 @@ void draw_window(Window* window,
   }
 
   // Draw client area
-  p.color(hit == Hit::Content ? kContentHigh: kContentBase);
+  p.color(hit == Hit::Content ? kContentHigh : kContentBase);
   surface->drawRect(rc2, p);
 
   p.style(Paint::Style::Stroke);
@@ -147,14 +146,12 @@ void draw_window(Window* window,
 
   p.style(Paint::Style::Fill);
   p.color(kContentText);
-  draw_text(surface, font, "Content Rect",
-            rc2.center(), &p, TextAlign::Center);
+  draw_text(surface, font, "Content Rect", rc2.center(), &p, TextAlign::Center);
 
   if (window->isFullscreen()) {
     auto pos = rc2.center();
     pos.y += 24;
-    draw_text(surface, font, "(F key or F11 to exit full screen)",
-              pos, &p, TextAlign::Center);
+    draw_text(surface, font, "(F key or F11 to exit full screen)", pos, &p, TextAlign::Center);
   }
 
   if (window->isVisible())
@@ -163,9 +160,7 @@ void draw_window(Window* window,
     window->setVisible(true);
 }
 
-bool update_hit(Window* window,
-                const Event& ev,
-                Hit& hit)
+bool update_hit(Window* window, const Event& ev, Hit& hit)
 {
   Hit newHit = hit_test(window, ev.position());
   if (newHit != hit) {
@@ -189,29 +184,26 @@ WindowRef create_window()
   return window;
 }
 
-void handle_mouse_move(Window* window,
-                       const Hit hit)
+void handle_mouse_move(Window* window, const Hit hit)
 {
   NativeCursor cursor = NativeCursor::Arrow;
   switch (hit) {
-    case Hit::Content:     cursor = NativeCursor::Arrow;  break;
-    case Hit::TitleBar:    cursor = NativeCursor::Move;   break;
+    case Hit::Content:     cursor = NativeCursor::Arrow; break;
+    case Hit::TitleBar:    cursor = NativeCursor::Move; break;
     case Hit::TopLeft:     cursor = NativeCursor::SizeNW; break;
-    case Hit::Top:         cursor = NativeCursor::SizeN;  break;
+    case Hit::Top:         cursor = NativeCursor::SizeN; break;
     case Hit::TopRight:    cursor = NativeCursor::SizeNE; break;
-    case Hit::Left:        cursor = NativeCursor::SizeW;  break;
-    case Hit::Right:       cursor = NativeCursor::SizeE;  break;
+    case Hit::Left:        cursor = NativeCursor::SizeW; break;
+    case Hit::Right:       cursor = NativeCursor::SizeE; break;
     case Hit::BottomLeft:  cursor = NativeCursor::SizeSW; break;
-    case Hit::Bottom:      cursor = NativeCursor::SizeS;  break;
+    case Hit::Bottom:      cursor = NativeCursor::SizeS; break;
     case Hit::BottomRight: cursor = NativeCursor::SizeSE; break;
-    default: break;
+    default:               break;
   }
   window->setCursor(cursor);
 }
 
-bool handle_mouse_down(Window* window,
-                       const Event& ev,
-                       const Hit hit)
+bool handle_mouse_down(Window* window, const Event& ev, const Hit hit)
 {
   NativeCursor cursor = NativeCursor::Arrow;
   WindowAction action = WindowAction::Move;
@@ -219,12 +211,12 @@ bool handle_mouse_down(Window* window,
     case Hit::Content:        return true;
     case Hit::TitleBar:       action = WindowAction::Move; break;
     case Hit::TopLeft:        action = WindowAction::ResizeFromTopLeft; break;
-    case Hit::Top:            action = WindowAction::ResizeFromTop;  break;
+    case Hit::Top:            action = WindowAction::ResizeFromTop; break;
     case Hit::TopRight:       action = WindowAction::ResizeFromTopRight; break;
-    case Hit::Left:           action = WindowAction::ResizeFromLeft;  break;
-    case Hit::Right:          action = WindowAction::ResizeFromRight;  break;
+    case Hit::Left:           action = WindowAction::ResizeFromLeft; break;
+    case Hit::Right:          action = WindowAction::ResizeFromRight; break;
     case Hit::BottomLeft:     action = WindowAction::ResizeFromBottomLeft; break;
-    case Hit::Bottom:         action = WindowAction::ResizeFromBottom;  break;
+    case Hit::Bottom:         action = WindowAction::ResizeFromBottom; break;
     case Hit::BottomRight:    action = WindowAction::ResizeFromBottomRight; break;
     case Hit::MinimizeButton: window->minimize(); return true;
     case Hit::MaximizeButton: window->maximize(); return true;
@@ -245,9 +237,7 @@ int app_main(int argc, char* argv[])
   Hit hit = Hit::None; // Current area which the mouse cursor hits
   window->activate();
 
-  system->handleWindowResize = [&](Window* w) {
-    draw_window(w, font, hit);
-  };
+  system->handleWindowResize = [&](Window* w) { draw_window(w, font, hit); };
   system->finishLaunching();
   system->activateApp();
 
@@ -264,23 +254,15 @@ int app_main(int argc, char* argv[])
     queue->getEvent(ev);
 
     switch (ev.type()) {
-
       case Event::CloseApp:
-      case Event::CloseWindow:
-        running = false;
-        break;
+      case Event::CloseWindow: running = false; break;
 
       case Event::KeyDown:
         switch (ev.scancode()) {
-          case kKeyEsc:
-            running = false;
-            break;
+          case kKeyEsc: running = false; break;
           case kKeyF:
-          case kKeyF11:
-            window->setFullscreen(!window->isFullscreen());
-            break;
-          default:
-            break;
+          case kKeyF11: window->setFullscreen(!window->isFullscreen()); break;
+          default:      break;
         }
         break;
 
@@ -296,12 +278,9 @@ int app_main(int argc, char* argv[])
           running = false;
         break;
 
-      case Event::MouseLeave:
-        redraw = update_hit(window.get(), ev, hit);
-        break;
+      case Event::MouseLeave: redraw = update_hit(window.get(), ev, hit); break;
 
-      default:
-        break;
+      default:                break;
     }
   }
 

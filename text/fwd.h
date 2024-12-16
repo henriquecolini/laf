@@ -14,32 +14,32 @@
 
 namespace text {
 
-  using codepoint_t = base::codepoint_t;
-  using glyph_t = base::glyph_t;
+using codepoint_t = base::codepoint_t;
+using glyph_t = base::glyph_t;
 
-  class DrawTextDelegate;
+class DrawTextDelegate;
 
-  class Font;
-  using FontRef = base::Ref<Font>;
+class Font;
+using FontRef = base::Ref<Font>;
 
-  struct FontMetrics;
+struct FontMetrics;
 
-  class FontMgr;
-  using FontMgrRef = base::Ref<FontMgr>;
+class FontMgr;
+using FontMgrRef = base::Ref<FontMgr>;
 
-  class FontStyle;
-  using FontStyleRef = base::Ref<FontStyle>;
+class FontStyle;
+using FontStyleRef = base::Ref<FontStyle>;
 
-  class FontStyleSet;
-  using FontStyleSetRef = base::Ref<FontStyleSet>;
+class FontStyleSet;
+using FontStyleSetRef = base::Ref<FontStyleSet>;
 
-  struct ShaperFeatures;
+struct ShaperFeatures;
 
-  class TextBlob;
-  using TextBlobRef = base::Ref<TextBlob>;
+class TextBlob;
+using TextBlobRef = base::Ref<TextBlob>;
 
-  class Typeface;
-  using TypefaceRef = base::Ref<Typeface>;
+class Typeface;
+using TypefaceRef = base::Ref<Typeface>;
 
 } // namespace text
 

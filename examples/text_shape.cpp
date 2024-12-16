@@ -40,13 +40,14 @@ struct TextEdit {
 
   class BoxBuilder : public TextBlob::RunHandler {
   public:
-    BoxBuilder() { }
+    BoxBuilder() {}
     const std::vector<Box>& boxes() const { return m_boxes; }
 
     // TextBlob::RunHandler impl
-    void commitRunBuffer(TextBlob::RunInfo& info) override {
+    void commitRunBuffer(TextBlob::RunInfo& info) override
+    {
       Box box;
-      for (int i=0; i<info.glyphCount; ++i) {
+      for (int i = 0; i < info.glyphCount; ++i) {
         box.utf8Range = info.getGlyphUtf8Range(i);
         box.bounds = info.getGlyphBounds(i);
         m_boxes.push_back(box);
@@ -57,12 +58,14 @@ struct TextEdit {
     std::vector<Box> m_boxes;
   };
 
-  void makeCaretVisible() {
+  void makeCaretVisible()
+  {
     caretTick = base::current_tick();
     caretVisible = true;
   }
 
-  void makeBlob(FontMgrRef& fontMgr, FontRef& font) {
+  void makeBlob(FontMgrRef& fontMgr, FontRef& font)
+  {
     // Create a blob without ligatures (to edit char by char)
     BoxBuilder handler;
     ShaperFeatures features;
@@ -100,7 +103,7 @@ void draw_window(Window* window,
       h = std::max(edit.caretHeight, edit.boxes[i].bounds.h);
     }
     else {
-      x = (!edit.boxes.empty() ? edit.boxes.back().bounds.x2(): 0);
+      x = (!edit.boxes.empty() ? edit.boxes.back().bounds.x2() : 0);
       w = 4;
       h = edit.caretHeight;
     }
@@ -126,15 +129,17 @@ void draw_window(Window* window,
   surface->restore();
 
   // Draw current char
-  surface->drawLine(0, rc.h/2, rc.w, rc.h/2, p);
-  surface->drawLine(rc.w/2, 0, rc.w/2, rc.h, p);
+  surface->drawLine(0, rc.h / 2, rc.w, rc.h / 2, p);
+  surface->drawLine(rc.w / 2, 0, rc.w / 2, rc.h, p);
   if (edit.caretIndex < edit.boxes.size()) {
     int i = edit.boxes[edit.caretIndex].utf8Range.begin;
     int j = edit.boxes[edit.caretIndex].utf8Range.end;
-    draw_text_with_shaper(
-      surface, fontMgr, fontBig,
-      edit.text.substr(i, j-i),
-      gfx::PointF(rc.center()), &p);
+    draw_text_with_shaper(surface,
+                          fontMgr,
+                          fontBig,
+                          edit.text.substr(i, j - i),
+                          gfx::PointF(rc.center()),
+                          &p);
   }
 
   // Invalidates the whole window to show it on the screen.
@@ -174,7 +179,7 @@ int app_main(int argc, char* argv[])
   FontMetrics metrics;
   font->metrics(&metrics);
   edit.caretHeight = metrics.descent - metrics.ascent + metrics.leading;
-  edit.caretBaseLine = - metrics.ascent - metrics.leading;
+  edit.caretBaseLine = -metrics.ascent - metrics.leading;
 
   system->finishLaunching();
   system->activateApp();
@@ -201,16 +206,11 @@ int app_main(int argc, char* argv[])
     }
 
     switch (ev.type()) {
-
-      case Event::CloseWindow:
-        running = false;
-        break;
+      case Event::CloseWindow: running = false; break;
 
       case Event::KeyDown:
         switch (ev.scancode()) {
-          case kKeyEsc:
-            running = false;
-            break;
+          case kKeyEsc: running = false; break;
 
           // Go to the beginning
           case kKeyHome:
@@ -260,8 +260,7 @@ int app_main(int argc, char* argv[])
           case kKeyDel:
             if (edit.caretIndex < edit.boxes.size()) {
               auto utf8Range = edit.boxes[edit.caretIndex].utf8Range;
-              edit.text.erase(utf8Range.begin,
-                              utf8Range.end - utf8Range.begin);
+              edit.text.erase(utf8Range.begin, utf8Range.end - utf8Range.begin);
             }
             edit.makeBlob(fontMgr, font);
             edit.makeCaretVisible();
@@ -278,8 +277,7 @@ int app_main(int argc, char* argv[])
                 std::string newUtf8Str = ev.unicodeCharAsUtf8();
 
 #if LAF_WITH_CLIP
-                if ((ev.scancode() == kKeyV) &&
-                    (ev.modifiers() & kKeyCtrlModifier) != 0) {
+                if ((ev.scancode() == kKeyV) && (ev.modifiers() & kKeyCtrlModifier) != 0) {
                   clip::get_text(newUtf8Str);
                 }
 #endif
@@ -301,9 +299,7 @@ int app_main(int argc, char* argv[])
         }
         break;
 
-      case Event::ResizeWindow:
-        redraw = true;
-        break;
+      case Event::ResizeWindow: redraw = true; break;
 
       case Event::MouseEnter:
       case Event::MouseMove:

@@ -30,9 +30,7 @@ struct DndDataX11 {
 
 class DragDataProviderX11 : public DragDataProvider {
 public:
-  DragDataProviderX11(::Display* display,
-                      ::Window target,
-                      const base::paths& urls);
+  DragDataProviderX11(::Display* display, ::Window target, const base::paths& urls);
 
   base::paths getPaths() override;
 #if CLIP_ENABLE_IMAGE
@@ -48,6 +46,6 @@ private:
   base::paths m_urls;
 };
 
-}  // namespace os
+} // namespace os
 
 #endif

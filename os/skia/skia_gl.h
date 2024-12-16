@@ -34,9 +34,7 @@ public:
   bool attachGL();
   void detachGL();
 
-  bool createRenderTarget(const gfx::Size& size,
-                          const int scale,
-                          sk_sp<SkColorSpace> colorSpace);
+  bool createRenderTarget(const gfx::Size& size, const int scale, sk_sp<SkColorSpace> colorSpace);
 
   sk_sp<SkSurface> backbufferSurface() const { return m_backbufferSurface; }
   sk_sp<SkSurface> surface() const { return m_surface; }
@@ -52,7 +50,7 @@ private:
 
 #else // !SK_SUPPORT_GPU
 
-class SkiaGL { };
+class SkiaGL {};
 
 #endif
 

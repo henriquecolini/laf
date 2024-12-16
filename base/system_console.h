@@ -38,8 +38,7 @@ namespace base {
 // possible. The output/input is deattached as soon as cmd.exe knows
 // that the program was linked with /subsystem:windows.
 //
-class SystemConsole
-{
+class SystemConsole {
 public:
   SystemConsole();
   ~SystemConsole();

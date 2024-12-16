@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "text/text_blob.h"
@@ -45,15 +45,12 @@ TextBlob::Utf8Range TextBlob::RunInfo::getGlyphUtf8Range(size_t i) const
   // LTR
   if (!rtl) {
     subRange.begin = utf8Range.begin + clusters[i];
-    subRange.end = (i+1 < glyphCount ?
-                    utf8Range.begin + clusters[i+1]:
-                    utf8Range.end);
+    subRange.end = (i + 1 < glyphCount ? utf8Range.begin + clusters[i + 1] : utf8Range.end);
   }
   // RTL
   else {
     subRange.begin = utf8Range.begin + clusters[i];
-    subRange.end = (i == 0 ? utf8Range.end:
-                             utf8Range.begin + clusters[i-1]);
+    subRange.end = (i == 0 ? utf8Range.end : utf8Range.begin + clusters[i - 1]);
   }
   return subRange;
 }
@@ -85,27 +82,21 @@ gfx::RectF TextBlob::RunInfo::getGlyphBounds(const size_t i) const
   return bounds;
 }
 
-TextBlobRef TextBlob::Make(
-  const FontRef& font,
-  const std::string& text)
+TextBlobRef TextBlob::Make(const FontRef& font, const std::string& text)
 {
   ASSERT(font);
   switch (font->type()) {
-
-    case FontType::SpriteSheet:
-      return SpriteTextBlob::Make(font, text);
+    case FontType::SpriteSheet: return SpriteTextBlob::Make(font, text);
 
     case FontType::FreeType:
-      ASSERT(false);            // TODO impl
+      ASSERT(false); // TODO impl
       return nullptr;
 
 #if LAF_SKIA
-    case FontType::Native:
-      return SkiaTextBlob::Make(font, text);
+    case FontType::Native: return SkiaTextBlob::Make(font, text);
 #endif
 
-    default:
-      return nullptr;
+    default: return nullptr;
   }
 }
 

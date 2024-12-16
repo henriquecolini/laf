@@ -30,9 +30,9 @@ public:
   };
 
   enum class Result {
-    Error = -1,  // This happens when we cannot open the native dialog
-    Cancel = 0,  // The user canceled the dialog
-    OK = 1,      // The user selected some file(s)
+    Error = -1, // This happens when we cannot open the native dialog
+    Cancel = 0, // The user canceled the dialog
+    OK = 1,     // The user selected some file(s)
   };
 
   struct Spec {
@@ -64,13 +64,12 @@ public:
   static FileDialogRef makeX11(const Spec& spec);
 #endif
 
-  virtual ~FileDialog() { }
+  virtual ~FileDialog() {}
 
   void setType(const Type type);
   void setTitle(const std::string& title);
   void setDefaultExtension(const std::string& extension);
-  void addFilter(const std::string& extension,
-                 const std::string& description);
+  void addFilter(const std::string& extension, const std::string& description);
 
   virtual std::string fileName() = 0;
   virtual void getMultipleFileNames(base::paths& output) = 0;
@@ -87,6 +86,6 @@ protected:
   std::vector<std::pair<std::string, std::string>> m_filters;
 };
 
-}  // namespace dlgs
+} // namespace dlgs
 
 #endif

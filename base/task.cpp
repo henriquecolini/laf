@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/task.h"
@@ -15,9 +15,7 @@
 
 namespace base {
 
-task::task()
-  : m_running(false)
-  , m_completed(false)
+task::task() : m_running(false), m_completed(false)
 {
 }
 
@@ -28,7 +26,7 @@ task::~task()
 
   // m_completed can be false in this case if the task was never
   // started (i.e. the user never called task::start()).
-  //ASSERT(m_completed);
+  // ASSERT(m_completed);
 }
 
 task_token& task::start(thread_pool& pool)
@@ -41,7 +39,7 @@ task_token& task::start(thread_pool& pool)
   m_completed = false;
   m_token.reset();
 
-  pool.execute([this]{ in_worker_thread(); });
+  pool.execute([this] { in_worker_thread(); });
   return m_token;
 }
 

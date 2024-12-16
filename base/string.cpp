@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/debug.h"
@@ -23,8 +23,7 @@
 namespace base {
 
 // Based on Allegro Unicode code (allegro/src/unicode.c)
-static std::size_t insert_utf8_char(const codepoint_t chr,
-                                    std::string* result = nullptr)
+static std::size_t insert_utf8_char(const codepoint_t chr, std::string* result = nullptr)
 {
   int size, bits, b, i;
 
@@ -35,7 +34,7 @@ static std::size_t insert_utf8_char(const codepoint_t chr,
   }
 
   bits = 7;
-  while (chr >= (1<<bits))
+  while (chr >= (1 << bits))
     bits++;
 
   size = 2;
@@ -47,16 +46,16 @@ static std::size_t insert_utf8_char(const codepoint_t chr,
   }
 
   if (result) {
-    b -= (7-size);
-    int firstbyte = chr>>b;
-    for (i=0; i<size; i++)
-      firstbyte |= (0x80>>i);
+    b -= (7 - size);
+    int firstbyte = chr >> b;
+    for (i = 0; i < size; i++)
+      firstbyte |= (0x80 >> i);
 
     result->push_back(firstbyte);
 
-    for (i=1; i<size; i++) {
+    for (i = 1; i < size; i++) {
       b -= 6;
-      result->push_back(0x80 | ((chr>>b)&0x3F));
+      result->push_back(0x80 | ((chr >> b) & 0x3F));
     }
   }
 
@@ -79,7 +78,7 @@ std::string string_vprintf(const char* format, va_list ap)
   va_copy(ap2, ap);
   const size_t required_size = std::vsnprintf(nullptr, 0, format, ap);
   if (required_size > 0) {
-    buf.resize(required_size+1);
+    buf.resize(required_size + 1);
     std::vsnprintf(buf.data(), buf.size(), format, ap2);
   }
   va_end(ap2);
@@ -121,25 +120,22 @@ std::string codepoint_to_utf8(const codepoint_t codepoint)
     return std::string();
 
   std::string result;
-  result.reserve(required_size+1);
+  result.reserve(required_size + 1);
   insert_utf8_char(codepoint, &result);
   return result;
 }
 
-codepoint_t utf16_to_codepoint(const uint16_t low,
-                               const uint16_t hi)
+codepoint_t utf16_to_codepoint(const uint16_t low, const uint16_t hi)
 {
   // Valid code point
-  if ((low >= 0x0000 && low <= 0xD7FF) ||
-      (low >= 0xE000 && low <= 0xFFFF)) {
+  if ((low >= 0x0000 && low <= 0xD7FF) || (low >= 0xE000 && low <= 0xFFFF)) {
     return codepoint_t(low);
   }
 
   // Surrogate pair
   if (low >= 0xDC00 && low <= 0xDFFF) {
     ASSERT(hi >= 0xD800 && hi <= 0xDBFF);
-    return (0x10000 | (((low - 0xDC00)) |
-                       ((hi - 0xD800) << 10)));
+    return (0x10000 | (((low - 0xDC00)) | ((hi - 0xD800) << 10)));
   }
 
   return 0;
@@ -149,39 +145,28 @@ codepoint_t utf16_to_codepoint(const uint16_t low,
 
 std::string to_utf8(const wchar_t* src, const size_t n)
 {
-  int required_size =
-    ::WideCharToMultiByte(CP_UTF8, 0,
-      src, (int)n,
-      NULL, 0, NULL, NULL);
+  int required_size = ::WideCharToMultiByte(CP_UTF8, 0, src, (int)n, NULL, 0, NULL, NULL);
 
   if (required_size == 0)
     return std::string();
 
   std::vector<char> buf(++required_size);
 
-  ::WideCharToMultiByte(CP_UTF8, 0,
-    src, (int)n,
-    &buf[0], required_size,
-    NULL, NULL);
+  ::WideCharToMultiByte(CP_UTF8, 0, src, (int)n, &buf[0], required_size, NULL, NULL);
 
   return std::string(&buf[0]);
 }
 
 std::wstring from_utf8(const std::string& src)
 {
-  int required_size =
-    MultiByteToWideChar(CP_UTF8, 0,
-      src.c_str(), (int)src.size(),
-      NULL, 0);
+  int required_size = MultiByteToWideChar(CP_UTF8, 0, src.c_str(), (int)src.size(), NULL, 0);
 
   if (required_size == 0)
     return std::wstring();
 
   std::vector<wchar_t> buf(++required_size);
 
-  ::MultiByteToWideChar(CP_UTF8, 0,
-    src.c_str(), (int)src.size(),
-    &buf[0], required_size);
+  ::MultiByteToWideChar(CP_UTF8, 0, src.c_str(), (int)src.size(), &buf[0], required_size);
 
   return std::wstring(&buf[0]);
 }
@@ -194,7 +179,7 @@ std::string to_utf8(const wchar_t* src, const size_t n)
   // doesn't need to reallocate its data.
   std::size_t required_size = 0;
   const auto* p = src;
-  for (size_t i=0; i<n; ++i, ++p)
+  for (size_t i = 0; i < n; ++i, ++p)
     required_size += insert_utf8_char(*p);
   if (!required_size)
     return "";
@@ -202,7 +187,7 @@ std::string to_utf8(const wchar_t* src, const size_t n)
   std::string result;
   result.reserve(++required_size);
   p = src;
-  for (int i=0; i<n; ++i, ++p)
+  for (int i = 0; i < n; ++i, ++p)
     insert_utf8_char(*p, &result);
   return result;
 }
@@ -212,9 +197,9 @@ std::wstring from_utf8(const std::string& src)
   int required_size = utf8_length(src);
   std::vector<wchar_t> buf(++required_size);
   std::vector<wchar_t>::iterator buf_it = buf.begin();
-#ifdef _DEBUG
+  #ifdef _DEBUG
   std::vector<wchar_t>::iterator buf_end = buf.end();
-#endif
+  #endif
   utf8_decode decode(src);
 
   while (const int chr = decode.next()) {
@@ -245,9 +230,7 @@ int utf8_icmp(const std::string& a, const std::string& b, int n)
   utf8_decode b_decode(b);
   int i = 0;
 
-  for (; (n == 0 || i < n)
-         && !a_decode.is_end()
-         && !b_decode.is_end(); ++i) {
+  for (; (n == 0 || i < n) && !a_decode.is_end() && !b_decode.is_end(); ++i) {
     int a_chr = a_decode.next();
     if (!a_chr)
       break;
@@ -259,8 +242,10 @@ int utf8_icmp(const std::string& a, const std::string& b, int n)
     a_chr = std::tolower(a_chr);
     b_chr = std::tolower(b_chr);
 
-    if (a_chr < b_chr) return -1;
-    if (a_chr > b_chr) return 1;
+    if (a_chr < b_chr)
+      return -1;
+    if (a_chr > b_chr)
+      return 1;
   }
 
   if (n > 0 && i == n)

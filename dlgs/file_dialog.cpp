@@ -28,8 +28,7 @@ void FileDialog::setDefaultExtension(const std::string& extension)
   m_defExtension = extension;
 }
 
-void FileDialog::addFilter(const std::string& extension,
-                           const std::string& description)
+void FileDialog::addFilter(const std::string& extension, const std::string& description)
 {
   if (m_defExtension.empty())
     m_defExtension = extension;
@@ -50,4 +49,4 @@ FileDialogRef FileDialog::make(const Spec& spec)
 #endif
 }
 
-}  // namespace dlgs
+} // namespace dlgs

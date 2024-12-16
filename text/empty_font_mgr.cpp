@@ -16,26 +16,27 @@ namespace text {
 
 class EmptyTypeface : public Typeface {
 public:
-  EmptyTypeface() { }
+  EmptyTypeface() {}
   std::string familyName() const override { return std::string(); }
   FontStyle fontStyle() const override { return FontStyle(); }
 };
 
 class EmptyFont : public Font {
 public:
-  EmptyFont() { }
+  EmptyFont() {}
   FontType type() override { return FontType::Unknown; }
   TypefaceRef typeface() const override { return base::make_ref<EmptyTypeface>(); }
   float metrics(FontMetrics*) const { return 0.0f; }
   int height() const override { return 0; }
   int textLength(const std::string&) const override { return 0; };
-  float measureText(const std::string&,
-                    gfx::RectF*,
-                    const os::Paint*) const override { return 0.0f; }
+  float measureText(const std::string&, gfx::RectF*, const os::Paint*) const override
+  {
+    return 0.0f;
+  }
   bool isScalable() const override { return false; }
-  void setSize(int) override { }
+  void setSize(int) override {}
   bool antialias() const override { return false; }
-  void setAntialias(bool) override { }
+  void setAntialias(bool) override {}
 
   glyph_t codePointToGlyph(codepoint_t) const override { return false; }
   gfx::RectF getGlyphBounds(glyph_t) const override { return gfx::RectF(); }
@@ -44,40 +45,33 @@ public:
 
 class EmptyFontStyleSet : public FontStyleSet {
 public:
-  EmptyFontStyleSet() { }
+  EmptyFontStyleSet() {}
   int count() override { return 0; }
-  void getStyle(int index,
-                FontStyle& style,
-                std::string& name) override { }
-  TypefaceRef typeface(int index) override {
-    return base::make_ref<EmptyTypeface>();
-  }
-  TypefaceRef matchStyle(const FontStyle& style) override {
+  void getStyle(int index, FontStyle& style, std::string& name) override {}
+  TypefaceRef typeface(int index) override { return base::make_ref<EmptyTypeface>(); }
+  TypefaceRef matchStyle(const FontStyle& style) override
+  {
     return base::make_ref<EmptyTypeface>();
   }
 };
 
 class EmptyFontMgr : public FontMgr {
 public:
-  EmptyFontMgr() { }
-  ~EmptyFontMgr() { }
+  EmptyFontMgr() {}
+  ~EmptyFontMgr() {}
 
-  FontRef makeFont(const TypefaceRef& typeface) {
-    return base::make_ref<EmptyFont>();
-  }
-  FontRef makeFont(const TypefaceRef& typeface, float size) {
-    return base::make_ref<EmptyFont>();
-  }
+  FontRef makeFont(const TypefaceRef& typeface) { return base::make_ref<EmptyFont>(); }
+  FontRef makeFont(const TypefaceRef& typeface, float size) { return base::make_ref<EmptyFont>(); }
 
-  FontRef defaultFont(float size) const override {
-    return base::make_ref<EmptyFont>();
-  }
+  FontRef defaultFont(float size) const override { return base::make_ref<EmptyFont>(); }
   int countFamilies() const override { return 0; }
   std::string familyName(int i) const override { return std::string(); }
-  FontStyleSetRef familyStyleSet(int i) const override {
+  FontStyleSetRef familyStyleSet(int i) const override
+  {
     return base::make_ref<EmptyFontStyleSet>();
   }
-  FontStyleSetRef matchFamily(const std::string& familyName) const override {
+  FontStyleSetRef matchFamily(const std::string& familyName) const override
+  {
     return base::make_ref<EmptyFontStyleSet>();
   }
 };

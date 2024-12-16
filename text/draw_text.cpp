@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "text/draw_text.h"
@@ -35,13 +35,12 @@
 
 namespace text {
 
-void draw_text(
-  os::Surface* surface,
-  const FontRef& font,
-  const std::string& text,
-  gfx::PointF pos,
-  const os::Paint* paint,
-  const TextAlign textAlign)
+void draw_text(os::Surface* surface,
+               const FontRef& font,
+               const std::string& text,
+               gfx::PointF pos,
+               const os::Paint* paint,
+               const TextAlign textAlign)
 {
   ASSERT(surface);
   if (!surface)
@@ -52,19 +51,18 @@ void draw_text(
     return;
 
   switch (textAlign) {
-    case TextAlign::Left: break;
+    case TextAlign::Left:   break;
     case TextAlign::Center: pos.x -= blob->bounds().w / 2.0f; break;
-    case TextAlign::Right: pos.x -= blob->bounds().w; break;
+    case TextAlign::Right:  pos.x -= blob->bounds().w; break;
   }
 
   draw_text(surface, blob, pos, paint);
 }
 
-void draw_text(
-  os::Surface* surface,
-  const TextBlobRef& blob,
-  const gfx::PointF& pos,
-  const os::Paint* paint)
+void draw_text(os::Surface* surface,
+               const TextBlobRef& blob,
+               const gfx::PointF& pos,
+               const os::Paint* paint)
 {
   ASSERT(surface);
   ASSERT(blob);
@@ -73,10 +71,11 @@ void draw_text(
 
 #if LAF_SKIA
   if (const auto* skiaBlob = dynamic_cast<const SkiaTextBlob*>(blob.get())) {
-    static_cast<os::SkiaSurface*>(surface)
-      ->canvas().drawTextBlob(skiaBlob->skTextBlob(),
-                              pos.x, pos.y,
-                              (paint ? paint->skPaint(): SkPaint()));
+    static_cast<os::SkiaSurface*>(surface)->canvas().drawTextBlob(
+      skiaBlob->skTextBlob(),
+      pos.x,
+      pos.y,
+      (paint ? paint->skPaint() : SkPaint()));
   }
 #endif
 
@@ -94,16 +93,13 @@ void draw_text(
       }
 
       const size_t n = run.glyphs.size();
-      for (int i=0; i<n; ++i) {
-        const gfx::Rect glyphBounds =
-          spriteFont->getGlyphBoundsOnSheet(run.glyphs[i]);
+      for (int i = 0; i < n; ++i) {
+        const gfx::Rect glyphBounds = spriteFont->getGlyphBoundsOnSheet(run.glyphs[i]);
 
-        surface->drawColoredRgbaSurface(
-          sheet,
-          (paint ? paint->color(): gfx::ColorNone),
-          gfx::ColorNone,
-          gfx::Clip(gfx::Point(run.positions[i]+pos),
-                    glyphBounds));
+        surface->drawColoredRgbaSurface(sheet,
+                                        (paint ? paint->color() : gfx::ColorNone),
+                                        gfx::ColorNone,
+                                        gfx::Clip(gfx::Point(run.positions[i] + pos), glyphBounds));
       }
     }
   }

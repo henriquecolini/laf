@@ -12,9 +12,9 @@ namespace text {
 
 struct ShaperFeatures {
   bool ligatures = true;
-  ShaperFeatures() { }
+  ShaperFeatures() {}
 };
 
-}  // namespace text
+} // namespace text
 
 #endif

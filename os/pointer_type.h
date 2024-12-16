@@ -10,16 +10,16 @@
 
 namespace os {
 
-  // Source of a mouse like event
-  enum class PointerType {
-    Unknown,
-    Mouse,                      // A regular mouse
-    Touchpad,                   // Touchpad/trackpad
-    Touch,                      // Touch screen
-    Pen,                        // Stylus pen
-    Cursor,                     // Puck like device
-    Eraser                      // Eraser end of a stylus pen
-  };
+// Source of a mouse like event
+enum class PointerType {
+  Unknown,
+  Mouse,    // A regular mouse
+  Touchpad, // Touchpad/trackpad
+  Touch,    // Touch screen
+  Pen,      // Stylus pen
+  Cursor,   // Puck like device
+  Eraser    // Eraser end of a stylus pen
+};
 
 } // namespace os
 

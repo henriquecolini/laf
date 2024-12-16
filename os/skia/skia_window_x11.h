@@ -26,7 +26,7 @@ public:
   SkiaWindowX11(const WindowSpec& spec);
 
   std::string getLayout() override { return ""; }
-  void setLayout(const std::string& layout) override { }
+  void setLayout(const std::string& layout) override {}
 
 private:
   void onPaint(const gfx::Rect& rc) override;

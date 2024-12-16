@@ -12,9 +12,9 @@
 
 namespace base {
 
-  // Unicode code point
-  using codepoint_t = uint32_t;
+// Unicode code point
+using codepoint_t = uint32_t;
 
-}
+} // namespace base
 
 #endif

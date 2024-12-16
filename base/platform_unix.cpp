@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/platform.h"
@@ -28,7 +28,7 @@ std::map<std::string, std::string> get_linux_release_info(const std::string& fn)
   std::string value;
 
   while (std::fgets(buf.data(), buf.size(), f.get())) {
-    for (auto i=buf.begin(), end=buf.end(); i != end; ++i) {
+    for (auto i = buf.begin(), end = buf.end(); i != end; ++i) {
       // Commented line
       if (*i == '#')
         break;
@@ -38,8 +38,7 @@ std::map<std::string, std::string> get_linux_release_info(const std::string& fn)
       // Read the key
       if (*i >= 'A' && *i <= 'Z') {
         auto j = i;
-        while (j != end && ((*j >= 'A' && *j <= 'Z') ||
-                            (*j >= '0' && *j <= '9') || (*j == '_'))) {
+        while (j != end && ((*j >= 'A' && *j <= 'Z') || (*j >= '0' && *j <= '9') || (*j == '_'))) {
           ++j;
         }
 
@@ -49,7 +48,7 @@ std::map<std::string, std::string> get_linux_release_info(const std::string& fn)
         while (j != end && *j == ' ')
           ++j;
         if (j != end && *j == '=') {
-          ++j;          // Skip '='
+          ++j; // Skip '='
           // Ignore white space between "KEY= ... VALUE"
           while (j != end && *j == ' ')
             ++j;
@@ -71,9 +70,7 @@ std::map<std::string, std::string> get_linux_release_info(const std::string& fn)
               }
             }
             else {
-              while (j != end && (*j != ' ' &&
-                                  *j != '\r' &&
-                                  *j != '\n')) {
+              while (j != end && (*j != ' ' && *j != '\r' && *j != '\n')) {
                 value.push_back(*j);
                 ++j;
               }

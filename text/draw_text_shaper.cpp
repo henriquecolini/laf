@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "text/draw_text.h"
@@ -38,38 +38,38 @@ public:
                  DrawTextDelegate* delegate)
     : m_surface(surface)
     , m_text(text)
-    , m_fg(fg), m_bg(bg)
+    , m_fg(fg)
+    , m_bg(bg)
     , m_origin(origin)
-    , m_delegate(delegate) { }
+    , m_delegate(delegate)
+  {
+  }
 
   // TextBlob::RunHandler impl
-  void commitRunBuffer(TextBlob::RunInfo& info) override {
-    if (info.clusters &&
-        info.glyphCount > 0) {
+  void commitRunBuffer(TextBlob::RunInfo& info) override
+  {
+    if (info.clusters && info.glyphCount > 0) {
       float advanceX = 0.0f;
 
       os::Paint paint;
       paint.style(os::Paint::Fill);
 
-      for (int i=0; i<info.glyphCount; ++i) {
+      for (int i = 0; i < info.glyphCount; ++i) {
         int utf8Begin, utf8End;
 
         // LTR
         if (!info.rtl) {
           utf8Begin = info.utf8Range.begin + info.clusters[i];
-          utf8End = (i+1 < info.glyphCount ?
-                     info.utf8Range.begin + info.clusters[i+1]:
-                     info.utf8Range.end);
+          utf8End = (i + 1 < info.glyphCount ? info.utf8Range.begin + info.clusters[i + 1] :
+                                               info.utf8Range.end);
         }
         // RTL
         else {
           utf8Begin = info.utf8Range.begin + info.clusters[i];
-          utf8End = (i == 0 ? info.utf8Range.end:
-                              info.utf8Range.begin + info.clusters[i-1]);
+          utf8End = (i == 0 ? info.utf8Range.end : info.utf8Range.begin + info.clusters[i - 1]);
         }
 
-        const std::string utf8text =
-          m_text.substr(utf8Begin, utf8End - utf8Begin);
+        const std::string utf8text = m_text.substr(utf8Begin, utf8End - utf8Begin);
 
         gfx::RectF bounds = info.getGlyphBounds(i);
         bounds.offset(m_origin);
@@ -86,17 +86,15 @@ public:
             }
             // On Windows wchar_t has 16-bits (wide strings are UTF-16 strings)
             else if constexpr (sizeof(wchar_t) == 2) {
-              codepoint = base::utf16_to_codepoint(
-                widetext.size() > 1 ? widetext[1]: widetext[0],
-                widetext.size() > 1 ? widetext[0]: 0);
+              codepoint = base::utf16_to_codepoint(widetext.size() > 1 ? widetext[1] : widetext[0],
+                                                   widetext.size() > 1 ? widetext[0] : 0);
             }
             else {
               codepoint = 0;
             }
           }
 
-          m_delegate->preProcessChar(utf8Begin, codepoint,
-                                     m_fg, m_bg, bounds);
+          m_delegate->preProcessChar(utf8Begin, codepoint, m_fg, m_bg, bounds);
         }
 
         if (m_delegate)
@@ -111,15 +109,13 @@ public:
           if (info.font->type() == FontType::SpriteSheet) {
             const auto* spriteFont = static_cast<const SpriteSheetFont*>(info.font.get());
             const os::Surface* sheet = spriteFont->sheetSurface();
-            const gfx::Rect sourceBounds =
-              spriteFont->getGlyphBoundsOnSheet(info.glyphs[i]);
+            const gfx::Rect sourceBounds = spriteFont->getGlyphBoundsOnSheet(info.glyphs[i]);
 
             m_surface->drawColoredRgbaSurface(
               sheet,
               m_fg,
               gfx::ColorNone,
-              gfx::Clip(gfx::Point(info.positions[i]+m_origin+info.point),
-                        sourceBounds));
+              gfx::Clip(gfx::Point(info.positions[i] + m_origin + info.point), sourceBounds));
           }
 #if LAF_SKIA
           else if (info.font->type() == FontType::Native) {
@@ -127,14 +123,16 @@ public:
             SkPoint positions = os::to_skia(info.positions[i]); //
             uint32_t clusters = info.clusters[i];
             paint.color(m_fg);
-            static_cast<os::SkiaSurface*>(m_surface)
-              ->canvas().drawGlyphs(
-                1, &glyphs, &positions, &clusters,
-                utf8text.size(),
-                utf8text.data(),
-                os::to_skia(m_origin+info.point),
-                static_cast<SkiaFont*>(info.font.get())->skFont(),
-                paint.skPaint());
+            static_cast<os::SkiaSurface*>(m_surface)->canvas().drawGlyphs(
+              1,
+              &glyphs,
+              &positions,
+              &clusters,
+              utf8text.size(),
+              utf8text.data(),
+              os::to_skia(m_origin + info.point),
+              static_cast<SkiaFont*>(info.font.get())->skFont(),
+              paint.skPaint());
           }
 #endif
         }
@@ -160,15 +158,16 @@ gfx::Rect draw_text(os::Surface* surface,
                     const FontMgrRef& fontMgr,
                     const FontRef& font,
                     const std::string& text,
-                    gfx::Color fg, gfx::Color bg,
-                    int x, int y,
+                    gfx::Color fg,
+                    gfx::Color bg,
+                    int x,
+                    int y,
                     DrawTextDelegate* delegate,
                     ShaperFeatures features)
 {
   TextBlobRef blob;
   if (delegate) {
-    AdapterBuilder handler(surface, text, fg, bg,
-                           gfx::PointF(x, y), delegate);
+    AdapterBuilder handler(surface, text, fg, bg, gfx::PointF(x, y), delegate);
     blob = TextBlob::MakeWithShaper(fontMgr, font, text, &handler, features);
   }
   else {
@@ -184,11 +183,7 @@ gfx::Rect draw_text(os::Surface* surface,
 
       os::Paint paint;
       paint.color(fg);
-      draw_text(
-        surface,
-        blob,
-        gfx::PointF(x, y),
-        &paint);
+      draw_text(surface, blob, gfx::PointF(x, y), &paint);
     }
   }
 
@@ -197,27 +192,25 @@ gfx::Rect draw_text(os::Surface* surface,
   return gfx::Rect();
 }
 
-void draw_text_with_shaper(
-  os::Surface* surface,
-  const FontMgrRef& fontMgr,
-  const FontRef& font,
-  const std::string& text,
-  gfx::PointF pos,
-  const os::Paint* paint,
-  const TextAlign textAlign)
+void draw_text_with_shaper(os::Surface* surface,
+                           const FontMgrRef& fontMgr,
+                           const FontRef& font,
+                           const std::string& text,
+                           gfx::PointF pos,
+                           const os::Paint* paint,
+                           const TextAlign textAlign)
 {
   if (!fontMgr || !font || font->type() != FontType::Native)
     return;
 
-  const TextBlobRef blob = TextBlob::MakeWithShaper(
-    fontMgr, font, text, nullptr);
+  const TextBlobRef blob = TextBlob::MakeWithShaper(fontMgr, font, text, nullptr);
   if (!blob)
     return;
 
   switch (textAlign) {
-    case TextAlign::Left: break;
+    case TextAlign::Left:   break;
     case TextAlign::Center: pos.x -= blob->bounds().w / 2.0f; break;
-    case TextAlign::Right: pos.x -= blob->bounds().w; break;
+    case TextAlign::Right:  pos.x -= blob->bounds().w; break;
   }
 
   draw_text(surface, blob, pos, paint);

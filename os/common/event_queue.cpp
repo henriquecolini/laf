@@ -6,7 +6,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #if LAF_WINDOWS
@@ -21,7 +21,8 @@ namespace os {
 
 EventQueueImpl g_queue;
 
-EventQueue* EventQueue::instance() {
+EventQueue* EventQueue::instance()
+{
   return &g_queue;
 }
 

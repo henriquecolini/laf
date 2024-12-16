@@ -13,36 +13,36 @@
 #include <memory>
 
 namespace ft {
-  class Lib;
+class Lib;
 }
 
 namespace text {
 
-  class FontMgr : public base::RefCount {
-  public:
-    [[nodiscard]]
-    static FontMgrRef Make();
+class FontMgr : public base::RefCount {
+public:
+  [[nodiscard]]
+  static FontMgrRef Make();
 
-    FontRef loadSpriteSheetFont(const char* filename, int scale);
-    virtual FontRef loadTrueTypeFont(const char* filename, float size);
-    virtual FontRef makeFont(const TypefaceRef& typeface) = 0;
-    virtual FontRef makeFont(const TypefaceRef& typeface, float size) = 0;
+  FontRef loadSpriteSheetFont(const char* filename, int scale);
+  virtual FontRef loadTrueTypeFont(const char* filename, float size);
+  virtual FontRef makeFont(const TypefaceRef& typeface) = 0;
+  virtual FontRef makeFont(const TypefaceRef& typeface, float size) = 0;
 
-    virtual FontRef defaultFont(float size = 12) const = 0;
-    virtual int countFamilies() const = 0;
-    virtual std::string familyName(int index) const = 0;
-    virtual FontStyleSetRef familyStyleSet(int index) const = 0;
-    virtual FontStyleSetRef matchFamily(const std::string& familyName) const = 0;
+  virtual FontRef defaultFont(float size = 12) const = 0;
+  virtual int countFamilies() const = 0;
+  virtual std::string familyName(int index) const = 0;
+  virtual FontStyleSetRef familyStyleSet(int index) const = 0;
+  virtual FontStyleSetRef matchFamily(const std::string& familyName) const = 0;
 
-  protected:
-    FontMgr();
-    virtual ~FontMgr();
+protected:
+  FontMgr();
+  virtual ~FontMgr();
 
-  private:
+private:
 #if LAF_FREETYPE
-    std::unique_ptr<ft::Lib> m_ft;
+  std::unique_ptr<ft::Lib> m_ft;
 #endif
-  };
+};
 
 } // namespace text
 

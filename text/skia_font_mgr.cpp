@@ -24,8 +24,7 @@ namespace text {
 //////////////////////////////////////////////////////////////////////
 // SkiaTypeface
 
-SkiaTypeface::SkiaTypeface(sk_sp<SkTypeface> skTypeface)
-  : m_skTypeface(skTypeface)
+SkiaTypeface::SkiaTypeface(sk_sp<SkTypeface> skTypeface) : m_skTypeface(skTypeface)
 {
 }
 
@@ -47,8 +46,7 @@ FontStyle SkiaTypeface::fontStyle() const
 //////////////////////////////////////////////////////////////////////
 // SkiaFontStyleSet
 
-SkiaFontStyleSet::SkiaFontStyleSet(sk_sp<SkFontStyleSet> set)
-  : m_skSet(set)
+SkiaFontStyleSet::SkiaFontStyleSet(sk_sp<SkFontStyleSet> set) : m_skSet(set)
 {
 }
 
@@ -57,9 +55,7 @@ int SkiaFontStyleSet::count()
   return m_skSet->count();
 }
 
-void SkiaFontStyleSet::getStyle(int index,
-                                FontStyle& style,
-                                std::string& name)
+void SkiaFontStyleSet::getStyle(int index, FontStyle& style, std::string& name)
 {
   SkFontStyle skStyle;
   SkString skName;
@@ -124,8 +120,7 @@ FontRef SkiaFontMgr::loadTrueTypeFont(const char* filename, float size)
 
 FontRef SkiaFontMgr::defaultFont(float size) const
 {
-  sk_sp<SkTypeface> face =
-    m_skFontMgr->legacyMakeTypeface(nullptr, SkFontStyle());
+  sk_sp<SkTypeface> face = m_skFontMgr->legacyMakeTypeface(nullptr, SkFontStyle());
   ASSERT(face);
   SkFont skFont(face, size);
   return base::make_ref<SkiaFont>(skFont);
@@ -134,8 +129,7 @@ FontRef SkiaFontMgr::defaultFont(float size) const
 FontRef SkiaFontMgr::makeFont(const TypefaceRef& typeface)
 {
   ASSERT(typeface.get());
-  return base::make_ref<SkiaFont>(
-    SkFont(static_cast<SkiaTypeface*>(typeface.get())->skTypeface()));
+  return base::make_ref<SkiaFont>(SkFont(static_cast<SkiaTypeface*>(typeface.get())->skTypeface()));
 }
 
 FontRef SkiaFontMgr::makeFont(const TypefaceRef& typeface, float size)

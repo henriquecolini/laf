@@ -5,15 +5,14 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "base/serialization.h"
 
 #include <iostream>
 
-namespace base {
-namespace serialization {
+namespace base { namespace serialization {
 
 std::ostream& write8(std::ostream& os, uint8_t byte)
 {
@@ -108,14 +107,9 @@ uint64_t little_endian::read64(std::istream& is)
   b6 = is.get();
   b7 = is.get();
   b8 = is.get();
-  return (((long long)b8 << 56) |
-          ((long long)b7 << 48) |
-          ((long long)b6 << 40) |
-          ((long long)b5 << 32) |
-          ((long long)b4 << 24) |
-          ((long long)b3 << 16) |
-          ((long long)b2 << 8) |
-          (long long)b1);
+  return (((long long)b8 << 56) | ((long long)b7 << 48) | ((long long)b6 << 40) |
+          ((long long)b5 << 32) | ((long long)b4 << 24) | ((long long)b3 << 16) |
+          ((long long)b2 << 8) | (long long)b1);
 }
 
 float little_endian::read_float(std::istream& is)
@@ -140,14 +134,9 @@ double little_endian::read_double(std::istream& is)
   b6 = is.get();
   b7 = is.get();
   b8 = is.get();
-  int v = (((long long)b8 << 56) |
-           ((long long)b7 << 48) |
-           ((long long)b6 << 40) |
-           ((long long)b5 << 32) |
-           ((long long)b4 << 24) |
-           ((long long)b3 << 16) |
-           ((long long)b2 << 8) |
-           (long long)b1);
+  int v = (((long long)b8 << 56) | ((long long)b7 << 48) | ((long long)b6 << 40) |
+           ((long long)b5 << 32) | ((long long)b4 << 24) | ((long long)b3 << 16) |
+           ((long long)b2 << 8) | (long long)b1);
   return *reinterpret_cast<double*>(&v);
 }
 
@@ -233,14 +222,9 @@ uint64_t big_endian::read64(std::istream& is)
   b3 = is.get();
   b2 = is.get();
   b1 = is.get();
-  return (((long long)b8 << 56) |
-          ((long long)b7 << 48) |
-          ((long long)b6 << 40) |
-          ((long long)b5 << 32) |
-          ((long long)b4 << 24) |
-          ((long long)b3 << 16) |
-          ((long long)b2 << 8) |
-          (long long)b1);
+  return (((long long)b8 << 56) | ((long long)b7 << 48) | ((long long)b6 << 40) |
+          ((long long)b5 << 32) | ((long long)b4 << 24) | ((long long)b3 << 16) |
+          ((long long)b2 << 8) | (long long)b1);
 }
 
 float big_endian::read_float(std::istream& is)
@@ -265,17 +249,10 @@ double big_endian::read_double(std::istream& is)
   b3 = is.get();
   b2 = is.get();
   b1 = is.get();
-  int v = (((long long)b8 << 56) |
-           ((long long)b7 << 48) |
-           ((long long)b6 << 40) |
-           ((long long)b5 << 32) |
-           ((long long)b4 << 24) |
-           ((long long)b3 << 16) |
-           ((long long)b2 << 8) |
-           (long long)b1);
+  int v = (((long long)b8 << 56) | ((long long)b7 << 48) | ((long long)b6 << 40) |
+           ((long long)b5 << 32) | ((long long)b4 << 24) | ((long long)b3 << 16) |
+           ((long long)b2 << 8) | (long long)b1);
   return *reinterpret_cast<double*>(&v);
 }
 
-
-} // namespace serialization
-} // namespace base
+}} // namespace base::serialization

@@ -5,7 +5,7 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "gfx/color_space.h"
@@ -22,10 +22,10 @@ ColorSpace::ColorSpace(const Type type,
                        const Flag flags,
                        const float gamma,
                        std::vector<uint8_t>&& data)
-  : m_type(type),
-    m_flags(flags),
-    m_gamma(gamma),
-    m_data(std::move(data))
+  : m_type(type)
+  , m_flags(flags)
+  , m_gamma(gamma)
+  , m_data(std::move(data))
 {
 }
 
@@ -54,8 +54,7 @@ ColorSpaceRef ColorSpace::MakeSRGBWithGamma(float gamma)
 }
 
 // static
-ColorSpaceRef ColorSpace::MakeRGB(const ColorSpaceTransferFn& fn,
-                                  const ColorSpacePrimaries& p)
+ColorSpaceRef ColorSpace::MakeRGB(const ColorSpaceTransferFn& fn, const ColorSpacePrimaries& p)
 {
   std::vector<uint8_t> data(sizeof(ColorSpaceTransferFn) + sizeof(ColorSpacePrimaries));
   std::copy(((const uint8_t*)&fn),
@@ -64,8 +63,7 @@ ColorSpaceRef ColorSpace::MakeRGB(const ColorSpaceTransferFn& fn,
   std::copy(((const uint8_t*)&p),
             ((const uint8_t*)&p) + sizeof(ColorSpacePrimaries),
             data.begin() + sizeof(ColorSpaceTransferFn));
-  return base::make_ref<ColorSpace>(
-    RGB, Flag(HasTransferFn | HasPrimaries), 1.0, std::move(data));
+  return base::make_ref<ColorSpace>(RGB, Flag(HasTransferFn | HasPrimaries), 1.0, std::move(data));
 }
 
 // static
@@ -82,9 +80,7 @@ ColorSpaceRef ColorSpace::MakeRGBWithSRGBGamut(const ColorSpaceTransferFn& fn)
 ColorSpaceRef ColorSpace::MakeRGBWithSRGBGamma(const ColorSpacePrimaries& p)
 {
   std::vector<uint8_t> data(sizeof(ColorSpacePrimaries));
-  std::copy(((const uint8_t*)&p),
-            ((const uint8_t*)&p) + sizeof(ColorSpacePrimaries),
-            data.begin());
+  std::copy(((const uint8_t*)&p), ((const uint8_t*)&p) + sizeof(ColorSpacePrimaries), data.begin());
   return base::make_ref<ColorSpace>(sRGB, HasPrimaries, 1.0, std::move(data));
 }
 
@@ -92,8 +88,7 @@ ColorSpaceRef ColorSpace::MakeRGBWithSRGBGamma(const ColorSpacePrimaries& p)
 ColorSpaceRef ColorSpace::MakeICC(const void* data, size_t n)
 {
   std::vector<uint8_t> newData(n);
-  std::copy(((const uint8_t*)data),
-            ((const uint8_t*)data)+n, newData.begin());
+  std::copy(((const uint8_t*)data), ((const uint8_t*)data) + n, newData.begin());
   return base::make_ref<ColorSpace>(ICC, HasICC, 1.0, std::move(newData));
 }
 
@@ -104,7 +99,8 @@ ColorSpaceRef ColorSpace::MakeICC(std::vector<uint8_t>&& data)
 }
 
 // Based on code in skia/src/core/SkICC.cpp by Google Inc.
-static bool nearly_equal(float x, float y) {
+static bool nearly_equal(float x, float y)
+{
   // A note on why I chose this tolerance:  transfer_fn_almost_equal() uses a
   // tolerance of 0.001, which doesn't seem to be enough to distinguish
   // between similar transfer functions, for example: gamma2.2 and sRGB.
@@ -116,27 +112,18 @@ static bool nearly_equal(float x, float y) {
   return fabsf(x - y) <= kTolerance;
 }
 
-static bool nearly_equal(const ColorSpaceTransferFn& u,
-                         const ColorSpaceTransferFn& v) {
-  return nearly_equal(u.g, v.g)
-    && nearly_equal(u.a, v.a)
-    && nearly_equal(u.b, v.b)
-    && nearly_equal(u.c, v.c)
-    && nearly_equal(u.d, v.d)
-    && nearly_equal(u.e, v.e)
-    && nearly_equal(u.f, v.f);
+static bool nearly_equal(const ColorSpaceTransferFn& u, const ColorSpaceTransferFn& v)
+{
+  return nearly_equal(u.g, v.g) && nearly_equal(u.a, v.a) && nearly_equal(u.b, v.b) &&
+         nearly_equal(u.c, v.c) && nearly_equal(u.d, v.d) && nearly_equal(u.e, v.e) &&
+         nearly_equal(u.f, v.f);
 }
 
-static bool nearly_equal(const ColorSpacePrimaries& u,
-                         const ColorSpacePrimaries& v) {
-  return nearly_equal(u.wx, v.wx)
-    && nearly_equal(u.wy, v.wy)
-    && nearly_equal(u.rx, v.ry)
-    && nearly_equal(u.ry, v.ry)
-    && nearly_equal(u.gx, v.gy)
-    && nearly_equal(u.gy, v.gy)
-    && nearly_equal(u.bx, v.by)
-    && nearly_equal(u.by, v.by);
+static bool nearly_equal(const ColorSpacePrimaries& u, const ColorSpacePrimaries& v)
+{
+  return nearly_equal(u.wx, v.wx) && nearly_equal(u.wy, v.wy) && nearly_equal(u.rx, v.ry) &&
+         nearly_equal(u.ry, v.ry) && nearly_equal(u.gx, v.gy) && nearly_equal(u.gy, v.gy) &&
+         nearly_equal(u.bx, v.by) && nearly_equal(u.by, v.by);
 }
 
 bool ColorSpace::nearlyEqual(const ColorSpace& that) const
@@ -145,8 +132,7 @@ bool ColorSpace::nearlyEqual(const ColorSpace& that) const
     return false;
   if (m_type == None)
     return true;
-  if (m_type == sRGB ||
-      m_type == RGB) {
+  if (m_type == sRGB || m_type == RGB) {
     // Gamma
     if (has(HasGamma) && that.has(HasGamma)) {
       if (!nearly_equal(gamma(), that.gamma()))

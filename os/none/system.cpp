@@ -5,16 +5,17 @@
 // Read LICENSE.txt for more information.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include "os/common/system.h"
 
 namespace os {
 
-class NoneSystem : public CommonSystem { };
+class NoneSystem : public CommonSystem {};
 
-SystemRef System::makeNone() {
+SystemRef System::makeNone()
+{
   return make_ref<NoneSystem>();
 }
 
