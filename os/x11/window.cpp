@@ -1317,7 +1317,6 @@ void WindowX11::processX11Event(XEvent& event)
           XFree(prop);
         }
 
-        const ::Window root = XDefaultRootWindow(m_display);
         XEvent event2;
         memset(&event2, 0, sizeof(event2));
         event2.xany.type = ClientMessage;
@@ -1329,7 +1328,7 @@ void WindowX11::processX11Event(XEvent& event)
         event2.xclient.data.l[1] = (successful ? 1 : 0);
         event2.xclient.data.l[2] = 0;
         event2.xclient.data.l[3] = 0;
-        XSendEvent(m_display, root, 0, 0, &event2);
+        XSendEvent(m_display, g_dndSource, 0, 0, &event2);
       }
       break;
 
