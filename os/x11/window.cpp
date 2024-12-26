@@ -1352,6 +1352,9 @@ void WindowX11::processX11Event(XEvent& event)
         XSendEvent(m_display, sourceWindow, 0, 0, &event2);
       }
       else if (event.xclient.message_type == XdndDrop) {
+        // The time stamp must be passed to XConvertSelection
+        // to insure that the correct data is received.
+        const Time time = event.xclient.data.l[2];
         const ::Window sourceWindow = (::Window)event.xclient.data.l[0];
 
         ASSERT(g_dndData);
@@ -1368,7 +1371,7 @@ void WindowX11::processX11Event(XEvent& event)
                             URI_LIST,
                             XdndSelection,
                             m_window,
-                            CurrentTime);
+                            time);
         }
       }
       break;
@@ -1436,7 +1439,6 @@ void WindowX11::processX11Event(XEvent& event)
           XFree(prop);
         }
 
-        const ::Window root = XDefaultRootWindow(m_display);
         XEvent event2;
         memset(&event2, 0, sizeof(event2));
         event2.xany.type = ClientMessage;
@@ -1448,7 +1450,7 @@ void WindowX11::processX11Event(XEvent& event)
         event2.xclient.data.l[1] = (successful ? 1 : 0);
         event2.xclient.data.l[2] = 0;
         event2.xclient.data.l[3] = 0;
-        XSendEvent(m_display, root, 0, 0, &event2);
+        XSendEvent(m_display, g_dndData->sourceWindow, 0, 0, &event2);
 
         // Delete temporary data.
         g_dndData.reset();
