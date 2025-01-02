@@ -121,10 +121,9 @@
 
     [self makeKeyAndOrderFront:self];
 
-    if (spec->floating()) {
+    m_floating = spec->floating();
+    if (spec->floating())
       self.level = NSFloatingWindowLevel;
-      self.hidesOnDeactivate = true;
-    }
 
     if (spec->modal())
       self.level = NSModalPanelWindowLevel;
@@ -253,6 +252,11 @@
     return YES;
   else
     return NO;
+}
+
+- (BOOL)isFloating
+{
+  return m_floating;
 }
 
 - (void)noResponderFor:(SEL)eventSelector

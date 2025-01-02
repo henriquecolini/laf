@@ -41,6 +41,7 @@ class WindowOSX;
   WindowOSXDelegate* __strong m_delegate;
   ViewOSX* __strong m_view;
   int m_scale;
+  bool m_floating;
 }
 - (WindowOSXObjc*)initWithImpl:(os::WindowOSX*)impl spec:(const os::WindowSpec*)spec;
 - (os::WindowOSX*)impl;
@@ -51,6 +52,7 @@ class WindowOSX;
 - (void)setMousePosition:(const gfx::Point&)position;
 - (BOOL)setNativeCursor:(os::NativeCursor)cursor;
 - (BOOL)canBecomeKeyWindow;
+- (BOOL)isFloating;
 @end
 
 using WindowOSXObjc_id = WindowOSXObjc*;
