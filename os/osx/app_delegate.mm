@@ -12,6 +12,7 @@
 #include <Cocoa/Cocoa.h>
 
 #include "os/osx/app_delegate.h"
+#include "os/osx/window.h"
 
 #include "base/fs.h"
 #include "os/event.h"
@@ -93,6 +94,13 @@
 
 - (void)applicationWillResignActive:(NSNotification*)notification
 {
+  for (id window : [NSApp windows]) {
+    if ([window isKindOfClass:[WindowOSXObjc class]] && [window isFloating]) {
+      [window setLevel:NSNormalWindowLevel];
+      [window orderWindow:NSWindowAbove relativeTo:0];
+    }
+  }
+
   NSEvent* event = [NSApp currentEvent];
   if (event != nil)
     [ViewOSX updateKeyFlags:event];
@@ -100,6 +108,12 @@
 
 - (void)applicationDidBecomeActive:(NSNotification*)notification
 {
+  for (id window : [NSApp windows]) {
+    if ([window isKindOfClass:[WindowOSXObjc class]] && [window isFloating]) {
+      [window setLevel:NSFloatingWindowLevel];
+    }
+  }
+
   NSEvent* event = [NSApp currentEvent];
   if (event != nil)
     [ViewOSX updateKeyFlags:event];
