@@ -10,6 +10,7 @@
 #include "base/file_content.h"
 #include "base/fs.h"
 
+#include <algorithm>
 #include <cstdio>
 
 #if !LAF_MACOS
