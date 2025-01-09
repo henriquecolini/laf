@@ -1,5 +1,5 @@
 // LAF Base Library
-// Copyright (c) 2020-2024 Igara Studio S.A.
+// Copyright (c) 2020-2025 Igara Studio S.A.
 // Copyright (c) 2001-2018 David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -166,7 +166,7 @@ std::string get_absolute_path(const std::string& path)
   else
     full = path;
 
-  TCHAR buffer[MAX_PATH + 1];
+  TCHAR buffer[MAX_PATH + 1] = {};
   GetFullPathName(from_utf8(full).c_str(), sizeof(buffer) / sizeof(TCHAR), buffer, nullptr);
   return to_utf8(buffer);
 }
