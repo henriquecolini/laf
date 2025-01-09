@@ -1,5 +1,5 @@
 // LAF Base Library
-// Copyright (c) 2024 Igara Studio S.A.
+// Copyright (c) 2024-2025 Igara Studio S.A.
 // Copyright (c) 2001-2018 David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -235,6 +235,8 @@ TEST(FS, GetRelativePath)
 TEST(FS, GetAbsolutePath)
 {
   const auto cp = get_current_path();
+
+  EXPECT_EQ("", get_absolute_path("")); // Check that empty full path is empty on all platforms
 
   EXPECT_EQ(join_path(cp, "a"), get_absolute_path("a"));
   EXPECT_EQ(join_path(cp, "a"), get_absolute_path("./a"));
