@@ -12,6 +12,7 @@
 
 #include "base/string.h"
 
+#include <cstdint>
 #include <cstdio>
 #include <string_view>
 #include <vector>
