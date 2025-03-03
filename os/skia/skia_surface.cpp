@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (c) 2018-2024  Igara Studio S.A.
+// Copyright (c) 2018-2025  Igara Studio S.A.
 // Copyright (c) 2016-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -116,6 +116,12 @@ void SkiaSurface::createRgba(int width, int height, const os::ColorSpaceRef& cs)
     throw base::Exception("Cannot create Skia surface");
 
   bmp.eraseColor(SK_ColorTRANSPARENT);
+  swapBitmap(bmp);
+}
+
+void SkiaSurface::createWithBitmap(SkBitmap&& bmp, const os::ColorSpaceRef& cs)
+{
+  m_colorSpace = cs;
   swapBitmap(bmp);
 }
 
@@ -257,8 +263,11 @@ void SkiaSurface::unlock()
   }
 }
 
-void SkiaSurface::applyScale(int scaleFactor)
+SurfaceRef SkiaSurface::applyScale(float scaleFactor, const Sampling& sampling)
 {
+  if (scaleFactor == 1.0f)
+    return AddRef(this);
+
   ASSERT(!m_surface);
 
   SkBitmap result;
@@ -271,14 +280,20 @@ void SkiaSurface::applyScale(int scaleFactor)
   SkCanvas canvas(result);
   SkRect srcRect = SkRect::Make(SkIRect::MakeXYWH(0, 0, width(), height()));
   SkRect dstRect = SkRect::Make(SkIRect::MakeXYWH(0, 0, result.width(), result.height()));
+
+  SkSamplingOptions skSampling;
+  to_skia(sampling, skSampling);
+
   canvas.drawImageRect(SkImages::RasterFromPixmap(m_bitmap.pixmap(), nullptr, nullptr),
                        srcRect,
                        dstRect,
-                       SkSamplingOptions(),
+                       skSampling,
                        &paint,
                        SkCanvas::kStrict_SrcRectConstraint);
 
-  swapBitmap(result);
+  auto resultSurface = base::make_ref<SkiaSurface>();
+  resultSurface->createWithBitmap(std::move(result), m_colorSpace);
+  return resultSurface;
 }
 
 void* SkiaSurface::nativeHandle()

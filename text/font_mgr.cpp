@@ -32,7 +32,7 @@ FontRef FontMgr::loadSpriteSheetFont(const char* filename, int scale)
   os::SurfaceRef sheet = os::System::instance()->loadRgbaSurface(filename);
   FontRef font = nullptr;
   if (sheet) {
-    sheet->applyScale(scale);
+    sheet = sheet->applyScale(scale);
     sheet->setImmutable();
     font = SpriteSheetFont::FromSurface(sheet);
   }

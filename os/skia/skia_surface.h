@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (c) 2018-2024  Igara Studio S.A.
+// Copyright (c) 2018-2025  Igara Studio S.A.
 // Copyright (c) 2012-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -34,6 +34,7 @@ public:
 
   void create(int width, int height, const os::ColorSpaceRef& cs);
   void createRgba(int width, int height, const os::ColorSpaceRef& cs);
+  void createWithBitmap(SkBitmap&& bmp, const os::ColorSpaceRef& cs);
   void destroy();
 
   void flush() const;
@@ -60,7 +61,7 @@ public:
   gfx::Matrix matrix() const override;
   void lock() override;
   void unlock() override;
-  void applyScale(int scaleFactor) override;
+  SurfaceRef applyScale(float scaleFactor, const Sampling& sampling) override;
 
   void* nativeHandle() override;
 

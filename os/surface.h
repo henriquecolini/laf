@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2018-2024  Igara Studio S.A.
+// Copyright (C) 2018-2025  Igara Studio S.A.
 // Copyright (C) 2012-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -142,7 +142,11 @@ public:
                                bool drawCenter,
                                const os::Paint* paint) = 0;
 
-  virtual void applyScale(int scaleFactor) = 0;
+  // Returns the same surface if scaleFactor == 1.0 or a new scaled
+  // surface.
+  [[nodiscard]]
+  virtual SurfaceRef applyScale(float scaleFactor, const Sampling& sampling = {}) = 0;
+
   virtual void* nativeHandle() = 0;
 };
 
