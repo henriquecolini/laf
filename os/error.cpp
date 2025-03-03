@@ -10,12 +10,22 @@
 
 #include "os/error.h"
 
+#include "base/string.h"
 #include "os/system.h"
+
+#if LAF_WINDOWS
+  #include <windows.h>
+#endif
 
 namespace os {
 
 void error_message(const char* msg)
 {
+#if LAF_WINDOWS
+  if (msg)
+    MessageBoxW(nullptr, base::from_utf8(msg).c_str(), L"Error", MB_OK | MB_ICONERROR);
+#endif
+
   fputs(msg, stderr);
 }
 
