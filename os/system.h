@@ -135,9 +135,6 @@ public:
   virtual void setTabletOptions(const TabletOptions& opts) = 0;
   virtual TabletOptions tabletOptions() const = 0;
 
-  // Error logging.
-  virtual void errorMessage(const char* msg) = 0;
-
   // Sub-interfaces
   virtual Logger* logger() = 0;
   virtual Menus* menus() = 0;

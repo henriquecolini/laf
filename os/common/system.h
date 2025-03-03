@@ -35,8 +35,6 @@ public:
   void setTabletOptions(const TabletOptions&) override {}
   TabletOptions tabletOptions() const override { return TabletOptions(); }
 
-  void errorMessage(const char* msg) override;
-
   Logger* logger() override { return nullptr; }
 
   Menus* menus() override { return nullptr; }

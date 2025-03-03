@@ -76,11 +76,6 @@ CommonSystem::~CommonSystem()
     destroyInstance();
 }
 
-void CommonSystem::errorMessage(const char* msg)
-{
-  fputs(msg, stderr);
-}
-
 KeyModifiers CommonSystem::keyModifiers()
 {
   return (

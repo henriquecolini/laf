@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (c) 2024  Igara Studio S.A.
+// Copyright (c) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -16,12 +16,7 @@ namespace os {
 
 void error_message(const char* msg)
 {
-  if (SystemRef system = System::instance()) {
-    system->errorMessage(msg);
-  }
-  else {
-    fputs(msg, stderr);
-  }
+  fputs(msg, stderr);
 }
 
 } // namespace os
