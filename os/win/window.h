@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2018-2024  Igara Studio S.A.
+// Copyright (C) 2018-2025  Igara Studio S.A.
 // Copyright (C) 2012-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -124,7 +124,11 @@ private:
   static void CALLBACK staticInteractionContextCallback(void* clientData,
                                                         const INTERACTION_CONTEXT_OUTPUT* output);
 
-  static Ref<SystemWin> system();
+  // Returns a raw pointer to the current System instance, or nullptr
+  // if it doesn't exist. It doesn't return a Ref because this pointer
+  // can be requested from a ~WindowWin(), which is when the ~System
+  // is already being called/destroyed.
+  static SystemWin* system();
 
   mutable HWND m_hwnd = nullptr;
   HCURSOR m_hcursor = nullptr;

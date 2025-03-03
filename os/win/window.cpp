@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2018-2024  Igara Studio S.A.
+// Copyright (C) 2018-2025  Igara Studio S.A.
 // Copyright (C) 2012-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -65,9 +65,6 @@
 #endif
 
 namespace os {
-
-// Extern raw reference to current system instance.
-extern System* g_instance;
 
 // Converts an os::Hit to a Win32 hit test value
 static int hit2hittest[] = {
@@ -318,7 +315,7 @@ WindowWin::~WindowWin()
   // come from ~System because the last Ref::unref() was called and
   // this window is being destroyed because its last reference was in
   // a os::Event of the os::EventQueue.
-  SystemWin* sys = (SystemWin*)g_instance;
+  SystemWin* sys = WindowWin::system();
 
   // If this assert fails it's highly probable that an os::WindowRef
   // was kept alive in some kind of memory leak (or just inside an
@@ -2610,9 +2607,9 @@ void CALLBACK WindowWin::staticInteractionContextCallback(void* clientData,
 }
 
 // static
-Ref<SystemWin> WindowWin::system()
+SystemWin* WindowWin::system()
 {
-  return SystemWin::instance();
+  return static_cast<SystemWin*>(System::rawInstance());
 }
 
 } // namespace os

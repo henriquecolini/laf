@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2019-2024  Igara Studio S.A.
+// Copyright (C) 2019-2025  Igara Studio S.A.
 // Copyright (C) 2012-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -21,12 +21,17 @@ namespace os {
 
 // Weak reference to the unique system instance. This is destroyed by
 // the user (with the main SystemRef to the system).
-System* g_instance = nullptr;
+static System* g_instance = nullptr;
 
 // Flag to know if the intance is already being destroyed, so we
 // cannot add a ref to it, i.e. calling System::instance() is illegal
 // if this flag is true.
 static bool g_is_being_destroyed = false;
+
+System* System::rawInstance()
+{
+  return g_instance;
+}
 
 SystemRef System::instance()
 {
