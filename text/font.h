@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (c) 2019-2024  Igara Studio S.A.
+// Copyright (c) 2019-2025  Igara Studio S.A.
 // Copyright (c) 2012-2017  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -12,6 +12,7 @@
 #include "base/ints.h"
 #include "base/ref.h"
 #include "gfx/fwd.h"
+#include "text/font_type.h"
 #include "text/fwd.h"
 
 #include <string>
@@ -21,13 +22,6 @@ class Paint;
 }
 
 namespace text {
-
-enum class FontType {
-  Unknown,
-  SpriteSheet, // SpriteSheet
-  FreeType,    // FreeType
-  Native,      // Skia
-};
 
 class Font : public base::RefCount {
 public:

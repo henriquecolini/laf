@@ -22,6 +22,8 @@ class DrawTextDelegate;
 class Font;
 using FontRef = base::Ref<Font>;
 
+enum class FontType : uint8_t;
+
 struct FontMetrics;
 
 class FontMgr;
