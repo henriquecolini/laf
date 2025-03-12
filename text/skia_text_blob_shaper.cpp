@@ -88,13 +88,12 @@ public:
 
     subInfo.clusters = m_buffer.clusters;
 
-    // subInfo.point = os::from_skia(m_buffer.point);
-    // subInfo.point = gfx::PointF(0, 0);
     subInfo.point += os::from_skia(m_builder.endPoint());
 
     if (m_subHandler)
       m_subHandler->commitRunBuffer(subInfo);
 
+    m_bounds |= gfx::RectF(subInfo.point.x, subInfo.point.y, 1, 1);
     for (int i = 0; i < subInfo.glyphCount; ++i)
       m_bounds |= subInfo.getGlyphBounds(i);
   }

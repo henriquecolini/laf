@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (c) 2024  Igara Studio S.A.
+// Copyright (c) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -25,9 +25,13 @@ namespace text {
 gfx::RectF TextBlob::bounds()
 {
   if (m_bounds.isEmpty()) {
+    m_bounds = gfx::RectF(0, 0, 1, 1);
     visitRuns([this](RunInfo& info) {
-      for (int i = 0; i < info.glyphCount; ++i)
+      for (int i = 0; i < info.glyphCount; ++i) {
         m_bounds |= info.getGlyphBounds(i);
+        if (info.font)
+          m_bounds |= gfx::RectF(0, 0, 1, info.font->metrics(nullptr));
+      }
     });
   }
   return m_bounds;

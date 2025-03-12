@@ -88,7 +88,7 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
     run.clear();
   };
 
-  gfx::Rect textBounds;
+  gfx::RectF textBounds;
   gfx::PointF pos(0.0f, 0.0f);
   base::utf8_decode decode(text);
   while (true) {
@@ -153,7 +153,7 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
       if (run.subBlob) {
         run.positions.push_back(pos);
 
-        textBounds |= gfx::RectF(run.subBlob->bounds());
+        textBounds |= run.subBlob->bounds();
         pos.x += run.subBlob->bounds().w;
 
         addRun();
