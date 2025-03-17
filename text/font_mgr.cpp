@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (C) 2024  Igara Studio S.A.
+// Copyright (C) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -27,14 +27,13 @@ FontMgr::~FontMgr()
 {
 }
 
-FontRef FontMgr::loadSpriteSheetFont(const char* filename, int scale)
+FontRef FontMgr::loadSpriteSheetFont(const char* filename, float size)
 {
   os::SurfaceRef sheet = os::System::instance()->loadRgbaSurface(filename);
-  FontRef font = nullptr;
+  base::Ref<SpriteSheetFont> font = nullptr;
   if (sheet) {
-    sheet = sheet->applyScale(scale);
+    font = SpriteSheetFont::FromSurface(sheet, size);
     sheet->setImmutable();
-    font = SpriteSheetFont::FromSurface(sheet);
   }
   return font;
 }

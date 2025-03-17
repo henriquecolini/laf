@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (C) 2024  Igara Studio S.A.
+// Copyright (C) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -23,7 +23,7 @@ public:
   [[nodiscard]]
   static FontMgrRef Make();
 
-  FontRef loadSpriteSheetFont(const char* filename, int scale);
+  FontRef loadSpriteSheetFont(const char* filename, float size);
   virtual FontRef loadTrueTypeFont(const char* filename, float size);
   virtual FontRef makeFont(const TypefaceRef& typeface) = 0;
   virtual FontRef makeFont(const TypefaceRef& typeface, float size) = 0;

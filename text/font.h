@@ -30,13 +30,17 @@ public:
   virtual FontType type() = 0;
   virtual TypefaceRef typeface() const = 0;
   virtual float metrics(FontMetrics* metrics) const = 0;
+
+  // Only valid for SpriteSheetFonts, it's 0.0f in other cases.
+  virtual float defaultSize() const { return 0.0f; }
+
   virtual int height() const = 0;
   virtual int textLength(const std::string& str) const = 0;
   virtual float measureText(const std::string& str,
                             gfx::RectF* bounds,
                             const os::Paint* paint = nullptr) const = 0;
   virtual bool isScalable() const = 0;
-  virtual void setSize(int size) = 0;
+  virtual void setSize(float size) = 0;
   virtual bool antialias() const = 0;
   virtual void setAntialias(bool antialias) = 0;
 

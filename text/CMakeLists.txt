@@ -1,5 +1,5 @@
 # LAF Text
-# Copyright (C) 2024  Igara Studio S.A.
+# Copyright (C) 2024-2025  Igara Studio S.A.
 
 ######################################################################
 
@@ -7,6 +7,7 @@ add_library(laf-text
   draw_text.cpp
   draw_text_shaper.cpp
   font_mgr.cpp
+  sprite_sheet_font.cpp
   sprite_text_blob.cpp
   sprite_text_blob_shaper.cpp
   text_blob.cpp

@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (C) 2019-2024  Igara Studio S.A.
+// Copyright (C) 2019-2025  Igara Studio S.A.
 // Copyright (C) 2012-2017  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -27,7 +27,7 @@ class SpriteSheetFont : public Font {
   static constexpr auto kRedColor = gfx::rgba(255, 0, 0);
 
 public:
-  SpriteSheetFont() : m_sheet(nullptr) {}
+  SpriteSheetFont() {}
   ~SpriteSheetFont() {}
 
   FontType type() override { return FontType::SpriteSheet; }
@@ -50,7 +50,9 @@ public:
     return height();
   }
 
-  int height() const override { return getCharBounds(' ').h; }
+  float defaultSize() const override { return m_defaultSize; }
+
+  int height() const override { return m_size; }
 
   int textLength(const std::string& str) const override
   {
@@ -71,18 +73,16 @@ public:
     return w;
   }
 
-  bool isScalable() const override { return false; }
+  bool isScalable() const override { return true; }
 
-  void setSize(int size) override
-  {
-    // Do nothing
-  }
+  void setSize(float size) override;
 
-  bool antialias() const override { return false; }
+  bool antialias() const override { return m_antialias; }
 
   void setAntialias(bool antialias) override
   {
-    // Do nothing
+    m_antialias = antialias;
+    setSize(m_size);
   }
 
   glyph_t codePointToGlyph(const codepoint_t codepoint) const override
@@ -113,6 +113,12 @@ public:
     return getCharBounds(128);
   }
 
+  gfx::RectF getGlyphBoundsOutput(glyph_t glyph) const
+  {
+    gfx::RectF bounds = getGlyphBoundsOnSheet(glyph);
+    return bounds * m_size;
+  }
+
   os::Surface* sheetSurface() const { return m_sheet.get(); }
 
   gfx::Rect getCharBounds(codepoint_t cp) const
@@ -127,72 +133,30 @@ public:
       return gfx::Rect();
   }
 
-  static FontRef FromSurface(const os::SurfaceRef& sur)
+  static FontRef FromSurface(os::SurfaceRef& sur, float size)
   {
     auto font = base::make_ref<SpriteSheetFont>();
-    font->m_sheet = sur;
-    font->m_glyphs.push_back(gfx::Rect()); // glyph index 0 is MISSING CHARACTER glyph
-    font->m_glyphs.push_back(gfx::Rect()); // glyph index 1 is NULL glyph
-
-    os::SurfaceLock lock(sur.get());
-    gfx::Rect bounds(0, 0, 1, 1);
-    gfx::Rect glyphBounds;
-
-    while (font->findGlyph(sur.get(), sur->width(), sur->height(), bounds, glyphBounds)) {
-      font->m_glyphs.push_back(glyphBounds);
-      bounds.x += bounds.w;
-    }
-
+    font->fromSurface(sur, size);
     return font;
   }
 
 private:
+  void fromSurface(os::SurfaceRef& sur, float size);
+
   bool findGlyph(const os::Surface* sur,
                  int width,
                  int height,
                  gfx::Rect& bounds,
-                 gfx::Rect& glyphBounds)
-  {
-    gfx::Color keyColor = sur->getPixel(0, 0);
-
-    while (sur->getPixel(bounds.x, bounds.y) == keyColor) {
-      bounds.x++;
-      if (bounds.x >= width) {
-        bounds.x = 0;
-        bounds.y += bounds.h;
-        bounds.h = 1;
-        if (bounds.y >= height)
-          return false;
-      }
-    }
-
-    gfx::Color firstCharPixel = sur->getPixel(bounds.x, bounds.y);
-
-    bounds.w = 0;
-    while ((bounds.x + bounds.w < width) &&
-           (sur->getPixel(bounds.x + bounds.w, bounds.y) != keyColor)) {
-      bounds.w++;
-    }
-
-    bounds.h = 0;
-    while ((bounds.y + bounds.h < height) &&
-           (sur->getPixel(bounds.x, bounds.y + bounds.h) != keyColor)) {
-      bounds.h++;
-    }
-
-    // Using red color in the first pixel of the char indicates that
-    // this glyph shouldn't be used as a valid one.
-    if (firstCharPixel != kRedColor)
-      glyphBounds = bounds;
-    else
-      glyphBounds = gfx::Rect();
-
-    return !bounds.isEmpty();
-  }
+                 gfx::Rect& glyphBounds);
 
 private:
+  os::SurfaceRef m_originalSheet;
   os::SurfaceRef m_sheet;
+  std::vector<gfx::Rect> m_originalGlyphs;
   std::vector<gfx::Rect> m_glyphs;
+  float m_defaultSize = 0.0f;
+  float m_size = 0.0f;
+  bool m_antialias = false;
 };
 
 } // namespace text

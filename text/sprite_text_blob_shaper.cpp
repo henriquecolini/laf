@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (c) 2024  Igara Studio S.A.
+// Copyright (c) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -71,7 +71,7 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
 
   Runs runs;
   Run run;
-  auto addRun = [&runs, &run, &font, &text, handler]() {
+  auto addRun = [&runs, &run, &font, handler]() {
     if (handler && !run.subBlob) {
       TextBlob::RunInfo info;
 

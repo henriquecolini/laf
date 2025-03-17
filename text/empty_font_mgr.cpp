@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (c) 2024  Igara Studio S.A.
+// Copyright (c) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -34,7 +34,7 @@ public:
     return 0.0f;
   }
   bool isScalable() const override { return false; }
-  void setSize(int) override {}
+  void setSize(float) override {}
   bool antialias() const override { return false; }
   void setAntialias(bool) override {}
 

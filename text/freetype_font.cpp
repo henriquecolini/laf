@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (C) 2020-2024  Igara Studio S.A.
+// Copyright (C) 2020-2025  Igara Studio S.A.
 // Copyright (C) 2016-2017  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -90,7 +90,7 @@ bool FreeTypeFont::isScalable() const
   return true;
 }
 
-void FreeTypeFont::setSize(int size)
+void FreeTypeFont::setSize(float size)
 {
   m_face.setSize(size);
 }

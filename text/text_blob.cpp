@@ -75,11 +75,12 @@ gfx::RectF TextBlob::RunInfo::getGlyphBounds(const size_t i) const
     bounds.h = std::abs(metrics.capHeight);
   }
 
-  ASSERT(!bounds.isEmpty());
+  if (bounds.isEmpty())
+    return bounds;
+
   bounds.offset(positions[i]);
-  if (offsets) {
+  if (offsets)
     bounds.offset(offsets[i]);
-  }
 
   // Add global "point" offset to the bounds.
   bounds.offset(point);
