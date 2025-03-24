@@ -1,5 +1,5 @@
 // LAF Base Library
-// Copyright (c) 2021 Igara Studio S.A.
+// Copyright (c) 2021-2025 Igara Studio S.A.
 // Copyright (c) 2001-2016 David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -14,6 +14,7 @@
   #include "base/debug.h"
 
   #include "base/convert_to.h"
+  #include "base/replace_string.h"
   #include "base/string.h"
 
   #include <cstdarg>
@@ -31,7 +32,7 @@ int base_assert(const char* condition, const char* file, int lineNum)
   #if LAF_WINDOWS
 
   std::vector<wchar_t> buf(MAX_PATH);
-  GetModuleFileNameW(NULL, &buf[0], MAX_PATH);
+  GetModuleFileNameW(nullptr, &buf[0], MAX_PATH);
 
   int ret = _CrtDbgReportW(_CRT_ASSERT,
                            base::from_utf8(file).c_str(),
@@ -64,10 +65,23 @@ void base_trace(const char* msg, ...)
   va_end(ap);
 
   #if LAF_WINDOWS
-  _CrtDbgReport(_CRT_WARN, NULL, 0, NULL, buf);
+  _CrtDbgReport(_CRT_WARN, nullptr, 0, nullptr, buf);
   #endif
 
   std::cerr << buf << std::flush;
+}
+
+void base_trace_raw(const char* str)
+{
+  #if LAF_WINDOWS
+  {
+    std::string output(str);
+    base::replace_string(output, "%", "%%");
+    _CrtDbgReport(_CRT_WARN, nullptr, 0, nullptr, output.c_str());
+  }
+  #endif
+
+  std::cerr << str << std::flush;
 }
 
 #endif

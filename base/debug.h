@@ -1,5 +1,5 @@
 // LAF Base Library
-// Copyright (C) 2019-2021 Igara Studio S.A.
+// Copyright (c) 2019-2025 Igara Studio S.A.
 // Copyright (c) 2001-2016 David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -13,6 +13,7 @@
 
 int base_assert(const char* condition, const char* file, int lineNum) LAF_ANALYZER_NORETURN;
 void base_trace(const char* msg, ...);
+void base_trace_raw(const char* str);
 
 #ifdef __cplusplus
   #include <sstream>
@@ -44,7 +45,7 @@ void base_trace_args(Args&&... args)
 {
   std::string s = base_args_to_string(std::forward<Args>(args)...);
   s.push_back('\n');
-  base_trace(s.c_str());
+  base_trace_raw(s.c_str());
 }
 #endif
 
