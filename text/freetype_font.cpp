@@ -65,12 +65,17 @@ float FreeTypeFont::metrics(FontMetrics* metrics) const
   return float(m_face.height());
 }
 
-int FreeTypeFont::height() const
+float FreeTypeFont::size() const
 {
-  return int(m_face.height());
+  return m_face.height();
 }
 
-int FreeTypeFont::textLength(const std::string& str) const
+float FreeTypeFont::lineHeight() const
+{
+  return m_face.height();
+}
+
+float FreeTypeFont::textLength(const std::string& str) const
 {
   return ft::calc_text_bounds(m_face, str).w;
 }

@@ -27,8 +27,9 @@ public:
   FontType type() override { return FontType::Unknown; }
   TypefaceRef typeface() const override { return base::make_ref<EmptyTypeface>(); }
   float metrics(FontMetrics*) const { return 0.0f; }
-  int height() const override { return 0; }
-  int textLength(const std::string&) const override { return 0; };
+  float size() const override { return 0.0f; }
+  float lineHeight() const override { return 0.0f; }
+  float textLength(const std::string&) const override { return 0.0f; };
   float measureText(const std::string&, gfx::RectF*, const os::Paint*) const override
   {
     return 0.0f;

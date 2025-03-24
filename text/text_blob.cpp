@@ -29,12 +29,25 @@ gfx::RectF TextBlob::bounds()
     visitRuns([this](RunInfo& info) {
       for (int i = 0; i < info.glyphCount; ++i) {
         m_bounds |= info.getGlyphBounds(i);
-        if (info.font)
-          m_bounds |= gfx::RectF(0, 0, 1, info.font->metrics(nullptr));
       }
     });
   }
   return m_bounds;
+}
+
+float TextBlob::baseline()
+{
+  if (m_baseline == 0.0f) {
+    visitRuns([this](RunInfo& info) {
+      if (!info.font)
+        return;
+
+      FontMetrics metrics;
+      info.font->metrics(&metrics);
+      m_baseline = std::max(m_baseline, -metrics.ascent);
+    });
+  }
+  return m_baseline;
 }
 
 TextBlob::Utf8Range TextBlob::RunInfo::getGlyphUtf8Range(size_t i) const
@@ -72,7 +85,7 @@ gfx::RectF TextBlob::RunInfo::getGlyphBounds(const size_t i) const
     FontMetrics metrics;
     font->metrics(&metrics);
     bounds.w = font->getGlyphAdvance(font->codePointToGlyph(' '));
-    bounds.h = std::abs(metrics.capHeight);
+    bounds.h = 1;
   }
 
   if (bounds.isEmpty())

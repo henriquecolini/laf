@@ -37,24 +37,31 @@ public:
     return nullptr; // TODO impl
   }
 
+  void setDescent(float descent) { m_descent = descent; }
+
   float metrics(FontMetrics* metrics) const override
   {
     // TODO impl
 
     if (metrics) {
-      metrics->ascent = -height();
+      float descent = m_descent;
+      if (m_descent > 0.0f && m_defaultSize > 0.0f && m_defaultSize != m_size)
+        descent = m_descent * m_size / m_defaultSize;
+
+      metrics->descent = descent;
+      metrics->ascent = -m_size + descent;
       metrics->underlineThickness = 1.0f;
-      metrics->underlinePosition = 0.5f;
+      metrics->underlinePosition = m_descent;
     }
 
-    return height();
+    return lineHeight();
   }
 
   float defaultSize() const override { return m_defaultSize; }
+  float size() const override { return m_size; }
+  float lineHeight() const override { return m_size; }
 
-  int height() const override { return m_size; }
-
-  int textLength(const std::string& str) const override
+  float textLength(const std::string& str) const override
   {
     base::utf8_decode decode(str);
     int x = 0;
@@ -69,7 +76,7 @@ public:
   {
     float w = textLength(str);
     if (bounds)
-      *bounds = gfx::RectF(0, 0, w, height());
+      *bounds = gfx::RectF(0, 0, w, lineHeight());
     return w;
   }
 
@@ -156,6 +163,7 @@ private:
   std::vector<gfx::Rect> m_glyphs;
   float m_defaultSize = 0.0f;
   float m_size = 0.0f;
+  float m_descent = 0.0f;
   bool m_antialias = false;
 };
 

@@ -69,9 +69,10 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
 
   const auto* spriteFont = static_cast<const SpriteSheetFont*>(font.get());
 
+  float baseline = 0.0f;
   Runs runs;
   Run run;
-  auto addRun = [&runs, &run, &font, handler]() {
+  auto addRun = [&runs, &run, &font, &baseline, handler]() {
     if (handler && !run.subBlob) {
       TextBlob::RunInfo info;
 
@@ -81,6 +82,10 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
       info.glyphs = run.glyphs.data();
       info.positions = run.positions.data();
       info.clusters = run.clusters.data();
+
+      FontMetrics metrics;
+      font->metrics(&metrics);
+      baseline = std::max(baseline, -metrics.ascent);
 
       handler->commitRunBuffer(info);
     }
@@ -131,7 +136,7 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
 
       // TODO add configuration of the default fallback font
       auto fallbackFont = fontMgr->defaultFont();
-      fallbackFont->setSize(font->height());
+      fallbackFont->setSize(font->size());
       fallbackFont->setAntialias(font->antialias());
 
       // Align position between both fonts (font and fallbackFont)
@@ -143,7 +148,11 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
 
       gfx::PointF alignedPos;
       alignedPos.x = pos.x;
-      alignedPos.y = pos.y - metrics.ascent + fallbackMetrics.ascent;
+      const float baselineShift = -metrics.ascent + fallbackMetrics.ascent;
+      alignedPos.y = pos.y + baselineShift;
+
+      // Adjust baseline for this composed TextBlob
+      baseline = std::max(baseline, -fallbackMetrics.ascent + baselineShift);
 
       OffsetHandler subHandler(handler, i, alignedPos);
       run.subBlob = TextBlob::MakeWithShaper(fontMgr,
@@ -179,7 +188,9 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
   if (!run.empty())
     addRun();
 
-  return base::make_ref<SpriteTextBlob>(textBounds, font, std::move(runs));
+  auto blob = base::make_ref<SpriteTextBlob>(textBounds, font, std::move(runs));
+  blob->setBaseline(baseline);
+  return blob;
 }
 
 } // namespace text

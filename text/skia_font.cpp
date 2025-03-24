@@ -62,14 +62,19 @@ float SkiaFont::metrics(FontMetrics* metrics) const
   return lineSpacing;
 }
 
-int SkiaFont::height() const
+float SkiaFont::size() const
+{
+  return m_skFont.getSize();
+}
+
+float SkiaFont::lineHeight() const
 {
   return m_skFont.getMetrics(nullptr);
 }
 
-int SkiaFont::textLength(const std::string& str) const
+float SkiaFont::textLength(const std::string& str) const
 {
-  return std::ceil(m_skFont.measureText(str.c_str(), str.size(), SkTextEncoding::kUTF8, nullptr));
+  return m_skFont.measureText(str.c_str(), str.size(), SkTextEncoding::kUTF8, nullptr);
 }
 
 float SkiaFont::measureText(const std::string& str,

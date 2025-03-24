@@ -1,5 +1,5 @@
 // LAF Library
-// Copyright (c) 2019-2024  Igara Studio S.A.
+// Copyright (c) 2019-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -102,7 +102,7 @@ void draw_window(Window* window,
         focusedGlyph.offset(textPos);
     }
 
-    pos.y += font->height() + 4;
+    pos.y += font->lineHeight() + 4;
   }
 
   // Show Unicode code point of the hover char in the title bar.

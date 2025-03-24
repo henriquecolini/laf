@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (c) 2024  Igara Studio S.A.
+// Copyright (c) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -70,6 +70,10 @@ public:
   // Returns exact bounds that are required to draw this TextBlob.
   gfx::RectF bounds();
 
+  // Baseline location in the bounds (this baseline depends on every
+  // font on each run).
+  float baseline();
+
   // Visits each run in the TextBlob.
   using RunVisitor = std::function<void(RunInfo&)>;
   virtual void visitRuns(const RunVisitor& visitor) = 0;
@@ -95,8 +99,12 @@ public:
                                     RunHandler* handler = nullptr,
                                     const ShaperFeatures features = {});
 
+protected:
+  void setBaseline(const float baseline) { m_baseline = baseline; }
+
 private:
   gfx::RectF m_bounds;
+  float m_baseline = 0.0f;
 };
 
 } // namespace text

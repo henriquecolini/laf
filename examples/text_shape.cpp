@@ -1,5 +1,5 @@
 // LAF Library
-// Copyright (c) 2024  Igara Studio S.A.
+// Copyright (c) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -13,6 +13,8 @@
 #include "os/skia/skia_surface.h"
 
 #include "include/core/SkCanvas.h"
+#include "include/core/SkPathEffect.h"
+#include "include/effects/SkDashPathEffect.h"
 
 #if LAF_WITH_CLIP
   #include "clip/clip.h"
@@ -134,12 +136,16 @@ void draw_window(Window* window,
   if (edit.caretIndex < edit.boxes.size()) {
     int i = edit.boxes[edit.caretIndex].utf8Range.begin;
     int j = edit.boxes[edit.caretIndex].utf8Range.end;
-    draw_text_with_shaper(surface,
-                          fontMgr,
-                          fontBig,
-                          edit.text.substr(i, j - i),
-                          gfx::PointF(rc.center()),
-                          &p);
+    gfx::PointF pos = gfx::PointF(rc.center());
+    draw_text_with_shaper(surface, fontMgr, fontBig, edit.text.substr(i, j - i), pos, &p);
+
+    FontMetrics metrics;
+    fontBig->metrics(&metrics);
+
+    pos.y -= metrics.ascent;
+    const SkScalar intervals[] = { 4.0f, 4.0f };
+    p.skPaint().setPathEffect(SkDashPathEffect::Make(intervals, 2, 0.0f));
+    surface->drawLine(pos, gfx::PointF(rc.w, pos.y), p);
   }
 
   // Invalidates the whole window to show it on the screen.
