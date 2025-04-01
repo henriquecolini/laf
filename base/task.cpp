@@ -15,36 +15,60 @@
 
 namespace base {
 
-task::task() : m_running(false), m_completed(false)
+task::task() : m_state(state::READY)
 {
 }
 
 task::~task()
 {
   // The task must not be running when we are destroying it.
-  ASSERT(!m_running);
-
-  // m_completed can be false in this case if the task was never
-  // started (i.e. the user never called task::start()).
-  // ASSERT(m_completed);
+  ASSERT(m_state != state::RUNNING);
 }
 
 task_token& task::start(thread_pool& pool)
 {
-  // Cannot start the task if it's already running
-  ASSERT(!m_running);
+  // Cannot start the task if it's already running or enqueued
+  ASSERT(m_state != state::RUNNING && m_state != state::ENQUEUED);
 
-  // Reset flags for a running task
-  m_running = true;
-  m_completed = false;
+  m_state = state::ENQUEUED;
   m_token.reset();
 
-  pool.execute([this] { in_worker_thread(); });
+  m_token.m_work = pool.execute([this] { in_worker_thread(); });
   return m_token;
+}
+
+bool task::try_pop(thread_pool& pool)
+{
+  bool popped = pool.try_pop(m_token.m_work);
+  if (popped) {
+    m_token.m_canceled = true;
+    // The task is not waiting for execution any more, we can safely execute the
+    // finished callback. Note that at this point the task remains in
+    // ENQUEUED state, this can be used to let the caller know that the task was
+    // never run.
+    call_finished();
+  }
+
+  return popped;
+}
+
+// Executes the "finished" callback only if it was set.
+void task::call_finished()
+{
+  if (m_finished) {
+    try {
+      task_token token = m_token;
+      m_finished(token);
+    }
+    catch (const std::exception& ex) {
+      LOG(ERROR, "Exception executing 'finished' callback: %s\n", ex.what());
+    }
+  }
 }
 
 void task::in_worker_thread()
 {
+  m_state = state::RUNNING;
   try {
     if (!m_token.canceled())
       m_execute(m_token);
@@ -53,11 +77,11 @@ void task::in_worker_thread()
     LOG(FATAL, "Exception running task: %s\n", ex.what());
   }
 
-  m_running = false;
+  m_state = state::FINISHED;
 
-  // This must be the latest statement in the worker thread (see
-  // task::complete() comment)
-  m_completed = true;
+  // The task finished execution, now we can call the finished callback safely
+  // without worrying if the task is destroyed there.
+  call_finished();
 }
 
 } // namespace base
