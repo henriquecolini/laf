@@ -92,6 +92,10 @@ public:
     setSize(m_size);
   }
 
+  FontHinting hinting() const override { return FontHinting::None; }
+
+  void setHinting(FontHinting hinting) override { (void)hinting; }
+
   glyph_t codePointToGlyph(const codepoint_t codepoint) const override
   {
     glyph_t glyph = codepoint - int(' ') + 2;

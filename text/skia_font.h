@@ -33,6 +33,8 @@ public:
   void setSize(float size) override;
   bool antialias() const override;
   void setAntialias(bool antialias) override;
+  FontHinting hinting() const override;
+  void setHinting(FontHinting hinting) override;
 
   glyph_t codePointToGlyph(codepoint_t codepoint) const override;
   gfx::RectF getGlyphBounds(glyph_t glyph) const override;

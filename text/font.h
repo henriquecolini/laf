@@ -12,6 +12,7 @@
 #include "base/ints.h"
 #include "base/ref.h"
 #include "gfx/fwd.h"
+#include "text/font_hinting.h"
 #include "text/font_type.h"
 #include "text/fwd.h"
 
@@ -44,6 +45,8 @@ public:
   virtual void setSize(float size) = 0;
   virtual bool antialias() const = 0;
   virtual void setAntialias(bool antialias) = 0;
+  virtual FontHinting hinting() const = 0;
+  virtual void setHinting(FontHinting hinting) = 0;
 
   bool hasCodePoint(codepoint_t cp) const { return (codePointToGlyph(cp) != 0); }
 

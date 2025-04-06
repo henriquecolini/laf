@@ -37,6 +37,8 @@ public:
   void setSize(float size) override;
   bool antialias() const override;
   void setAntialias(bool antialias) override;
+  FontHinting hinting() const override;
+  void setHinting(FontHinting hinting) override;
 
   glyph_t codePointToGlyph(codepoint_t cp) const override;
   gfx::RectF getGlyphBounds(glyph_t glyph) const override;
@@ -48,6 +50,7 @@ public:
 
 private:
   mutable Face m_face;
+  text::FontHinting m_hinting;
 };
 
 } // namespace text

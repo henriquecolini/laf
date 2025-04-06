@@ -112,6 +112,30 @@ void SkiaFont::setAntialias(bool antialias)
   m_skFont.setEdging(antialias ? SkFont::Edging::kAntiAlias : SkFont::Edging::kAlias);
 }
 
+FontHinting SkiaFont::hinting() const
+{
+  switch (m_skFont.getHinting()) {
+    case SkFontHinting::kNone:   return text::FontHinting::None;
+    case SkFontHinting::kSlight: return text::FontHinting::Slight;
+    case SkFontHinting::kNormal: return text::FontHinting::Normal;
+    case SkFontHinting::kFull:   return text::FontHinting::Full;
+    default:                     return text::FontHinting::Normal;
+  }
+}
+
+void SkiaFont::setHinting(FontHinting hinting)
+{
+  SkFontHinting skHinting = SkFontHinting::kNormal;
+  switch (hinting) {
+    case text::FontHinting::None:   skHinting = SkFontHinting::kNone; break;
+    case text::FontHinting::Slight: skHinting = SkFontHinting::kSlight; break;
+    case text::FontHinting::Normal: skHinting = SkFontHinting::kNormal; break;
+    case text::FontHinting::Full:   skHinting = SkFontHinting::kFull; break;
+  }
+
+  m_skFont.setHinting(skHinting);
+}
+
 glyph_t SkiaFont::codePointToGlyph(codepoint_t codepoint) const
 {
   return m_skFont.unicharToGlyph(codepoint);

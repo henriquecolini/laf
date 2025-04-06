@@ -110,6 +110,17 @@ void FreeTypeFont::setAntialias(bool antialias)
   m_face.setAntialias(antialias);
 }
 
+FontHinting FreeTypeFont::hinting() const
+{
+  return m_hinting;
+}
+
+void FreeTypeFont::setHinting(FontHinting hinting)
+{
+  m_hinting = hinting;
+  // TODO Use m_hinting where it is needed
+}
+
 glyph_t FreeTypeFont::codePointToGlyph(codepoint_t cp) const
 {
   return m_face.codePointToGlyph(cp);
