@@ -26,17 +26,24 @@ jobs:
             libpixman-1-dev libfreetype6-dev libharfbuzz-dev zlib1g-dev \
             libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev libfontconfig1-dev
         fi
-        if [[ "${{ matrix.backend }}" == "skia" ]] ; then
-          if [[ "${{ matrix.build_type }}" == "RelWithDebInfo" ]] ; then
-            skia_build_type=Release
-          else
-            skia_build_type=Debug
-          fi
-          skia_arch=$(echo $RUNNER_ARCH | awk '{print tolower($0)}')
-          echo Downloading https://github.com/aseprite/skia/releases/download/m124-08a5439a6b/Skia-${{ runner.os }}-$skia_build_type-$skia_arch.zip ...
-          curl -LO https://github.com/aseprite/skia/releases/download/m124-08a5439a6b/Skia-${{ runner.os }}-$skia_build_type-$skia_arch.zip
-          unzip Skia-${{ runner.os }}-$skia_build_type-$skia_arch.zip -d skia
+    - name: Install Skia
+      if: ${{ matrix.backend == 'skia' }}
+      shell: bash
+      run: |
+        if [[ "${{ runner.os }}" == "Windows" ]] ; then
+          this_dir=$(cygpath "${{ github.workspace }}")
+        else
+          this_dir="${{ github.workspace }}"
         fi
+        if [[ "${{ matrix.build_type }}" == "RelWithDebInfo" ]] ; then
+          skia_build_type=release
+        else
+          skia_build_type=debug
+        fi
+        skia_url=$(source $this_dir/misc/skia-url.sh $skia_build_type | xargs)
+        skia_file=$(basename $skia_url)
+        curl --ssl-revoke-best-effort -L -o "$skia_file" "$skia_url"
+        unzip "$skia_file" -d skia
     - uses: ilammy/msvc-dev-cmd@v1
       if: runner.os == 'Windows'
     - uses: aseprite/get-ninja@main
