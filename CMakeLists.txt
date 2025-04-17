@@ -1,5 +1,5 @@
 # LAF
-# Copyright (C) 2019-2024  Igara Studio S.A.
+# Copyright (C) 2019-2025  Igara Studio S.A.
 # Copyright (C) 2016-2018  David Capello
 
 cmake_minimum_required(VERSION 3.16)
@@ -56,6 +56,7 @@ if(LAF_WITH_CLIP)
   # Disable clip examples and tests
   set(CLIP_EXAMPLES OFF CACHE BOOL "Compile clip examples")
   set(CLIP_TESTS OFF CACHE BOOL "Compile clip tests")
+  set(CLIP_INSTALL OFF CACHE BOOL "Enable clip installation")
   if(PNG_LIBRARY)
     set(CLIP_X11_PNG_LIBRARY "${PNG_LIBRARY}")
   endif()
