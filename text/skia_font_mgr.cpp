@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (c) 2019-2024  Igara Studio S.A.
+// Copyright (c) 2019-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -158,7 +158,15 @@ FontStyleSetRef SkiaFontMgr::familyStyleSet(int i) const
 
 FontStyleSetRef SkiaFontMgr::matchFamily(const std::string& familyName) const
 {
-  return base::make_ref<SkiaFontStyleSet>(m_skFontMgr->matchFamily(familyName.c_str()));
+  auto set = m_skFontMgr->matchFamily(familyName.c_str());
+
+  // Not sure why Skia (at least the SkFontMgr_DirectWrite impl, the
+  // IDWriteFontCollection::FindFamilyName method) returns a valid
+  // pointer even when the font family doesn't exist.
+  if (!set || set->count() == 0)
+    return nullptr;
+
+  return base::make_ref<SkiaFontStyleSet>(set);
 }
 
 } // namespace text
