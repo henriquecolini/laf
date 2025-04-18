@@ -35,17 +35,14 @@ this case `/skiadir/out/Release-x64` should contain the Skia library
 files, i.e. `skia.lib` on Windows or `libskia.a` on other platforms):
 
 ```
-git clone https://github.com/aseprite/laf.git
+git clone --recursive https://github.com/aseprite/laf.git
 cd laf
-mkdir build
-cd build
-cmake -G Ninja \
+cmake -G Ninja -S . -B build \
   -DLAF_BACKEND=skia \
   -DSKIA_DIR=/skiadir \
-  -DSKIA_LIBRARY_DIR=/skiadir/out/Release-x64 \
-  ..
-ninja
-./examples/helloworld
+  -DSKIA_LIBRARY_DIR=/skiadir/out/Release-x64
+cmake --build build
+build/examples/helloworld
 ```
 
 To compile only the library (without examples and tests) you can
