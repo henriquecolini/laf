@@ -65,8 +65,13 @@ static SkCanvas::SrcRectConstraint to_constraint(const Paint* paint)
 // static
 Surface::ColorChannelsOrder Surface::getNativeColorChannelsOrder()
 {
-  return kN32_SkColorType == kRGBA_8888_SkColorType ? ColorChannelsOrder::RGB :
-                                                      ColorChannelsOrder::BGR;
+  // There are two possible values by Skia (at the moment)
+  static_assert(kN32_SkColorType == kRGBA_8888_SkColorType ||
+                kN32_SkColorType == kBGRA_8888_SkColorType);
+  if constexpr (kN32_SkColorType == kRGBA_8888_SkColorType)
+    return ColorChannelsOrder::RGB;
+  if constexpr (kN32_SkColorType == kBGRA_8888_SkColorType)
+    return ColorChannelsOrder::BGR;
 }
 
 SkiaSurface::SkiaSurface() : m_surface(nullptr), m_colorSpace(nullptr), m_canvas(nullptr), m_lock(0)
