@@ -3,7 +3,7 @@
 # Prints the URL to download the Skia version for the given parameters.
 # Usage:
 #
-#   ./.skia-url.sh [release|debug] [windows|macos|linux] [x86|x64|arm64]
+#   ./skia-url.sh [release|debug] [windows|macos|linux] [x86|x64|arm64]
 #
 # The first version will print the URL for the release version of the
 # current platform.
@@ -13,7 +13,7 @@ script_dir=$(dirname "${BASH_SOURCE[0]}")
 skia_tag=$(cat "$script_dir/skia-tag.txt" | xargs)
 skia_build=Release
 
-source "$script_dir/platform.sh" --nocl
+source "$script_dir/platform.sh"
 
 while [[ "$1" != "" ]] ; do
     arg=$(echo $1 | tr '[:upper:]' '[:lower:]')
