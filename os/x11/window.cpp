@@ -1366,12 +1366,7 @@ void WindowX11::processX11Event(XEvent& event)
         if (g_dndData->containsType(URI_LIST)) {
           // Ask for the XdndSelection, we're going to receive the
           // dropped items in the SelectionNotify.
-          XConvertSelection(m_display,
-                            XdndSelection,
-                            URI_LIST,
-                            XdndSelection,
-                            m_window,
-                            time);
+          XConvertSelection(m_display, XdndSelection, URI_LIST, XdndSelection, m_window, time);
         }
       }
       break;
