@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (c) 2020-2023  Igara Studio S.A.
+// Copyright (c) 2020-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -108,6 +108,12 @@ void SystemOSX::setMousePosition(const gfx::Point& screenPosition)
 gfx::Color SystemOSX::getColorFromScreen(const gfx::Point& screenPosition) const
 {
   gfx::Color color = gfx::ColorNone;
+
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_VERSION_15_0
+  // TODO Use ScreenCaptureKit for macOS 15.0 as
+  //      CGDisplayCreateImageForRect() function is obsoleted in
+  //      this version.
+#else
   CGImageRef image = CGDisplayCreateImageForRect(
     CGMainDisplayID(),
     CGRectMake(screenPosition.x, screenPosition.y, 1, 1));
@@ -135,6 +141,7 @@ gfx::Color SystemOSX::getColorFromScreen(const gfx::Point& screenPosition) const
     }
     CGImageRelease(image);
   }
+#endif
   return color;
 }
 
