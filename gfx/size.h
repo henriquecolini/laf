@@ -1,5 +1,5 @@
 // LAF Gfx Library
-// Copyright (C) 2020-2024  Igara Studio S.A.
+// Copyright (C) 2020-2025  Igara Studio S.A.
 // Copyright (C) 2001-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -15,6 +15,8 @@ namespace gfx {
 
 template<typename T>
 class PointT;
+template<typename T>
+class BorderT;
 
 // A 2D size.
 template<typename T>
@@ -64,6 +66,20 @@ public:
     return *this;
   }
 
+  const SizeT& operator+=(const BorderT<T>& br)
+  {
+    w += br.width();
+    h += br.height();
+    return *this;
+  }
+
+  const SizeT& operator-=(const BorderT<T>& br)
+  {
+    w -= br.width();
+    h -= br.height();
+    return *this;
+  }
+
   const SizeT& operator+=(const T& value)
   {
     w += value;
@@ -100,6 +116,10 @@ public:
 
   SizeT operator-(const SizeT& sz) const { return SizeT(w - sz.w, h - sz.h); }
 
+  SizeT operator+(const BorderT<T>& br) const { return SizeT(w + br.width(), h + br.height()); }
+
+  SizeT operator-(const BorderT<T>& br) const { return SizeT(w - br.width(), h - br.height()); }
+
   SizeT operator+(const T& value) const { return SizeT(w + value, h + value); }
 
   SizeT operator-(const T& value) const { return SizeT(w - value, h - value); }
@@ -109,6 +129,10 @@ public:
   SizeT operator/(const T& value) const { return SizeT(w / value, h / value); }
 
   SizeT operator-() const { return SizeT(-w, -h); }
+
+  SizeT operator|(const SizeT& other) const { return createUnion(other); }
+
+  SizeT operator&(const SizeT& other) const { return createIntersection(other); }
 
   bool operator==(const SizeT& sz) const { return w == sz.w && h == sz.h; }
 
