@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2024  Igara Studio S.A.
+// Copyright (C) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -26,9 +26,9 @@ private:
   NSPasteboard* m_pasteboard;
 
   base::paths getPaths() override;
-
+  #if CLIP_ENABLE_IMAGE
   SurfaceRef getImage() override;
-
+  #endif
   std::string getUrl() override;
 
   bool contains(DragDataItemType type) override;

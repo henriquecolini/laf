@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (C) 2024  Igara Studio S.A.
+// Copyright (C) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -35,6 +35,8 @@ base::paths DragDataProviderOSX::getPaths()
   return files;
 }
 
+  #if CLIP_ENABLE_IMAGE
+
 SurfaceRef DragDataProviderOSX::getImage()
 {
   clip::image img;
@@ -44,6 +46,8 @@ SurfaceRef DragDataProviderOSX::getImage()
 
   return os::instance()->makeSurface(img);
 }
+
+  #endif // CLIP_ENABLE_IMAGE
 
 std::string DragDataProviderOSX::getUrl()
 {
