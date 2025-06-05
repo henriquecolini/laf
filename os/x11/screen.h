@@ -1,5 +1,5 @@
 // LAF OS Library
-// Copyright (c) 2020-2021  Igara Studio S.A.
+// Copyright (c) 2020-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -17,7 +17,7 @@ namespace os {
 
 class ScreenX11 : public Screen {
 public:
-  ScreenX11(int screen)
+  ScreenX11(int screen) : m_screen(screen)
   {
     auto x11 = X11::instance();
     auto x11display = x11->display();
