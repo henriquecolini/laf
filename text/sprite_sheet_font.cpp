@@ -12,19 +12,20 @@
 
 #include "os/sampling.h"
 
+#include <algorithm>
+#include <cmath>
+
 namespace text {
 
 void SpriteSheetFont::setSize(const float size)
 {
   ASSERT(m_defaultSize > 0.0f);
 
-  os::Sampling sampling;
-  if (m_antialias)
-    sampling = os::Sampling(os::Sampling::Filter::Linear, os::Sampling::Mipmap::Nearest);
-
-  const float scale = size / m_defaultSize;
-  m_sheet = m_originalSheet->applyScale(scale, sampling);
-  m_size = size;
+  // Limit the size of the sprite sheet font to multiples of its own
+  // size (x1, x2, x3, etc.)
+  const int scale = std::max<int>(1, std::floor(size / m_defaultSize));
+  m_sheet = m_originalSheet->applyScale(scale, os::Sampling{});
+  m_size = scale * m_defaultSize;
 
   m_glyphs = m_originalGlyphs;
   for (auto& rc : m_glyphs)
