@@ -26,7 +26,7 @@ namespace text {
 
 class Font : public base::RefCount {
 public:
-  Font() : m_fallback(nullptr) {}
+  Font() {}
   virtual ~Font() {}
   virtual FontType type() = 0;
   virtual TypefaceRef typeface() const = 0;
@@ -54,11 +54,11 @@ public:
   virtual gfx::RectF getGlyphBounds(glyph_t glyph) const = 0;
   virtual float getGlyphAdvance(glyph_t glyph) const = 0;
 
-  Font* fallback() const { return m_fallback; }
-  void setFallback(Font* font) { m_fallback = font; }
+  FontRef fallback() const { return m_fallback; }
+  void setFallback(FontRef font) { m_fallback = font; }
 
 private:
-  Font* m_fallback;
+  FontRef m_fallback;
 };
 
 } // namespace text

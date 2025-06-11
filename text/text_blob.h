@@ -74,6 +74,9 @@ public:
   // font on each run).
   float baseline();
 
+  // Returns the max(descent - ascent) for all fonts used in this text blob.
+  float textHeight();
+
   // Visits each run in the TextBlob.
   using RunVisitor = std::function<void(RunInfo&)>;
   virtual void visitRuns(const RunVisitor& visitor) = 0;
@@ -101,10 +104,12 @@ public:
 
 protected:
   void setBaseline(const float baseline) { m_baseline = baseline; }
+  void setTextHeight(const float textHeight) { m_textHeight = textHeight; }
 
 private:
   gfx::RectF m_bounds;
   float m_baseline = 0.0f;
+  float m_textHeight = 0.0f;
 };
 
 } // namespace text

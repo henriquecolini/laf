@@ -69,10 +69,66 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
 
   const auto* spriteFont = static_cast<const SpriteSheetFont*>(font.get());
 
-  float baseline = 0.0f;
+  // TODO add configuration of the default falback font
+  auto getFallbackFont = [](const FontMgrRef& fontMgr, const FontRef& font) -> FontRef {
+    FontRef fallbackFont = font->fallback();
+    if (!fallbackFont) {
+      fallbackFont = fontMgr->defaultFont();
+      fallbackFont->setSize(font->size());
+      fallbackFont->setAntialias(font->antialias());
+    }
+    return fallbackFont;
+  };
+
+  // First iteration through the text/fonts/fallback fonts to
+  // calculate the total text height and baseline to be used.
+  FontMetrics metrics;
+  font->metrics(&metrics);
+  float baseline = -metrics.ascent;
+  float textHeight = metrics.descent - metrics.ascent;
+  {
+    // TODO this utf8 iteration between fonts/fallback is duplicated
+    //      here and below, we could try to merge this code
+    base::utf8_decode decode(text);
+    while (true) {
+      const codepoint_t chr = decode.next();
+      if (chr == 0)
+        break;
+
+      const glyph_t glyph = spriteFont->codePointToGlyph(chr);
+      // Code point not found, use the fallback font or the FontMgr and
+      // create a run using another TextBlob.
+      if (glyph == 0) {
+        base::utf8_decode subDecode = decode;
+        while (true) {
+          const base::utf8_decode prevSubDecode = subDecode;
+          const codepoint_t subChr = subDecode.next();
+          if (subChr == 0) {
+            decode = subDecode;
+            break;
+          }
+
+          // Continue the run until we find a glyph that can be
+          // represent with the original font.
+          if (spriteFont->codePointToGlyph(subChr) != 0) {
+            decode = prevSubDecode; // Go back to the previous decode point
+            break;
+          }
+        }
+
+        // Calculate the max baseline/textHeight
+        FontRef fallbackFont = getFallbackFont(fontMgr, font);
+        FontMetrics fallbackMetrics;
+        fallbackFont->metrics(&fallbackMetrics);
+        baseline = std::max(baseline, -fallbackMetrics.ascent);
+        textHeight = std::max(textHeight, fallbackMetrics.descent - fallbackMetrics.ascent);
+      }
+    }
+  }
+
   Runs runs;
   Run run;
-  auto addRun = [&runs, &run, &font, &baseline, handler]() {
+  auto addRun = [&runs, &run, &font, handler]() {
     if (handler && !run.subBlob) {
       TextBlob::RunInfo info;
 
@@ -82,10 +138,6 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
       info.glyphs = run.glyphs.data();
       info.positions = run.positions.data();
       info.clusters = run.clusters.data();
-
-      FontMetrics metrics;
-      font->metrics(&metrics);
-      baseline = std::max(baseline, -metrics.ascent);
 
       handler->commitRunBuffer(info);
     }
@@ -134,25 +186,15 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
       run.utf8Range.begin = i;
       run.utf8Range.end = j;
 
-      // TODO add configuration of the default fallback font
-      auto fallbackFont = fontMgr->defaultFont();
-      fallbackFont->setSize(font->size());
-      fallbackFont->setAntialias(font->antialias());
-
       // Align position between both fonts (font and fallbackFont)
       // in the baseline pos of the original font.
-      FontMetrics metrics;
+      FontRef fallbackFont = getFallbackFont(fontMgr, font);
       FontMetrics fallbackMetrics;
-      font->metrics(&metrics);
       fallbackFont->metrics(&fallbackMetrics);
 
       gfx::PointF alignedPos;
       alignedPos.x = pos.x;
-      const float baselineShift = -metrics.ascent + fallbackMetrics.ascent;
-      alignedPos.y = pos.y + baselineShift;
-
-      // Adjust baseline for this composed TextBlob
-      baseline = std::max(baseline, -fallbackMetrics.ascent + baselineShift);
+      alignedPos.y = pos.y + baseline + fallbackMetrics.ascent;
 
       OffsetHandler subHandler(handler, i, alignedPos);
       run.subBlob = TextBlob::MakeWithShaper(fontMgr,
@@ -169,7 +211,7 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
       }
 
       // Restore beginning of UTF8 range for the next run
-      run.utf8Range.begin = decode.pos() - text.begin();
+      run.utf8Range.begin = j;
       continue;
     }
 
@@ -177,7 +219,10 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
     if (glyphBounds.isEmpty())
       continue;
 
-    run.add(glyph, pos, i - run.utf8Range.begin);
+    gfx::PointF alignedPos;
+    alignedPos.x = pos.x;
+    alignedPos.y = pos.y + baseline + metrics.ascent;
+    run.add(glyph, alignedPos, i - run.utf8Range.begin);
 
     glyphBounds.offset(pos);
     textBounds |= glyphBounds;
@@ -190,6 +235,7 @@ TextBlobRef SpriteTextBlob::MakeWithShaper(const FontMgrRef& fontMgr,
 
   auto blob = base::make_ref<SpriteTextBlob>(textBounds, font, std::move(runs));
   blob->setBaseline(baseline);
+  blob->setTextHeight(textHeight);
   return blob;
 }
 

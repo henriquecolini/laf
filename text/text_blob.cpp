@@ -50,6 +50,21 @@ float TextBlob::baseline()
   return m_baseline;
 }
 
+float TextBlob::textHeight()
+{
+  if (m_textHeight == 0.0f) {
+    visitRuns([this](RunInfo& info) {
+      if (!info.font)
+        return;
+
+      FontMetrics metrics;
+      info.font->metrics(&metrics);
+      m_textHeight = std::max(m_textHeight, metrics.descent - metrics.ascent);
+    });
+  }
+  return m_textHeight;
+}
+
 TextBlob::Utf8Range TextBlob::RunInfo::getGlyphUtf8Range(size_t i) const
 {
   Utf8Range subRange;
