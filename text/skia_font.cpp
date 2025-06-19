@@ -35,7 +35,7 @@ FontType SkiaFont::type()
 
 TypefaceRef SkiaFont::typeface() const
 {
-  return base::make_ref<SkiaTypeface>(sk_ref_sp(m_skFont.getTypeface()));
+  return base::make_ref<SkiaTypeface>(sk_ref_sp(m_skFont.getTypeface()), nullptr);
 }
 
 float SkiaFont::metrics(FontMetrics* metrics) const

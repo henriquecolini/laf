@@ -24,12 +24,29 @@ namespace text {
 //////////////////////////////////////////////////////////////////////
 // SkiaTypeface
 
-SkiaTypeface::SkiaTypeface(sk_sp<SkTypeface> skTypeface) : m_skTypeface(skTypeface)
+struct SkiaFontStyleSet::LockSet {
+  LockSet(SkiaFontStyleSet* set) : m_set(set)
+  {
+    if (m_set)
+      m_set->m_mutex.lock();
+  }
+  ~LockSet()
+  {
+    if (m_set)
+      m_set->m_mutex.unlock();
+  }
+  SkiaFontStyleSet* m_set;
+};
+
+SkiaTypeface::SkiaTypeface(sk_sp<SkTypeface> skTypeface, SkiaFontStyleSet* owner)
+  : m_skTypeface(skTypeface)
+  , m_owner(owner)
 {
 }
 
 std::string SkiaTypeface::familyName() const
 {
+  SkiaFontStyleSet::LockSet lock(m_owner);
   SkString name;
   m_skTypeface->getFamilyName(&name);
   return std::string(name.c_str());
@@ -37,6 +54,7 @@ std::string SkiaTypeface::familyName() const
 
 FontStyle SkiaTypeface::fontStyle() const
 {
+  SkiaFontStyleSet::LockSet lock(m_owner);
   SkFontStyle skStyle = m_skTypeface->fontStyle();
   return FontStyle((FontStyle::Weight)skStyle.weight(),
                    (FontStyle::Width)skStyle.width(),
@@ -52,11 +70,13 @@ SkiaFontStyleSet::SkiaFontStyleSet(sk_sp<SkFontStyleSet> set) : m_skSet(set)
 
 int SkiaFontStyleSet::count()
 {
+  LockSet lock(this);
   return m_skSet->count();
 }
 
 void SkiaFontStyleSet::getStyle(int index, FontStyle& style, std::string& name)
 {
+  LockSet lock(this);
   SkFontStyle skStyle;
   SkString skName;
   m_skSet->getStyle(index, &skStyle, &skName);
@@ -68,15 +88,17 @@ void SkiaFontStyleSet::getStyle(int index, FontStyle& style, std::string& name)
 
 TypefaceRef SkiaFontStyleSet::typeface(int index)
 {
-  return base::make_ref<SkiaTypeface>(m_skSet->createTypeface(index));
+  LockSet lock(this);
+  return base::make_ref<SkiaTypeface>(m_skSet->createTypeface(index), this);
 }
 
 TypefaceRef SkiaFontStyleSet::matchStyle(const FontStyle& style)
 {
+  LockSet lock(this);
   SkFontStyle skStyle((SkFontStyle::Weight)style.weight(),
                       (SkFontStyle::Width)style.width(),
                       (SkFontStyle::Slant)style.slant());
-  return base::make_ref<SkiaTypeface>(m_skSet->matchStyle(skStyle));
+  return base::make_ref<SkiaTypeface>(m_skSet->matchStyle(skStyle), this);
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (c) 2019-2024  Igara Studio S.A.
+// Copyright (c) 2019-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -16,11 +16,15 @@
 #include "include/core/SkFontMgr.h"
 #include "include/core/SkTypeface.h"
 
+#include <mutex>
+
 namespace text {
+
+class SkiaFontStyleSet;
 
 class SkiaTypeface : public Typeface {
 public:
-  SkiaTypeface(sk_sp<SkTypeface> skTypeface);
+  SkiaTypeface(sk_sp<SkTypeface> skTypeface, SkiaFontStyleSet* owner);
 
   std::string familyName() const override;
   FontStyle fontStyle() const override;
@@ -29,6 +33,7 @@ public:
 
 private:
   sk_sp<SkTypeface> m_skTypeface;
+  SkiaFontStyleSet* m_owner;
 };
 
 class SkiaFontStyleSet : public FontStyleSet {
@@ -40,7 +45,10 @@ public:
   TypefaceRef typeface(int index) override;
   TypefaceRef matchStyle(const FontStyle& style) override;
 
+  struct LockSet;
+
 private:
+  std::mutex m_mutex;
   sk_sp<SkFontStyleSet> m_skSet;
 };
 
