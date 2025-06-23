@@ -43,6 +43,9 @@ using TextBlobRef = base::Ref<TextBlob>;
 class Typeface;
 using TypefaceRef = base::Ref<Typeface>;
 
+class SpriteSheetFont;
+class SpriteSheetTypeface;
+
 } // namespace text
 
 #endif

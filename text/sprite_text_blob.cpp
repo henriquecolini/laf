@@ -1,5 +1,5 @@
 // LAF Text Library
-// Copyright (c) 2024  Igara Studio S.A.
+// Copyright (c) 2024-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -11,6 +11,7 @@
 #include "text/sprite_text_blob.h"
 
 #include "base/ref.h"
+#include "base/utf8_decode.h"
 #include "text/font.h"
 #include "text/font_mgr.h"
 #include "text/sprite_sheet_font.h"

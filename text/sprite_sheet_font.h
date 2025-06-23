@@ -9,76 +9,36 @@
 #define LAF_TEXT_SPRITE_SHEET_FONT_H_INCLUDED
 #pragma once
 
-#include "base/debug.h"
 #include "base/ref.h"
-#include "base/string.h"
-#include "base/utf8_decode.h"
 #include "gfx/rect.h"
 #include "os/surface.h"
 #include "text/font.h"
-#include "text/font_metrics.h"
-#include "text/typeface.h"
 
 #include <vector>
 
 namespace text {
 
-class SpriteSheetFont : public Font {
-  static constexpr auto kRedColor = gfx::rgba(255, 0, 0);
+class SpriteSheetTypeface;
 
+class SpriteSheetFont : public Font {
 public:
-  SpriteSheetFont() {}
-  ~SpriteSheetFont() {}
+  SpriteSheetFont(const base::Ref<SpriteSheetTypeface>& typeface, float size);
 
   FontType type() override { return FontType::SpriteSheet; }
 
-  TypefaceRef typeface() const override
-  {
-    return nullptr; // TODO impl
-  }
+  TypefaceRef typeface() const override;
 
   void setDescent(float descent) { m_descent = descent; }
 
-  float metrics(FontMetrics* metrics) const override
-  {
-    // TODO impl
+  float metrics(FontMetrics* metrics) const override;
 
-    if (metrics) {
-      float descent = m_descent;
-      if (m_descent > 0.0f && m_defaultSize > 0.0f && m_defaultSize != m_size)
-        descent = m_descent * m_size / m_defaultSize;
-
-      metrics->descent = descent;
-      metrics->ascent = -m_size + descent;
-      metrics->underlineThickness = 1.0f;
-      metrics->underlinePosition = m_descent;
-    }
-
-    return lineHeight();
-  }
-
-  float defaultSize() const override { return m_defaultSize; }
+  float defaultSize() const override;
   float size() const override { return m_size; }
   float lineHeight() const override { return m_size; }
-
-  float textLength(const std::string& str) const override
-  {
-    base::utf8_decode decode(str);
-    int x = 0;
-    while (int chr = decode.next())
-      x += getCharBounds(chr).w;
-    return x;
-  }
-
+  float textLength(const std::string& str) const override;
   float measureText(const std::string& str,
                     gfx::RectF* bounds,
-                    const os::Paint* paint) const override
-  {
-    float w = textLength(str);
-    if (bounds)
-      *bounds = gfx::RectF(0, 0, w, lineHeight());
-    return w;
-  }
+                    const os::Paint* paint) const override;
 
   bool isScalable() const override { return true; }
 
@@ -144,28 +104,10 @@ public:
       return gfx::Rect();
   }
 
-  static FontRef FromSurface(os::SurfaceRef& sur, float size)
-  {
-    auto font = base::make_ref<SpriteSheetFont>();
-    font->fromSurface(sur, size);
-    return font;
-  }
-
 private:
-  void fromSurface(os::SurfaceRef& sur, float size);
-
-  bool findGlyph(const os::Surface* sur,
-                 int width,
-                 int height,
-                 gfx::Rect& bounds,
-                 gfx::Rect& glyphBounds);
-
-private:
-  os::SurfaceRef m_originalSheet;
+  base::Ref<SpriteSheetTypeface> m_typeface;
   os::SurfaceRef m_sheet;
-  std::vector<gfx::Rect> m_originalGlyphs;
   std::vector<gfx::Rect> m_glyphs;
-  float m_defaultSize = 0.0f;
   float m_size = 0.0f;
   float m_descent = 0.0f;
   bool m_antialias = false;

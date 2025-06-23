@@ -10,12 +10,12 @@
 
 #include "text/font_mgr.h"
 
-#include "os/system.h"
 #if LAF_FREETYPE
   #include "ft/lib.h"
   #include "text/freetype_font.h"
 #endif
 #include "text/sprite_sheet_font.h"
+#include "text/sprite_sheet_typeface.h"
 
 namespace text {
 
@@ -29,13 +29,20 @@ FontMgr::~FontMgr()
 
 FontRef FontMgr::loadSpriteSheetFont(const char* filename, float size)
 {
-  os::SurfaceRef sheet = os::System::instance()->loadRgbaSurface(filename);
-  base::Ref<SpriteSheetFont> font = nullptr;
-  if (sheet) {
-    font = SpriteSheetFont::FromSurface(sheet, size);
-    sheet->setImmutable();
+  base::Ref<SpriteSheetTypeface> typeface;
+  auto it = m_spriteSheetTypefaces.find(filename);
+  if (it != m_spriteSheetTypefaces.end())
+    typeface = it->second;
+  else {
+    typeface = SpriteSheetTypeface::FromFile(filename);
+    if (!typeface)
+      return nullptr;
+
+    // Cache this typeface
+    m_spriteSheetTypefaces[filename] = typeface;
   }
-  return font;
+
+  return base::make_ref<SpriteSheetFont>(typeface, size);
 }
 
 FontRef FontMgr::loadTrueTypeFont(const char* filename, float size)

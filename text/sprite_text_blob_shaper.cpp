@@ -11,7 +11,9 @@
 #include "text/sprite_text_blob.h"
 
 #include "base/ref.h"
+#include "base/utf8_decode.h"
 #include "text/font.h"
+#include "text/font_metrics.h"
 #include "text/font_mgr.h"
 #include "text/sprite_sheet_font.h"
 

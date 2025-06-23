@@ -10,7 +10,9 @@
 
 #include "text/fwd.h"
 
+#include <map>
 #include <memory>
+#include <string>
 
 namespace ft {
 class Lib;
@@ -42,6 +44,7 @@ private:
 #if LAF_FREETYPE
   std::unique_ptr<ft::Lib> m_ft;
 #endif
+  std::map<std::string, base::Ref<SpriteSheetTypeface>> m_spriteSheetTypefaces;
 };
 
 } // namespace text

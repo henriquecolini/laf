@@ -10,105 +10,110 @@
 
 #include "text/sprite_sheet_font.h"
 
+#include "base/utf8_decode.h"
 #include "os/sampling.h"
+#include "text/font_metrics.h"
+#include "text/sprite_sheet_typeface.h"
 
 #include <algorithm>
 #include <cmath>
 
 namespace text {
 
+SpriteSheetFont::SpriteSheetFont(const base::Ref<SpriteSheetTypeface>& typeface, float size)
+  : m_typeface(typeface)
+{
+  setSize(size);
+}
+
+TypefaceRef SpriteSheetFont::typeface() const
+{
+  return m_typeface;
+}
+
+float SpriteSheetFont::metrics(FontMetrics* metrics) const
+{
+  // TODO impl
+
+  const float defaultSize = this->defaultSize();
+
+  if (metrics) {
+    float descent = m_descent;
+    if (m_descent > 0.0f && defaultSize > 0.0f && defaultSize != m_size)
+      descent = m_descent * m_size / defaultSize;
+
+    metrics->descent = descent;
+    metrics->ascent = -m_size + descent;
+    metrics->underlineThickness = 1.0f;
+    metrics->underlinePosition = m_descent;
+  }
+
+  return lineHeight();
+}
+
+float SpriteSheetFont::defaultSize() const
+{
+  return m_typeface->defaultSize();
+}
+
+float SpriteSheetFont::textLength(const std::string& str) const
+{
+  base::utf8_decode decode(str);
+  int x = 0;
+  while (int chr = decode.next())
+    x += getCharBounds(chr).w;
+  return x;
+}
+
+float SpriteSheetFont::measureText(const std::string& str,
+                                   gfx::RectF* bounds,
+                                   const os::Paint* paint) const
+{
+  float w = textLength(str);
+  if (bounds)
+    *bounds = gfx::RectF(0, 0, w, lineHeight());
+  return w;
+}
+
 void SpriteSheetFont::setSize(const float size)
 {
-  ASSERT(m_defaultSize > 0.0f);
+  const float defaultSize = this->defaultSize();
+  ASSERT(defaultSize > 0.0f);
 
   // Limit the size of the sprite sheet font to multiples of its own
   // size (x1, x2, x3, etc.)
-  const int scale = std::max<int>(1, std::floor(size / m_defaultSize));
-  m_sheet = m_originalSheet->applyScale(scale, os::Sampling{});
-  m_size = scale * m_defaultSize;
+  int scale = std::max<int>(1, std::floor(size / defaultSize));
 
-  m_glyphs = m_originalGlyphs;
+  // Limit the scale to the well known maximum size (by memory restrictions).
+  const int maxScale = m_typeface->maxScale();
+  if (maxScale > 0)
+    scale = std::min(scale, maxScale);
+
+  do {
+    try {
+      // TODO We should be able to use the original sheet scaled in
+      // the rendering process (instead of scaling the surface). Right
+      // now this simplifies our code but consumes a lot of memory for
+      // big font sizes.
+      m_sheet = m_typeface->sheetSurface()->applyScale(scale, os::Sampling{});
+      break;
+    }
+    // If an exception is thrown it means that there is not enough
+    // memory to scale the font, we have to reduce the scale and try
+    // again.
+    catch (...) {
+      if (scale == 1)
+        throw;
+      scale /= 2;
+
+      // Mark this new scale as new possible max size.
+      m_typeface->setMaxScale(scale);
+    }
+  } while (scale > 1);
+  m_size = scale * defaultSize;
+  m_glyphs = m_typeface->glyphs();
   for (auto& rc : m_glyphs)
     rc = gfx::Rect(gfx::RectF(rc) * scale);
-}
-
-void SpriteSheetFont::fromSurface(os::SurfaceRef& sur, float size)
-{
-  m_originalSheet = sur;
-  m_sheet = sur;
-  m_originalGlyphs.push_back(gfx::Rect()); // glyph index 0 is MISSING CHARACTER glyph
-  m_originalGlyphs.push_back(gfx::Rect()); // glyph index 1 is NULL glyph
-
-  os::SurfaceLock lock(sur.get());
-  gfx::Rect bounds(0, 0, 1, 1);
-  gfx::Rect glyphBounds;
-
-  while (findGlyph(sur.get(), sur->width(), sur->height(), bounds, glyphBounds)) {
-    m_originalGlyphs.push_back(glyphBounds);
-    bounds.x += bounds.w;
-  }
-
-  // Clear the border of all glyphs to avoid bilinear interpolation
-  // with those borders when drawing this font scaled/antialised.
-  os::Paint p;
-  p.blendMode(os::BlendMode::Clear);
-  p.style(os::Paint::Stroke);
-  for (gfx::Rect rc : m_originalGlyphs) {
-    sur->drawRect(rc.enlarge(1), p);
-  }
-
-  m_glyphs = m_originalGlyphs;
-
-  m_defaultSize = getCharBounds(' ').h;
-  if (m_defaultSize <= 0.0f)
-    m_defaultSize = 1.0f;
-  m_size = m_defaultSize;
-
-  if (size > 0.0f)
-    setSize(size);
-}
-
-bool SpriteSheetFont::findGlyph(const os::Surface* sur,
-                                int width,
-                                int height,
-                                gfx::Rect& bounds,
-                                gfx::Rect& glyphBounds)
-{
-  gfx::Color keyColor = sur->getPixel(0, 0);
-
-  while (sur->getPixel(bounds.x, bounds.y) == keyColor) {
-    bounds.x++;
-    if (bounds.x >= width) {
-      bounds.x = 0;
-      bounds.y += bounds.h;
-      bounds.h = 1;
-      if (bounds.y >= height)
-        return false;
-    }
-  }
-
-  gfx::Color firstCharPixel = sur->getPixel(bounds.x, bounds.y);
-
-  bounds.w = 0;
-  while ((bounds.x + bounds.w < width) &&
-         (sur->getPixel(bounds.x + bounds.w, bounds.y) != keyColor)) {
-    bounds.w++;
-  }
-
-  bounds.h = 0;
-  while ((bounds.y + bounds.h < height) &&
-         (sur->getPixel(bounds.x, bounds.y + bounds.h) != keyColor)) {
-    bounds.h++;
-  }
-
-  // Using red color in the first pixel of the char indicates that
-  // this glyph shouldn't be used as a valid one.
-  if (firstCharPixel != kRedColor)
-    glyphBounds = bounds;
-  else
-    glyphBounds = gfx::Rect();
-
-  return !bounds.isEmpty();
 }
 
 } // namespace text

@@ -1,5 +1,5 @@
 // LAF Base Library
-// Copyright (c) 2020  Igara Studio S.A.
+// Copyright (c) 2020-2025  Igara Studio S.A.
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -88,7 +88,7 @@ public:
       m_ptr->ref();
   }
   template<typename U>
-  Ref(const Ref<U>& ref) : m_ptr(static_cast<T*>(ref.m_ptr))
+  Ref(const Ref<U>& ref) : m_ptr(static_cast<T*>(ref.get()))
   {
     if (m_ptr)
       m_ptr->ref();
