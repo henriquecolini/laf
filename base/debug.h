@@ -52,6 +52,7 @@ void base_trace_args(Args&&... args)
 #undef ASSERT
 #undef TRACE
 #undef TRACEARGS
+#undef PRINTARGS
 
 #ifdef _DEBUG
   #if LAF_WINDOWS
@@ -78,5 +79,6 @@ void base_trace_args(Args&&... args)
   #define TRACE(...)
   #define TRACEARGS(...)
 #endif
+#define PRINTARGS base_trace_args
 
 #endif

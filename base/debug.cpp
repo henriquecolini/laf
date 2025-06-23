@@ -9,23 +9,23 @@
   #include "config.h"
 #endif
 
+#include "base/debug.h"
+
+#include "base/convert_to.h"
+#include "base/replace_string.h"
+#include "base/string.h"
+
+#include <cstdarg>
+#include <cstdlib>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#if LAF_WINDOWS
+  #include <windows.h>
+#endif
+
 #ifdef _DEBUG
-
-  #include "base/debug.h"
-
-  #include "base/convert_to.h"
-  #include "base/replace_string.h"
-  #include "base/string.h"
-
-  #include <cstdarg>
-  #include <cstdlib>
-  #include <iostream>
-  #include <string>
-  #include <vector>
-
-  #if LAF_WINDOWS
-    #include <windows.h>
-  #endif
 
 int base_assert(const char* condition, const char* file, int lineNum)
 {
@@ -56,6 +56,8 @@ int base_assert(const char* condition, const char* file, int lineNum)
   #endif
 }
 
+#endif // _DEBUG
+
 void base_trace(const char* msg, ...)
 {
   va_list ap;
@@ -64,24 +66,22 @@ void base_trace(const char* msg, ...)
   vsnprintf(buf, sizeof(buf), msg, ap);
   va_end(ap);
 
-  #if LAF_WINDOWS
+#if LAF_WINDOWS && _DEBUG
   _CrtDbgReport(_CRT_WARN, nullptr, 0, nullptr, buf);
-  #endif
+#endif
 
   std::cerr << buf << std::flush;
 }
 
 void base_trace_raw(const char* str)
 {
-  #if LAF_WINDOWS
+#if LAF_WINDOWS && _DEBUG
   {
     std::string output(str);
     base::replace_string(output, "%", "%%");
     _CrtDbgReport(_CRT_WARN, nullptr, 0, nullptr, output.c_str());
   }
-  #endif
+#endif
 
   std::cerr << str << std::flush;
 }
-
-#endif
