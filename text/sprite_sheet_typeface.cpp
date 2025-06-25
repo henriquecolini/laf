@@ -43,8 +43,6 @@ bool SpriteSheetTypeface::fromFile(const char* filename)
   if (!m_sheet)
     return false;
 
-  m_sheet->setImmutable();
-
   m_glyphs.push_back(gfx::Rect()); // glyph index 0 is MISSING CHARACTER glyph
   m_glyphs.push_back(gfx::Rect()); // glyph index 1 is NULL glyph
 
@@ -71,6 +69,7 @@ bool SpriteSheetTypeface::fromFile(const char* filename)
   if (m_defaultSize <= 0.0f)
     m_defaultSize = 1.0f;
 
+  m_sheet->setImmutable();
   return true;
 }
 
