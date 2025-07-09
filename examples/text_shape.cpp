@@ -77,7 +77,8 @@ struct TextEdit {
   }
 };
 
-void draw_window(Window* window,
+void draw_window(System* system,
+                 Window* window,
                  const FontMgrRef& fontMgr,
                  const FontRef& font,
                  const FontRef& fontBig,
@@ -96,7 +97,8 @@ void draw_window(Window* window,
   gfx::PointF textPos;
   gfx::RectF box;
 
-  if (edit.caretVisible) {
+  // Draw caret
+  {
     int i = edit.caretIndex;
     float x, w, h;
     if (i < edit.boxes.size()) {
@@ -112,14 +114,19 @@ void draw_window(Window* window,
 
     box = gfx::RectF(textPos.x + x, textPos.y, w, h);
 
-    surface->save();
-    surface->clipRect(rc);
-    p.color(gfx::rgba(240, 240, 240));
-    surface->drawRect(box, p);
-    p.color(gfx::rgba(64, 64, 64));
-    if (edit.blob)
-      draw_text(surface, edit.blob, textPos, &p);
-    surface->restore();
+    // Set the position for a possible IME dialog of the system.
+    system->setTextInput(true, window->pointToScreen(gfx::Point(box.origin())));
+
+    if (edit.caretVisible) {
+      surface->save();
+      surface->clipRect(rc);
+      p.color(gfx::rgba(240, 240, 240));
+      surface->drawRect(box, p);
+      p.color(gfx::rgba(64, 64, 64));
+      if (edit.blob)
+        draw_text(surface, edit.blob, textPos, &p);
+      surface->restore();
+    }
   }
 
   surface->save();
@@ -198,7 +205,7 @@ int app_main(int argc, char* argv[])
   while (running) {
     if (redraw) {
       redraw = false;
-      draw_window(window.get(), fontMgr, font, fontBig, mousePos, edit);
+      draw_window(system.get(), window.get(), fontMgr, font, fontBig, mousePos, edit);
     }
 
     Event ev;
