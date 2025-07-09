@@ -1,5 +1,5 @@
 # LAF OS
-# Copyright (C) 2018-2024  Igara Studio S.A.
+# Copyright (C) 2018-2025  Igara Studio S.A.
 # Copyright (C) 2012-2018  David Capello
 
 ######################################################################
@@ -106,6 +106,8 @@ if(WIN32)
   IF (LAF_WITH_IME)
     target_compile_definitions(laf-os PUBLIC
       LAF_WITH_IME)
+    list(APPEND LAF_OS_PLATFORM_LIBS
+      imm32)
   endif()
 
   # Don't define min/max() macros when including <windows.h>

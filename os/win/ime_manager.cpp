@@ -8,16 +8,12 @@
   #include "config.h"
 #endif
 
-#include "ime_manager.h"
-
-#include "base/debug.h"
-#include "os/event_queue.h"
+#include "os/win/ime_manager.h"
 
 #include <windows.h>
 
 // Must be included after windows.h
 #include <imm.h>
-#pragma comment(lib, "imm32.lib")
 
 namespace os {
 
