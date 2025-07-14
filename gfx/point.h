@@ -1,5 +1,5 @@
 // LAF Gfx Library
-// Copyright (C) 2020-2024  Igara Studio S.A.
+// Copyright (C) 2020-2025  Igara Studio S.A.
 // Copyright (C) 2001-2016  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -91,30 +91,60 @@ public:
   }
 
   template<typename U>
+  [[nodiscard]]
   PointT operator+(const PointT<U>& pt) const
   {
     return PointT(x + pt.x, y + pt.y);
   }
 
   template<typename U>
+  [[nodiscard]]
   PointT operator-(const PointT<U>& pt) const
   {
     return PointT(x - pt.x, y - pt.y);
   }
 
-  PointT operator+(const T& value) const { return PointT(x + value, y + value); }
+  [[nodiscard]]
+  PointT operator+(const T& value) const
+  {
+    return PointT(x + value, y + value);
+  }
 
-  PointT operator-(const T& value) const { return PointT(x - value, y - value); }
+  [[nodiscard]]
+  PointT operator-(const T& value) const
+  {
+    return PointT(x - value, y - value);
+  }
 
-  PointT operator*(const T& value) const { return PointT(x * value, y * value); }
+  [[nodiscard]]
+  PointT operator*(const T& value) const
+  {
+    return PointT(x * value, y * value);
+  }
 
-  PointT operator/(const T& value) const { return PointT(x / value, y / value); }
+  [[nodiscard]]
+  PointT operator/(const T& value) const
+  {
+    return PointT(x / value, y / value);
+  }
 
-  PointT operator-() const { return PointT(-x, -y); }
+  [[nodiscard]]
+  PointT operator-() const
+  {
+    return PointT(-x, -y);
+  }
 
-  bool operator==(const PointT& pt) const { return x == pt.x && y == pt.y; }
+  [[nodiscard]]
+  bool operator==(const PointT& pt) const
+  {
+    return x == pt.x && y == pt.y;
+  }
 
-  bool operator!=(const PointT& pt) const { return x != pt.x || y != pt.y; }
+  [[nodiscard]]
+  bool operator!=(const PointT& pt) const
+  {
+    return x != pt.x || y != pt.y;
+  }
 };
 
 using Point = PointT<int>;

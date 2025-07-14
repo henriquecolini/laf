@@ -1,5 +1,5 @@
 // LAF Gfx Library
-// Copyright (C) 2019-2024  Igara Studio S.A.
+// Copyright (C) 2019-2025  Igara Studio S.A.
 // Copyright (C) 2001-2017  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -94,20 +94,40 @@ public:
 
   // Verifies if the width and/or height of the rectangle are less or
   // equal than zero.
-  bool isEmpty() const { return (w <= 0 || h <= 0); }
+  [[nodiscard]]
+  bool isEmpty() const
+  {
+    return (w <= 0 || h <= 0);
+  }
 
   // Returns the middle point of the rectangle (x+w/2, y+h/2).
-  PointT<T> center() const { return PointT<T>(x + w / 2, y + h / 2); }
+  [[nodiscard]]
+  PointT<T> center() const
+  {
+    return PointT<T>(x + w / 2, y + h / 2);
+  }
 
   // Returns the point in the upper-left corner (that is inside the
   // rectangle).
-  PointT<T> origin() const { return PointT<T>(x, y); }
+  [[nodiscard]]
+  PointT<T> origin() const
+  {
+    return PointT<T>(x, y);
+  }
 
   // Returns point in the lower-right corner that is outside the
   // rectangle (x+w, y+h).
-  PointT<T> point2() const { return PointT<T>(x + w, y + h); }
+  [[nodiscard]]
+  PointT<T> point2() const
+  {
+    return PointT<T>(x + w, y + h);
+  }
 
-  SizeT<T> size() const { return SizeT<T>(w, h); }
+  [[nodiscard]]
+  SizeT<T> size() const
+  {
+    return SizeT<T>(w, h);
+  }
 
   RectT& setOrigin(const PointT<T>& pt)
   {
@@ -239,14 +259,20 @@ public:
   }
 
   // Returns true if this rectangle encloses the pt point.
+  [[nodiscard]]
   bool contains(const PointT<T>& pt) const
   {
     return pt.x >= x && pt.x < x + w && pt.y >= y && pt.y < y + h;
   }
 
-  bool contains(const T& u, const T& v) const { return u >= x && u < x + w && v >= y && v < y + h; }
+  [[nodiscard]]
+  bool contains(const T& u, const T& v) const
+  {
+    return u >= x && u < x + w && v >= y && v < y + h;
+  }
 
   // Returns true if this rectangle entirely contains the rc rectangle.
+  [[nodiscard]]
   bool contains(const RectT& rc) const
   {
     if (isEmpty() || rc.isEmpty())
@@ -257,6 +283,7 @@ public:
 
   // Returns true if the intersection between this rectangle with rc
   // rectangle is not empty.
+  [[nodiscard]]
   bool intersects(const RectT& rc) const
   {
     if (isEmpty() || rc.isEmpty())
@@ -266,6 +293,7 @@ public:
   }
 
   // Returns the union rectangle between this and rc rectangle.
+  [[nodiscard]]
   RectT createUnion(const RectT& rc) const
   {
     if (isEmpty())
@@ -278,6 +306,7 @@ public:
   }
 
   // Returns the intersection rectangle between this and rc rectangles.
+  [[nodiscard]]
   RectT createIntersection(const RectT& rc) const
   {
     if (intersects(rc))

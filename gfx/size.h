@@ -38,8 +38,13 @@ public:
 
   explicit SizeT(const PointT<T>& point) : w(point.x), h(point.y) {}
 
-  SizeT createUnion(const SizeT& sz) const { return SizeT(std::max(w, sz.w), std::max(h, sz.h)); }
+  [[nodiscard]]
+  SizeT createUnion(const SizeT& sz) const
+  {
+    return SizeT(std::max(w, sz.w), std::max(h, sz.h));
+  }
 
+  [[nodiscard]]
   SizeT createIntersection(const SizeT& sz) const
   {
     return SizeT(std::min(w, sz.w), std::min(h, sz.h));
@@ -112,31 +117,83 @@ public:
 
   const SizeT& operator&=(const SizeT& sz) { return *this = createIntersection(sz); }
 
-  SizeT operator+(const SizeT& sz) const { return SizeT(w + sz.w, h + sz.h); }
+  [[nodiscard]]
+  SizeT operator+(const SizeT& sz) const
+  {
+    return SizeT(w + sz.w, h + sz.h);
+  }
 
-  SizeT operator-(const SizeT& sz) const { return SizeT(w - sz.w, h - sz.h); }
+  [[nodiscard]]
+  SizeT operator-(const SizeT& sz) const
+  {
+    return SizeT(w - sz.w, h - sz.h);
+  }
 
-  SizeT operator+(const BorderT<T>& br) const { return SizeT(w + br.width(), h + br.height()); }
+  [[nodiscard]]
+  SizeT operator+(const BorderT<T>& br) const
+  {
+    return SizeT(w + br.width(), h + br.height());
+  }
 
-  SizeT operator-(const BorderT<T>& br) const { return SizeT(w - br.width(), h - br.height()); }
+  [[nodiscard]]
+  SizeT operator-(const BorderT<T>& br) const
+  {
+    return SizeT(w - br.width(), h - br.height());
+  }
 
-  SizeT operator+(const T& value) const { return SizeT(w + value, h + value); }
+  [[nodiscard]]
+  SizeT operator+(const T& value) const
+  {
+    return SizeT(w + value, h + value);
+  }
 
-  SizeT operator-(const T& value) const { return SizeT(w - value, h - value); }
+  [[nodiscard]]
+  SizeT operator-(const T& value) const
+  {
+    return SizeT(w - value, h - value);
+  }
 
-  SizeT operator*(const T& value) const { return SizeT(w * value, h * value); }
+  [[nodiscard]]
+  SizeT operator*(const T& value) const
+  {
+    return SizeT(w * value, h * value);
+  }
 
-  SizeT operator/(const T& value) const { return SizeT(w / value, h / value); }
+  [[nodiscard]]
+  SizeT operator/(const T& value) const
+  {
+    return SizeT(w / value, h / value);
+  }
 
-  SizeT operator-() const { return SizeT(-w, -h); }
+  [[nodiscard]]
+  SizeT operator-() const
+  {
+    return SizeT(-w, -h);
+  }
 
-  SizeT operator|(const SizeT& other) const { return createUnion(other); }
+  [[nodiscard]]
+  SizeT operator|(const SizeT& other) const
+  {
+    return createUnion(other);
+  }
 
-  SizeT operator&(const SizeT& other) const { return createIntersection(other); }
+  [[nodiscard]]
+  SizeT operator&(const SizeT& other) const
+  {
+    return createIntersection(other);
+  }
 
-  bool operator==(const SizeT& sz) const { return w == sz.w && h == sz.h; }
+  [[nodiscard]]
+  bool operator==(const SizeT& sz) const
+  {
+    return w == sz.w && h == sz.h;
+  }
 
-  bool operator!=(const SizeT& sz) const { return w != sz.w || h != sz.h; }
+  [[nodiscard]]
+  bool operator!=(const SizeT& sz) const
+  {
+    return w != sz.w || h != sz.h;
+  }
 };
 
 using Size = SizeT<int>;
