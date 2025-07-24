@@ -833,23 +833,24 @@ void WindowWin::setLayout(const std::string& layout)
 void WindowWin::setTextInput(bool state, const gfx::Point& screenCaretPos)
 {
   m_textInput = state;
+
 #if LAF_WITH_IME
   auto imeManager = os::IMEManagerWin::instance();
   imeManager->setTextInput(state);
   imeManager->setScreenCaretPos(screenCaretPos);
 #endif
 
-  // Here we clear dead keys so we don't get those keys in the new
-  // "translate dead keys" state. E.g. If we focus a text entry
-  // field and the translation of dead keys is enabled, we don't
-  // want to get previous dead keys. The same in case we leave the
-  // text field with a pending dead key, that dead key must be
-  // discarded.
-  VkToUnicode tu;
-  if (tu) {
-    tu.toUnicode(VK_SPACE, 0);
-    if (tu.size() != 0)
+  if (!state) {
+    // When we disable the text input (e.g. change to another
+    // widget/text field) we have to discard the daed key.  To change
+    // to another text field you should setTextInput(false) and then
+    // setTextInput(true).
+    VkToUnicode tu;
+    if (tu) {
       tu.toUnicode(VK_SPACE, 0);
+      if (tu.size() != 0)
+        tu.toUnicode(VK_SPACE, 0);
+    }
   }
 }
 
