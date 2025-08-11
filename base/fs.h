@@ -50,6 +50,7 @@ void set_current_path(const std::string& path);
 
 std::string get_app_path();
 std::string get_temp_path();
+std::string get_events_fifo_path();
 std::string get_user_docs_folder();
 #if __APPLE__
 std::string get_lib_app_support_path();

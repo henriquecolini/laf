@@ -23,6 +23,8 @@ public:
   void queueEvent(const Event& ev) override;
   void getEvent(Event& ev, double timeout) override;
   void clearEvents() override;
+  EventQueueX11();
+  ~EventQueueX11() override;
 
   bool isEmpty() const { return m_events.empty(); }
 
@@ -30,6 +32,7 @@ private:
   void processX11Event(XEvent& event);
 
   base::concurrent_queue<Event> m_events;
+  int pipe_fd = -1;
 };
 
 using EventQueueImpl = EventQueueX11;

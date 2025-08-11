@@ -120,6 +120,13 @@ std::string get_file_extension(const std::string& filename)
   return result;
 }
 
+std::string get_events_fifo_path()
+{
+  std::string appName = get_app_name();
+  std::string pipeName = appName + ".fifo";
+  return join_path(get_temp_path(), pipeName);
+}
+
 std::string replace_extension(const std::string& filename, const std::string& extension)
 {
   std::string::const_reverse_iterator rit;

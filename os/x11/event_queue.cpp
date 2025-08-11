@@ -11,12 +11,14 @@
 
 #include "os/x11/event_queue.h"
 
-#include "base/thread.h"
+#include "base/fs.h"
 #include "os/x11/window.h"
 
 #include <X11/Xlib.h>
-
+#include <fcntl.h>
 #include <sys/select.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #define EV_TRACE(...)
 
@@ -83,6 +85,30 @@ void wait_file_descriptor_for_reading(int fd, base::tick_t timeoutMilliseconds)
 }
 
 } // anonymous namespace
+
+EventQueueX11::EventQueueX11()
+{
+  const auto fifoPath = base::get_events_fifo_path();
+  // Create the FIFO if it doesn't exist yet
+  if (mkfifo(fifoPath.c_str(), 0666) == -1) {
+    if (errno != EEXIST) {
+      EV_TRACE("XEvent: Failed to create named pipe\n");
+      return;
+    }
+  }
+  pipe_fd = open(fifoPath.c_str(), O_RDONLY | O_NONBLOCK);
+  if (pipe_fd == -1) {
+    EV_TRACE("XEvent: Failed to open named pipe\n");
+  }
+}
+
+EventQueueX11::~EventQueueX11()
+{
+  if (pipe_fd != -1) {
+    close(pipe_fd);
+    pipe_fd = -1;
+  }
+}
 
 void EventQueueX11::queueEvent(const Event& ev)
 {
@@ -159,6 +185,27 @@ void EventQueueX11::getEvent(Event& ev, double timeout)
     }
     else {
       processX11Event(event);
+    }
+  }
+
+  if (pipe_fd != -1) {
+    char buf[4096];
+    ssize_t n = read(pipe_fd, buf, sizeof(buf) - 1);
+    if (n > 0) {
+      buf[n] = 0;
+      std::vector<std::string> files;
+      std::istringstream iss(buf);
+      std::string line;
+      while (std::getline(iss, line)) {
+        if (!line.empty())
+          files.push_back(line);
+      }
+      if (!files.empty()) {
+        Event dropEv;
+        dropEv.setType(Event::DropFiles);
+        dropEv.setFiles(files);
+        os::queue_event(dropEv);
+      }
     }
   }
 
