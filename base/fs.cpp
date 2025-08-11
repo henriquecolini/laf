@@ -13,6 +13,7 @@
 #include "base/split_string.h"
 #include "base/string.h"
 #include "base/utf8_decode.h"
+#include "ver/info.h"
 
 #if LAF_WINDOWS
   #include "base/fs_win32.h"
